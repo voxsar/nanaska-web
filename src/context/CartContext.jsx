@@ -11,7 +11,7 @@ export function CartProvider({ children }) {
         const { items, expiry } = JSON.parse(stored);
         if (Date.now() < expiry) return items;
       }
-    } catch {}
+    } catch (_e) { /* ignore */ }
     return [];
   });
   const [mergeAnimation, setMergeAnimation] = useState(null);
