@@ -16,7 +16,7 @@ const NAV_LINKS = [
   },
   { label: 'Testimonials', href: '#testimonials' },
   { label: 'Blog', href: '#blog' },
-  { label: 'Contact Us', href: '#contact' },
+  { label: 'Contact Us', href: '#contact-us' },
 ];
 
 const TOP_LINKS = [

@@ -7,7 +7,7 @@ const FOOTER_LINKS = {
     { label: 'Courses', href: '#courses' },
     { label: 'Testimonials', href: '#testimonials' },
     { label: 'Blog', href: '#blog' },
-    { label: 'Contact Us', href: '#contact' },
+    { label: 'Contact Us', href: '#contact-us' },
   ],
   'CIMA Levels': [
     { label: 'Certificate Level', href: '#certificate' },
@@ -29,7 +29,7 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="footer" id="contact">
+    <footer className="footer" id="footer">
       <div className="footer__top">
         <div className="footer__container">
           <div className="footer__brand">

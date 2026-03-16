@@ -8,6 +8,7 @@ import Stats from './components/Stats';
 import News from './components/News';
 import Testimonials from './components/Testimonials';
 import Connect from './components/Connect';
+import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <News />
       <Testimonials />
       <Connect />
+      <Contact />
       <Footer />
     </>
   );
