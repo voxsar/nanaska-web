@@ -7,9 +7,9 @@
 }
 
 .footer__container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 2.5rem;
@@ -184,7 +184,7 @@
 }
 
 .footer__payments-inner {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
   display: flex;
   flex-direction: column;

@@ -5,9 +5,9 @@
 }
 
 .lecturer__container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 4rem;
@@ -27,7 +27,7 @@
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 16px;
+  border-radius: 0;
   box-shadow: 0 24px 60px rgba(27, 54, 93, 0.2);
   position: relative;
   z-index: 1;
@@ -40,7 +40,7 @@
   width: 100%;
   height: 100%;
   border: 4px solid #24ade3;
-  border-radius: 16px;
+  border-radius: 0;
   z-index: 0;
   opacity: 0.45;
 }
@@ -76,7 +76,7 @@
   background-color: #e8f4fd;
   color: #1b365d;
   border: 1px solid #b8d8f0;
-  border-radius: 50px;
+  border-radius: 0;
   padding: 0.3rem 0.85rem;
   font-size: 0.78rem;
   font-weight: 700;
