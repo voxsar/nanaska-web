@@ -23,7 +23,10 @@ export default function Footer() {
 
   const handleSubscribe = (e) => {
     e.preventDefault();
-    if (email) { setSubscribed(true); setEmail(''); }
+    if (email) {
+      setSubscribed(true);
+      setEmail('');
+    }
   };
 
   return (
@@ -37,23 +40,33 @@ export default function Footer() {
               <span className="footer__logo-nanaska">NAN</span>
               <span className="footer__logo-accent">ASKA</span>
             </Link>
+
             <p className="footer__tagline">
               Join with the best CIMA study partner with inspirational individual support!
             </p>
+
             <div className="footer__social">
               {SOCIAL_LINKS.map((s) => (
-                <a key={s.label} href={s.href} className="footer__social-link"
-                   aria-label={s.label} target="_blank" rel="noopener noreferrer">
+                <a
+                  key={s.label}
+                  href={s.href}
+                  className="footer__social-link"
+                  aria-label={s.label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {s.initial}
                 </a>
               ))}
             </div>
+
             <img
               src="https://www.nanaska.com/wp-content/uploads/2023/02/secure-payments-logos-v2-1-2048x826.png"
-              alt="Bank logos representing PCI DSS certified and 3D Secure payments, ensuring safe and secure transactions"
+              alt="Secure payment logos"
               className="footer__payments-img"
               loading="lazy"
             />
+
             <p className="footer__copyright">
               © Copyright 2022 - Artslab Creatives - All Rights Reserved
             </p>
@@ -62,10 +75,16 @@ export default function Footer() {
           {/* Get In Touch */}
           <div className="footer__col">
             <h4 className="footer__col-heading">GET IN TOUCH</h4>
+
             <div className="footer__contact-item">
               <span className="footer__contact-icon">📍</span>
-              <p>331 Galle Rd,<br />Colombo 00300<br />Sri Lanka</p>
+              <p>
+                331 Galle Rd,<br />
+                Colombo 00300<br />
+                Sri Lanka
+              </p>
             </div>
+
             <div className="footer__contact-item">
               <span className="footer__contact-icon">📞</span>
               <p>
@@ -74,23 +93,35 @@ export default function Footer() {
                 (+94) 0112575016
               </p>
             </div>
+
             <div className="footer__contact-item">
               <span className="footer__contact-icon">✉</span>
-              <a href="mailto:info@nanaska.com" className="footer__col-link">info@nanaska.com</a>
+              <a href="mailto:info@nanaska.com" className="footer__col-link">
+                info@nanaska.com
+              </a>
             </div>
           </div>
 
           {/* Learn More */}
           <div className="footer__col">
             <h4 className="footer__col-heading">LEARN MORE</h4>
+
             <ul className="footer__col-links">
               {LEARN_MORE_LINKS.map((link) => (
                 <li key={link.label}>
                   {link.external ? (
-                    <a href={link.href} className="footer__col-link"
-                       target="_blank" rel="noopener noreferrer">{link.label}</a>
+                    <a
+                      href={link.href}
+                      className="footer__col-link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                    </a>
                   ) : (
-                    <a href={link.href} className="footer__col-link">{link.label}</a>
+                    <a href={link.href} className="footer__col-link">
+                      {link.label}
+                    </a>
                   )}
                 </li>
               ))}
@@ -100,11 +131,20 @@ export default function Footer() {
           {/* Subscribe */}
           <div className="footer__col">
             <h4 className="footer__col-heading">SUBSCRIBE NOW</h4>
-            <p className="footer__subscribe-text">Subscribe for free CIMA study materials</p>
+
+            <p className="footer__subscribe-text">
+              Subscribe for free CIMA study materials
+            </p>
+
             {subscribed ? (
-              <p className="footer__subscribe-success">✓ Thank you for subscribing!</p>
+              <p className="footer__subscribe-success">
+                ✓ Thank you for subscribing!
+              </p>
             ) : (
-              <form className="footer__subscribe-form" onSubmit={handleSubscribe}>
+              <form
+                className="footer__subscribe-form"
+                onSubmit={handleSubscribe}
+              >
                 <input
                   type="email"
                   className="footer__subscribe-input"
@@ -113,7 +153,13 @@ export default function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <button type="submit" className="footer__subscribe-btn">Subscribe</button>
+
+                <button
+                  type="submit"
+                  className="footer__subscribe-btn"
+                >
+                  Subscribe
+                </button>
               </form>
             )}
           </div>
@@ -123,19 +169,31 @@ export default function Footer() {
 
       <div className="footer__bottom">
         <div className="footer__bottom-inner">
+
           <p className="footer__copy">
             © {new Date().getFullYear()} Nanaska. All rights reserved.
           </p>
+
           <div className="footer__legal">
-            <a href="https://www.nanaska.com/terms-and-conditions/"
-               className="footer__legal-link" target="_blank" rel="noopener noreferrer">
-              Terms &amp; Conditions
+            <a
+              href="https://www.nanaska.com/terms-and-conditions/"
+              className="footer__legal-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Terms & Conditions
             </a>
-            <a href="https://www.nanaska.com/privacy-policy/"
-               className="footer__legal-link" target="_blank" rel="noopener noreferrer">
+
+            <a
+              href="https://www.nanaska.com/privacy-policy/"
+              className="footer__legal-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Privacy Policy
             </a>
           </div>
+
         </div>
       </div>
     </footer>
