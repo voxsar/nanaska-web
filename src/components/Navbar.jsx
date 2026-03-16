@@ -5,6 +5,32 @@ import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
 import './Navbar.css';
 
+const NAV_LINKS = [
+  { label: 'Home', to: '/' },
+  {
+    label: 'About Us',
+    to: '/about',
+    dropdown: [
+      { label: 'Our Faculty', to: '/our-faculty' },
+      { label: 'Our Specialty', to: '/our-specialty' },
+      { label: 'Nanaska Alumni', to: '/nanaska-alumni' },
+    ],
+  },
+  {
+    label: 'Courses',
+    to: null,
+    dropdown: [
+      { label: 'Certificate Level', to: '/cima-certificate-level' },
+      { label: 'Operational Level', to: '/cima-operational-level' },
+      { label: 'Management Level', to: '/cima-management-level' },
+      { label: 'Strategic Level', to: '/cima-strategic-level' },
+    ],
+  },
+  { label: 'Testimonials', to: '/testimonials' },
+  { label: 'Blog', to: '/#blog' },
+  { label: 'Contact Us', to: '/#contact' },
+];
+
 const TOP_LINKS = [
   { label: 'LMS', href: 'https://nanaska.webcolms.com/login' },
   { label: 'Online Exams', href: 'https://exam.nanaska.com/index.php?r=site/login' },

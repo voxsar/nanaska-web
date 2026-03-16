@@ -1,0 +1,58 @@
+.funnel-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(13, 32, 64, 0.1);
+}
+
+.funnel-header__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.funnel-header__logo {
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+.funnel-header__logo-nan {
+  color: #1b365d;
+}
+
+.funnel-header__logo-aska {
+  color: #24ade3;
+}
+
+.funnel-header__cta {
+  background: linear-gradient(135deg, #24ade3, #1b8ec0);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.6rem 1.6rem;
+  border-radius: 50px;
+  text-decoration: none;
+  letter-spacing: 0.3px;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 3px 14px rgba(36, 173, 227, 0.35);
+}
+
+.funnel-header__cta:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(36, 173, 227, 0.45);
+}
+
+@media (max-width: 480px) {
+  .funnel-header__inner { padding: 0.7rem 1.25rem; }
+  .funnel-header__logo { font-size: 1.2rem; }
+}

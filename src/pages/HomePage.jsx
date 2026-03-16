@@ -18,7 +18,7 @@ export default function HomePage() {
       <LeadLecturer />
       <Stats />
       <News />
-      <Testimonials />
+      <Testimonials compact />
       <Connect />
     </>
   );
