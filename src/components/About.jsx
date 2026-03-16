@@ -1,14 +1,19 @@
+import { useRef } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import './About.css';
 
 export default function About() {
+  const sectionRef = useRef(null);
+  useScrollReveal(sectionRef);
+
   return (
-    <section className="about" id="about">
+    <section className="about" id="about" ref={sectionRef}>
       {/* Full-bleed background image with overlay */}
       <div className="about__bg" aria-hidden="true" />
 
       <div className="about__inner">
         {/* Left column – enroll CTA */}
-        <div className="about__col about__col--enroll">
+        <div className="about__col about__col--enroll" data-reveal="left">
           <span className="about__eyebrow">Latest Batch Now Open</span>
           <h2 className="about__title">Start Your CIMA Journey Today</h2>
           <p className="about__body">
@@ -23,7 +28,7 @@ export default function About() {
         <div className="about__col about__col--empty" aria-hidden="true" />
 
         {/* Right column – stats + testimonial */}
-        <div className="about__col about__col--stats">
+        <div className="about__col about__col--stats" data-reveal="right">
           <div className="about__metrics">
             {[
               { number: '5,000+', label: 'Graduates' },
@@ -39,8 +44,8 @@ export default function About() {
 
           <blockquote className="about__quote">
             <p className="about__quote-text">
-              "Nanaska gave me the skills and confidence to pass all my CIMA
-              exams first time. The support is truly world-class."
+              &ldquo;Nanaska gave me the skills and confidence to pass all my CIMA
+              exams first time. The support is truly world-class.&rdquo;
             </p>
             <footer className="about__quote-footer">— Sarah K., CGMA</footer>
           </blockquote>

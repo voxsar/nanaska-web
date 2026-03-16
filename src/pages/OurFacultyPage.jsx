@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import './OurFacultyPage.css';
 
 const FACULTY = [
@@ -8,7 +9,7 @@ const FACULTY = [
     name: 'Channa Gunawardana',
     credentials: 'MBA, FCA, FCMA, BSc First Class',
     role: 'CEO & Lead Lecturer — CIMA Case Study Specialist',
-    img: 'https://www.nanaska.com/wp-content/uploads/2021/03/Lead-Lecturer-home-page-.jpg',
+    img: 'https://www.nanaska.com/wp-content/uploads/2021/04/Channa.png',
     bio: "Channa Gunawardana serves as the CEO of a public listed company in Sri Lanka and is a Fellow Member of both CIMA UK and CA Sri Lanka. He holds a Bachelor's degree in Accountancy and Financial Management from the University of Sri Jayewardenepura and an MBA in Finance from the University of Southern Queensland, Australia. He is also pursuing a PhD at Management and Science University, Malaysia. With 21+ years of lecturing experience, he is renowned as Sri Lanka's CIMA Case Study Specialist — having produced over 95% of Sri Lanka's CIMA prize winners over the past decade, including global prize winners. He is also a Member of the CIMA Global Council.",
     tag: '🏆 Lead',
   },
@@ -43,18 +44,18 @@ const FACULTY = [
     id: 'shervin',
     name: 'Shervin Perera',
     credentials: 'ACMA (UK), CGMA, MBA (UOS)',
-    role: 'Lecturer',
-    img: 'https://www.nanaska.com/wp-content/uploads/2024/07/IMG_8581-1-copy.png',
-    bio: 'Shervin Perera is an ACMA-qualified professional with a CGMA designation and an MBA from the University of Salford, bringing strong analytical and strategic finance skills to the Nanaska faculty.',
-    tag: '📈 Lecturer',
+    role: 'Lecturer — F2 & BA3',
+    img: 'https://www.nanaska.com/wp-content/uploads/2024/06/Shervin_Perera-removebg-preview.png',
+    bio: 'Shervin Perera holds impressive credentials including ACMA (UK), CGMA, and an MBA from the University of Southampton. His extensive expertise in management accounting and business analysis is invaluable as he teaches the F2 and BA3 subjects at Nanaska.',
+    tag: '📈 F2 & BA3',
   },
   {
     id: 'mark',
     name: 'Mark Gunathilake',
     credentials: 'B.Sc. Hons (USJ), ACMA, CGMA (SCS Prize Winner)',
-    role: 'Case Study Lecturer',
+    role: 'Lecturer — P2, OCS & BA2',
     img: 'https://www.nanaska.com/wp-content/uploads/2025/01/Untitled-design-11.png',
-    bio: 'Mark Gunathilake is an ACMA, CGMA professional and a former CIMA Strategic Case Study Prize Winner. His first-hand knowledge of excelling in CIMA case study exams gives students a unique practical edge in their preparation at Nanaska.',
+    bio: 'Mark Gunathilake is an ACMA, CGMA professional and a former CIMA Strategic Case Study Prize Winner. He also holds a 1st Class Bachelor\'s Degree in Accountancy from USJ and brings experience from one of the Big 4 audit firms. He is the P2, OCS and BA2 lecturer at Nanaska.',
     tag: '🥇 SCS Winner',
   },
   {
@@ -66,13 +67,51 @@ const FACULTY = [
     bio: 'Osmand Fernando holds an MBA from the United Kingdom and ACMA/CGMA qualifications, bringing international perspective and professional finance expertise to Nanaska students.',
     tag: '🌐 Lecturer',
   },
+  {
+    id: 'lasantha',
+    name: 'Lasantha Vidanagamage',
+    credentials: 'CIMA Passed Finalist, MPAcc (USJ), BPharm (USJ)',
+    role: 'Lecturer — P2 Advanced Management Accounting',
+    img: 'https://www.nanaska.com/wp-content/uploads/2024/07/441312389_467371879000666_851286037044610417_n-copy-1.png',
+    bio: 'Lasantha Vidanagamage is a CIMA pass finalist and holds both a Master of Professional Accounting (MPAcc) and a Bachelor of Pharmacy (BPharm) from the University of Sri Jayewardenepura. His diverse academic background and extensive expertise in management accounting provide students with a comprehensive and practical learning experience.',
+    tag: '📋 P2',
+  },
+  {
+    id: 'sanuda',
+    name: 'Sanuda Minuraka',
+    credentials: 'BSc Hons 1st Class Accounting & Finance (Plymouth University UK), CIMA Passed Finalist',
+    role: 'Lecturer — BA1',
+    img: 'https://www.nanaska.com/wp-content/uploads/2025/01/Untitled-design-12.png',
+    bio: 'Sanuda Minuraka holds a First-Class Honours degree in Accounting & Finance from Plymouth University, UK, reflecting his academic excellence and in-depth knowledge of the field. As a CIMA Passed Finalist, Sanuda combines his strong theoretical foundation with practical insights into management accounting, making his teaching highly engaging and relevant to real-world applications.',
+    tag: '🎓 BA1',
+  },
+  {
+    id: 'janith',
+    name: 'Janith Jayasinghe',
+    credentials: 'LB (Hons), Affiliate CIPM, Attorney-at-Law, Notary Public, Commissioner for Oaths, Company Secretary',
+    role: 'Lecturer — Law, Ethics & HRM',
+    img: 'https://www.nanaska.com/wp-content/uploads/2025/01/Untitled-design-15.png',
+    bio: 'Janith Jayasinghe is a multifaceted professional excelling in both the legal and human resources domains. Holding an LB (Hons) degree and a Professional Qualification in HRM from CIPM, he is an Attorney-at-Law, Notary Public, Commissioner for Oaths, and a Company Secretary. As an Affiliate CIPM, Janith brings a unique blend of legal expertise and HR management proficiency, making him a well-rounded professional in his field.',
+    tag: '⚖️ Law & HRM',
+  },
+  {
+    id: 'ali',
+    name: 'Ali Raheem',
+    credentials: 'BSc USJ (UG), CIMA Exams Complete',
+    role: 'Lecturer — BA2',
+    img: 'https://www.nanaska.com/wp-content/uploads/2025/01/Untitled-design-13.png',
+    bio: "Ali Raheem is a CIMA passed finalist, having completed the qualification within a span of 2 years. He is a product of St. Peter's College, Colombo and is currently an Undergraduate at the University of Sri Jayewardenepura. Ali has been an assistant lecturer at Nanaska since 2019 and he is the BA2 lecturer at Nanaska.",
+    tag: '📗 BA2',
+  },
 ];
 
 export default function OurFacultyPage() {
   const [active, setActive] = useState(null);
+  const pageRef = useRef(null);
+  useScrollReveal(pageRef);
 
   return (
-    <div className="faculty-page">
+    <div className="faculty-page" ref={pageRef}>
       {/* Hero */}
       <section className="faculty-page__hero">
         <div className="faculty-page__hero-inner">
@@ -95,7 +134,7 @@ export default function OurFacultyPage() {
       {/* Faculty Grid */}
       <section className="faculty-page__grid-section">
         <div className="faculty-page__container">
-          <div className="faculty-grid">
+          <div className="faculty-grid" data-reveal-stagger>
             {FACULTY.map((member) => (
               <div
                 key={member.id}
@@ -125,9 +164,9 @@ export default function OurFacultyPage() {
 
       {/* CTA */}
       <section className="faculty-page__cta">
-        <div className="faculty-page__container faculty-page__cta-inner">
+        <div className="faculty-page__container faculty-page__cta-inner" data-reveal="fade">
           <h2>Ready to start your CIMA journey?</h2>
-          <p>Learn from Sri Lanka's best — register today and get expert guidance every step of the way.</p>
+          <p>Learn from Sri Lanka&apos;s best — register today and get expert guidance every step of the way.</p>
           <a
             href="https://www.nanaska.com/onboarding/courses/gather/students/registration/begin/entry/"
             className="faculty-page__cta-btn"

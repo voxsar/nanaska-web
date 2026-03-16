@@ -1,129 +1,385 @@
-.lecturer {
-  background-color: #ffffff;
-  padding: 7rem 0;
+/* =========================================================
+   Faculty Carousel Section
+   ========================================================= */
+.faculty {
+  background: linear-gradient(160deg, #f0f6ff 0%, #ffffff 100%);
+  padding: 6rem 0 4rem;
   overflow: hidden;
+  position: relative;
 }
 
-.lecturer__container {
-  max-width: var(--max-width);
-  margin: 0 auto;
+/* ── Section header ── */
+.faculty__header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem;
   padding: 0 2rem;
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  gap: 4rem;
-  align-items: center;
 }
 
-/* Image */
-.lecturer__img-col { display: flex; justify-content: center; }
-
-.lecturer__img-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-}
-
-.lecturer__img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 0;
-  box-shadow: 0 24px 60px rgba(27, 54, 93, 0.2);
-  position: relative;
-  z-index: 1;
-}
-
-.lecturer__img-accent {
-  position: absolute;
-  bottom: -18px;
-  right: -18px;
-  width: 100%;
-  height: 100%;
-  border: 4px solid #24ade3;
-  border-radius: 0;
-  z-index: 0;
-  opacity: 0.45;
-}
-
-/* Body */
-.lecturer__eyebrow {
+.faculty__eyebrow {
   display: inline-block;
   color: #24ade3;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   margin-bottom: 0.6rem;
 }
 
-.lecturer__name {
-  font-size: clamp(1.75rem, 3vw, 2.6rem);
+.faculty__title {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
   font-weight: 900;
   color: #1b365d;
-  margin: 0 0 1.1rem;
+  margin: 0 0 0.8rem;
   line-height: 1.15;
 }
 
-.lecturer__credentials {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+.faculty__subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.7;
+  margin: 0;
 }
 
-.lecturer__badge {
-  display: inline-block;
-  background-color: #e8f4fd;
-  color: #1b365d;
-  border: 1px solid #b8d8f0;
+/* ── Thumbnail strip ── */
+.faculty__strip {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0 2rem 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.faculty__thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0.35rem;
   border-radius: 0;
-  padding: 0.3rem 0.85rem;
-  font-size: 0.78rem;
+  transition: border-color 0.25s, transform 0.25s;
+  position: relative;
+}
+
+.faculty__thumb:hover {
+  border-color: rgba(36, 173, 227, 0.4);
+  transform: translateY(-3px);
+}
+
+.faculty__thumb--active {
+  border-color: #24ade3;
+  transform: translateY(-3px);
+}
+
+.faculty__thumb-img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(30%);
+  transition: filter 0.3s;
+}
+
+.faculty__thumb--active .faculty__thumb-img,
+.faculty__thumb:hover .faculty__thumb-img {
+  filter: grayscale(0%);
+}
+
+.faculty__thumb-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: center;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.25s;
+}
+
+.faculty__thumb--active .faculty__thumb-name {
+  color: #24ade3;
   font-weight: 700;
 }
 
-.lecturer__bio {
-  color: #4b5563;
-  font-size: 0.97rem;
-  line-height: 1.8;
-  margin: 0 0 1rem;
+/* ── Main panel wrapper ── */
+.faculty__panel-wrap {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 4.5rem;
 }
 
-.lecturer__bio strong { color: #1b365d; }
-
-.lecturer__stats {
-  display: flex;
-  gap: 2.5rem;
-  margin-top: 2rem;
-  flex-wrap: wrap;
+/* ── Main panel ── */
+.faculty__panel {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 4rem;
+  align-items: center;
+  padding: 0 1rem;
+  animation: fadeSlideIn 0.5s ease both;
 }
 
-.lecturer__stat {
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.faculty__panel--next {
+  animation: slideInRight 0.45s ease both;
+}
+
+.faculty__panel--prev {
+  animation: slideInLeft 0.45s ease both;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Image column ── */
+.faculty__img-col {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.faculty__img-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+}
+
+.faculty__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: top center;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 20px 60px rgba(27, 54, 93, 0.2);
+}
+
+.faculty__img-accent {
+  position: absolute;
+  bottom: -14px;
+  right: -14px;
+  width: 100%;
+  height: 100%;
+  border: 4px solid #24ade3;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* Stats */
+.faculty__stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.faculty__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 0.2rem;
 }
 
-.lecturer__stat-number {
-  font-size: 2.2rem;
+.faculty__stat-number {
+  font-size: 1.7rem;
   font-weight: 900;
   color: #24ade3;
   line-height: 1;
 }
 
-.lecturer__stat-label {
-  font-size: 0.8rem;
+.faculty__stat-label {
+  font-size: 0.7rem;
   color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* ── Body column ── */
+.faculty__panel-eyebrow {
+  display: inline-block;
+  color: #24ade3;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.faculty__name {
+  font-size: clamp(1.6rem, 2.5vw, 2.3rem);
+  font-weight: 900;
+  color: #1b365d;
+  margin: 0 0 0.4rem;
+  line-height: 1.2;
+}
+
+.faculty__role {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #24ade3;
+  margin: 0 0 1.1rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-@media (max-width: 960px) {
-  .lecturer__container { grid-template-columns: 1fr; gap: 3rem; }
-  .lecturer__img-wrap  { max-width: 360px; margin: 0 auto; }
+.faculty__credentials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
 }
 
-@media (max-width: 480px) {
-  .lecturer__stats { gap: 1.5rem; }
-  .lecturer__stat-number { font-size: 1.8rem; }
+.faculty__badge {
+  display: inline-block;
+  background-color: #e8f4fd;
+  color: #1b365d;
+  border: 1px solid #b8d8f0;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.faculty__bio {
+  color: #4b5563;
+  font-size: 0.94rem;
+  line-height: 1.8;
+  margin: 0 0 0.85rem;
+}
+
+.faculty__specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.faculty__spec-tag {
+  display: inline-block;
+  background: rgba(36, 173, 227, 0.1);
+  color: #1b365d;
+  border: 1px solid rgba(36, 173, 227, 0.3);
+  padding: 0.25rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 0;
+}
+
+/* ── Arrows ── */
+.faculty__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  background: rgba(27, 54, 93, 0.07);
+  border: 2px solid rgba(27, 54, 93, 0.15);
+  color: #1b365d;
+  font-size: 2.2rem;
+  line-height: 1;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.faculty__arrow:hover {
+  background: #24ade3;
+  border-color: #24ade3;
+  color: #fff;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.faculty__arrow--prev { left: 0; }
+.faculty__arrow--next { right: 0; }
+
+/* ── Dots ── */
+.faculty__dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+  padding: 0 1rem;
+}
+
+.faculty__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid #b8d8f0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s, border-color 0.3s, transform 0.3s, width 0.3s;
+}
+
+.faculty__dot--active {
+  background: #24ade3;
+  border-color: #24ade3;
+  width: 22px;
+  border-radius: 4px;
+}
+
+.faculty__dot:hover:not(.faculty__dot--active) {
+  background: rgba(36, 173, 227, 0.4);
+  border-color: #24ade3;
+}
+
+/* ── Counter ── */
+.faculty__counter {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 0.6rem;
+  letter-spacing: 0.5px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .faculty__panel {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 0;
+  }
+
+  .faculty__img-col { align-items: center; }
+  .faculty__img-wrap { max-width: 280px; }
+  .faculty__panel-wrap { padding: 0 3rem; }
+}
+
+@media (max-width: 640px) {
+  .faculty { padding: 4rem 0 3rem; }
+  .faculty__strip { gap: 0.5rem; padding: 0 1rem 2rem; }
+  .faculty__thumb-img { width: 50px; height: 50px; }
+  .faculty__panel-wrap { padding: 0 2.5rem; }
+  .faculty__arrow { width: 36px; height: 36px; font-size: 1.7rem; }
+  .faculty__arrow--prev { left: -0.25rem; }
+  .faculty__arrow--next { right: -0.25rem; }
+  .faculty__img-wrap { max-width: 220px; }
+  .faculty__stats { gap: 1.2rem; }
 }

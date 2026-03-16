@@ -2,13 +2,13 @@ import { useEffect, useRef } from 'react';
 
 /**
  * useScrollReveal – attaches an IntersectionObserver to the container ref,
- * adding the `revealed` CSS class to every child carrying [data-reveal].
- * Call this once per page component.
+ * adding the `revealed` CSS class to every child carrying [data-reveal]
+ * or [data-reveal-stagger]. Call this once per page/section component.
  */
 export function useScrollReveal(containerRef) {
   useEffect(() => {
     const root = containerRef?.current ?? document;
-    const els = root.querySelectorAll('[data-reveal]');
+    const els = root.querySelectorAll('[data-reveal], [data-reveal-stagger]');
 
     const observer = new IntersectionObserver(
       (entries) => {
