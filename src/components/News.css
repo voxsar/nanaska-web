@@ -1,6 +1,6 @@
 .news {
   background-color: #f5f8fc;
-  padding: 5rem 0;
+  padding: 7rem 0;
   overflow: hidden;
 }
 
@@ -12,7 +12,7 @@
 
 .news__header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
 }
 
 .news__eyebrow {

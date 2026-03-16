@@ -1,6 +1,6 @@
 .connect {
   background-color: #ffffff;
-  padding: 5rem 0;
+  padding: 7rem 0;
 }
 
 .connect__container {
@@ -92,16 +92,16 @@
 .connect__circle--outer {
   width: 300px;
   height: 300px;
-  background: rgba(36, 173, 227, 0.08);
-  border: 2px dashed rgba(36, 173, 227, 0.3);
+  background: rgba(36, 173, 227, 0.05);
+  border: 2px dashed rgba(36, 173, 227, 0.25);
   animation: spin 20s linear infinite;
 }
 
 .connect__circle--mid {
   width: 220px;
   height: 220px;
-  background: rgba(27, 54, 93, 0.06);
-  border: 2px dashed rgba(27, 54, 93, 0.2);
+  background: rgba(27, 54, 93, 0.04);
+  border: 2px dashed rgba(27, 54, 93, 0.15);
   animation: spin 15s linear infinite reverse;
 }
 
