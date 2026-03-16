@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import LecturerPanel from './LecturerPanel';
+import { LECTURERS } from '../data/lecturersData';
 import './CourseLevelPage.css';
 
 export default function CourseLevelPage({ level }) {
   const [activeSubject, setActiveSubject] = useState(level.subjects[0].code);
   const [activeTab, setActiveTab] = useState('overview');
   const currentSubject = level.subjects.find((s) => s.code === activeSubject);
+  const { addCourse, addLevel, isInCart, isLevelInCart } = useCart();
+
+  const levelInCart = isLevelInCart(level.levelId);
 
   return (
     <div className="course-page" style={{ '--level-color': level.color, '--level-gradient': level.gradient }}>
@@ -24,14 +30,23 @@ export default function CourseLevelPage({ level }) {
             <span className="course-page__meta-item">⏱ {level.duration}</span>
             <span className="course-page__meta-item">🏆 {level.qualification}</span>
           </div>
-          <a
-            href="https://www.nanaska.com/onboarding/courses/gather/students/registration/begin/entry/"
-            className="course-page__enroll-btn"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Enroll Now
-          </a>
+          <div className="course-page__hero-actions">
+            <a
+              href="https://www.nanaska.com/onboarding/courses/gather/students/registration/begin/entry/"
+              className="course-page__enroll-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Enroll Now
+            </a>
+            <button
+              className={`course-page__add-level-btn${levelInCart ? ' course-page__add-level-btn--added' : ''}`}
+              onClick={() => addLevel(level)}
+              disabled={levelInCart}
+            >
+              {levelInCart ? '✓ Level Added' : '+ Add Level to Cart'}
+            </button>
+          </div>
         </div>
         <div className="course-page__hero-wave">
           <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
@@ -48,16 +63,28 @@ export default function CourseLevelPage({ level }) {
 
           {/* Subject Selector */}
           <div className="subject-selector">
-            {level.subjects.map((subject) => (
-              <button
-                key={subject.code}
-                className={`subject-selector__btn ${activeSubject === subject.code ? 'subject-selector__btn--active' : ''}`}
-                onClick={() => { setActiveSubject(subject.code); setActiveTab('overview'); }}
-              >
-                <span className="subject-selector__code">{subject.code}</span>
-                <span className="subject-selector__name">{subject.name}</span>
-              </button>
-            ))}
+            {level.subjects.map((subject) => {
+              const subjectInCart = isInCart(subject.code);
+              return (
+                <div key={subject.code} className="subject-selector__item">
+                  <button
+                    className={`subject-selector__btn ${activeSubject === subject.code ? 'subject-selector__btn--active' : ''}`}
+                    onClick={() => { setActiveSubject(subject.code); setActiveTab('overview'); }}
+                  >
+                    <span className="subject-selector__code">{subject.code}</span>
+                    <span className="subject-selector__name">{subject.name}</span>
+                  </button>
+                  <button
+                    className={`subject-selector__cart-btn${(subjectInCart || levelInCart) ? ' subject-selector__cart-btn--added' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); addCourse(subject, level); }}
+                    disabled={subjectInCart || levelInCart}
+                    title={levelInCart ? 'Level already in cart' : subjectInCart ? 'Already in cart' : 'Add to enrollment cart'}
+                  >
+                    {(subjectInCart || levelInCart) ? '✓' : '+'}
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
           {/* Subject Detail */}
@@ -150,6 +177,14 @@ export default function CourseLevelPage({ level }) {
         </div>
       </section>
 
+      {/* Lecturer Panel */}
+      <section className="course-page__lecturer-section">
+        <div className="course-page__container">
+          <h2 className="course-page__section-title">Your Lead Lecturer</h2>
+          <LecturerPanel lecturer={LECTURERS[0]} compact={true} />
+        </div>
+      </section>
+
       {/* Related Levels */}
       <section className="course-page__related">
         <div className="course-page__container">
@@ -158,7 +193,7 @@ export default function CourseLevelPage({ level }) {
             {[
               { title: 'Certificate Level', to: '/cima-certificate-level', emoji: '📗' },
               { title: 'Operational Level', to: '/cima-operational-level', emoji: '📘' },
-              { title: 'Management Level', to: '/cima-management-level', emoji: '📙' },
+              { title: 'Management Level', to: '/cima-management-level', emoji: '��' },
               { title: 'Strategic Level', to: '/cima-strategic-level', emoji: '📕' },
             ].filter((r) => r.to !== level.currentPath).map((r) => (
               <Link key={r.to} to={r.to} className="related-card">
