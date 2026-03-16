@@ -4,9 +4,9 @@
 }
 
 .connect__container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
@@ -63,7 +63,7 @@
   background-color: #24ade3;
   color: #ffffff;
   padding: 0.85rem 2rem;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 0.95rem;
   font-weight: 700;
   text-decoration: none;

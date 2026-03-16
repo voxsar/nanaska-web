@@ -12,6 +12,7 @@
   --color-bg-light: #f5f8fc;
   --color-text: #374151;
   --color-text-muted: #6b7280;
+  --max-width: 1400px;
 
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-size: 16px;

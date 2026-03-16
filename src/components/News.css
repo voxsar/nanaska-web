@@ -5,9 +5,9 @@
 }
 
 .news__container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 .news__header {
@@ -57,7 +57,7 @@
 /* Card */
 .news-card {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 2px 16px rgba(27,54,93,0.08);
   border: 1px solid #e4eaf2;
@@ -97,7 +97,7 @@
   letter-spacing: 0.8px;
   text-transform: uppercase;
   padding: 0.28rem 0.75rem;
-  border-radius: 50px;
+  border-radius: 0;
 }
 
 .news-card__body {

@@ -5,9 +5,9 @@
 }
 
 .testimonials__container {
-  max-width: 1200px;
+  max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
 .testimonials__header {
@@ -57,7 +57,7 @@
 .testimonial-card {
   background: #f5f8fc;
   border: 1px solid #e4eaf2;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 2rem;
   position: relative;
   display: flex;
