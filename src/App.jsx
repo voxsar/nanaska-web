@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -11,13 +11,17 @@ import OperationalLevelPage from './pages/OperationalLevelPage';
 import ManagementLevelPage from './pages/ManagementLevelPage';
 import StrategicLevelPage from './pages/StrategicLevelPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import FinancialLeadershipPage from './pages/FinancialLeadershipPage';
+import CaseStudyPage from './pages/CaseStudyPage';
+import CertificateLevelIntakePage from './pages/CertificateLevelIntakePage';
 import './App.css';
 
-function Layout({ children }) {
+/** Wraps regular site pages with the shared Navbar + Footer. */
+function Layout() {
   return (
     <>
       <Navbar />
-      {children}
+      <Outlet />
       <Footer />
     </>
   );
@@ -26,8 +30,14 @@ function Layout({ children }) {
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
+      <Routes>
+        {/* ── Funnel landing pages – no Navbar or Footer ── */}
+        <Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />
+        <Route path="/case-study" element={<CaseStudyPage />} />
+        <Route path="/certificate-level-intake" element={<CertificateLevelIntakePage />} />
+
+        {/* ── Regular site pages wrapped in the shared Layout ── */}
+        <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/our-faculty" element={<OurFacultyPage />} />
@@ -38,8 +48,8 @@ function App() {
           <Route path="/cima-management-level" element={<ManagementLevelPage />} />
           <Route path="/cima-strategic-level" element={<StrategicLevelPage />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
-        </Routes>
-      </Layout>
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
