@@ -1,0 +1,175 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './CourseLevelPage.css';
+
+export default function CourseLevelPage({ level }) {
+  const [activeSubject, setActiveSubject] = useState(level.subjects[0].code);
+  const [activeTab, setActiveTab] = useState('overview');
+  const currentSubject = level.subjects.find((s) => s.code === activeSubject);
+
+  return (
+    <div className="course-page" style={{ '--level-color': level.color, '--level-gradient': level.gradient }}>
+      {/* Hero */}
+      <section className="course-page__hero">
+        <div className="course-page__hero-bg" />
+        <div className="course-page__hero-inner">
+          <span className="course-page__breadcrumb">
+            <Link to="/">Home</Link> / Courses / {level.title}
+          </span>
+          <div className="course-page__level-badge">{level.badge}</div>
+          <h1 className="course-page__title">{level.title}</h1>
+          <p className="course-page__tagline">{level.tagline}</p>
+          <div className="course-page__meta">
+            <span className="course-page__meta-item">📚 {level.subjects.length} Subjects</span>
+            <span className="course-page__meta-item">⏱ {level.duration}</span>
+            <span className="course-page__meta-item">🏆 {level.qualification}</span>
+          </div>
+          <a
+            href="https://www.nanaska.com/onboarding/courses/gather/students/registration/begin/entry/"
+            className="course-page__enroll-btn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Enroll Now
+          </a>
+        </div>
+        <div className="course-page__hero-wave">
+          <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+            <path fill="#f9fbff" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Subject Explorer */}
+      <section className="course-page__explorer">
+        <div className="course-page__container">
+          <h2 className="course-page__section-title">Explore Subjects</h2>
+          <p className="course-page__section-sub">Click on any subject to explore the syllabus, learning outcomes and more.</p>
+
+          {/* Subject Selector */}
+          <div className="subject-selector">
+            {level.subjects.map((subject) => (
+              <button
+                key={subject.code}
+                className={`subject-selector__btn ${activeSubject === subject.code ? 'subject-selector__btn--active' : ''}`}
+                onClick={() => { setActiveSubject(subject.code); setActiveTab('overview'); }}
+              >
+                <span className="subject-selector__code">{subject.code}</span>
+                <span className="subject-selector__name">{subject.name}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Subject Detail */}
+          {currentSubject && (
+            <div className="subject-detail">
+              {/* Tabs */}
+              <div className="subject-tabs">
+                {['overview', 'syllabus', 'outcomes'].map((tab) => (
+                  <button
+                    key={tab}
+                    className={`subject-tab ${activeTab === tab ? 'subject-tab--active' : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {activeTab === 'overview' && (
+                <div className="subject-detail__panel">
+                  <div className="subject-detail__header">
+                    <div className="subject-detail__icon">{currentSubject.icon}</div>
+                    <div>
+                      <h3>{currentSubject.code} — {currentSubject.name}</h3>
+                      <p className="subject-detail__subtitle">{currentSubject.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="subject-detail__desc">{currentSubject.description}</p>
+                  <div className="subject-detail__highlights">
+                    {currentSubject.highlights.map((h) => (
+                      <div key={h} className="subject-highlight">
+                        <span className="subject-highlight__check">✓</span>
+                        <span>{h}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'syllabus' && (
+                <div className="subject-detail__panel">
+                  <h3>{currentSubject.code} — Syllabus Overview</h3>
+                  <div className="syllabus-list">
+                    {currentSubject.syllabus.map((item, idx) => (
+                      <div key={idx} className="syllabus-item">
+                        <span className="syllabus-item__num">{String(idx + 1).padStart(2, '0')}</span>
+                        <div className="syllabus-item__content">
+                          <h4>{item.topic}</h4>
+                          <p>{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'outcomes' && (
+                <div className="subject-detail__panel">
+                  <h3>{currentSubject.code} — Learning Outcomes</h3>
+                  <ul className="outcomes-list">
+                    {currentSubject.outcomes.map((o, idx) => (
+                      <li key={idx} className="outcome-item">
+                        <span className="outcome-item__icon">🎯</span>
+                        <span>{o}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Why Study This Level */}
+      <section className="course-page__why">
+        <div className="course-page__container">
+          <h2 className="course-page__section-title course-page__section-title--light">
+            Why Study {level.title}?
+          </h2>
+          <div className="course-page__why-grid">
+            {level.whyPoints.map((point) => (
+              <div key={point.title} className="why-card">
+                <span className="why-card__icon">{point.icon}</span>
+                <h4>{point.title}</h4>
+                <p>{point.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Related Levels */}
+      <section className="course-page__related">
+        <div className="course-page__container">
+          <h2 className="course-page__section-title">Other CIMA Levels</h2>
+          <div className="course-page__related-grid">
+            {[
+              { title: 'Certificate Level', to: '/cima-certificate-level', emoji: '📗' },
+              { title: 'Operational Level', to: '/cima-operational-level', emoji: '📘' },
+              { title: 'Management Level', to: '/cima-management-level', emoji: '📙' },
+              { title: 'Strategic Level', to: '/cima-strategic-level', emoji: '📕' },
+            ].filter((r) => r.to !== level.currentPath).map((r) => (
+              <Link key={r.to} to={r.to} className="related-card">
+                <span className="related-card__emoji">{r.emoji}</span>
+                <span className="related-card__title">{r.title}</span>
+                <span className="related-card__arrow">→</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

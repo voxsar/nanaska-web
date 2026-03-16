@@ -120,6 +120,10 @@
   letter-spacing: 0.1px;
 }
 
+.navbar__link--noroute {
+  cursor: default;
+}
+
 .navbar__link:hover {
   color: #24ade3;
   background-color: rgba(36, 173, 227, 0.06);
