@@ -23,7 +23,7 @@
 }
 
 .topbar__container {
-  max-width: 1400px;
+  max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 2rem;
   height: 100%;
@@ -72,7 +72,7 @@
 }
 
 .navbar__container {
-  max-width: 1400px;
+  max-width: var(--max-width);
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
@@ -259,6 +259,8 @@
   }
 }
 
+/* Hide the middle topbar link on very small screens, keeping first (Exam Login)
+   and last (Nanaska Connect) visible */
 @media (max-width: 480px) {
   .topbar__links li:not(:first-child):not(:last-child) .topbar__link {
     display: none;
