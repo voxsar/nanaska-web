@@ -7,6 +7,7 @@ import Stats from '../components/Stats';
 import News from '../components/News';
 import Testimonials from '../components/Testimonials';
 import Connect from '../components/Connect';
+import EnrollModal from '../components/EnrollModal';
 
 export default function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default function HomePage() {
       <News />
       <Testimonials compact />
       <Connect />
+      <EnrollModal />
     </>
   );
 }

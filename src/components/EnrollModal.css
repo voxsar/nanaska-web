@@ -1,0 +1,220 @@
+/* =========================================================
+   Overlay
+   ========================================================= */
+.enroll-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 25, 50, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 2000;
+  animation: overlay-in 0.3s ease both;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* =========================================================
+   Modal box
+   ========================================================= */
+.enroll-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.5rem 2rem 2rem;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 24px 64px rgba(10, 25, 50, 0.3);
+  animation: modal-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.85) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.enroll-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.enroll-modal__close:hover {
+  background: #e2e8f0;
+  color: #1b365d;
+}
+
+/* Badge */
+.enroll-modal__badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #24ade3, #1b365d);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.enroll-modal__title {
+  font-size: clamp(1.4rem, 4vw, 1.75rem);
+  font-weight: 900;
+  color: #1b365d;
+  margin: 0 0 0.5rem;
+  line-height: 1.25;
+}
+
+.enroll-modal__sub {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 1.5rem;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   Form
+   ========================================================= */
+.enroll-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.enroll-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.enroll-modal__field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.enroll-modal__field input,
+.enroll-modal__field select {
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #374151;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #fff;
+  appearance: auto;
+}
+
+.enroll-modal__field input:focus,
+.enroll-modal__field select:focus {
+  border-color: #24ade3;
+  box-shadow: 0 0 0 3px rgba(36, 173, 227, 0.15);
+}
+
+.enroll-modal__submit {
+  padding: 0.85rem;
+  background: linear-gradient(135deg, #f5a623, #e8891a);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 0.25rem;
+}
+
+.enroll-modal__submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+}
+
+.enroll-modal__note {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-align: center;
+  margin: 0;
+}
+
+.enroll-modal__note a {
+  color: #24ade3;
+  text-decoration: underline;
+}
+
+/* =========================================================
+   Success state
+   ========================================================= */
+.enroll-modal__success {
+  text-align: center;
+  padding: 1rem 0;
+  animation: success-in 0.4s ease both;
+}
+
+@keyframes success-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.enroll-modal__success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+.enroll-modal__success h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1b365d;
+  margin: 0 0 0.5rem;
+}
+
+.enroll-modal__success p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0 0 1.25rem;
+}
+
+.enroll-modal__cta {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  background: linear-gradient(135deg, #24ade3, #1b9acc);
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.enroll-modal__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(36, 173, 227, 0.35);
+}

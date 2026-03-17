@@ -1,7 +1,20 @@
-import { BrowserRouter, Routes, Route, Outlet, useParams, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import FloatingWidgets from './components/FloatingWidgets';
+import MobileBottomNav from './components/MobileBottomNav';
 import { CartProvider } from './context/CartContext';
+
+/* Scrolls to the top of the page on every route change */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'instant' });
+  }, [pathname]);
+  return null;
+}
 
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
@@ -46,13 +59,15 @@ function CourseRouteWrapper() {
 }
 
 
-/* Shared layout (Navbar + Footer) */
+/* Shared layout (Navbar + Footer + Floating widgets) */
 function Layout() {
   return (
     <>
       <Navbar />
       <Outlet />
       <Footer />
+      <FloatingWidgets />
+      <MobileBottomNav />
     </>
   );
 }
@@ -62,7 +77,7 @@ function App() {
   return (
     <BrowserRouter>
       <CartProvider>
-
+        <ScrollToTop />
         <Routes>
 
           {/* Funnel landing pages (no navbar/footer) */}

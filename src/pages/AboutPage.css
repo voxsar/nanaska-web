@@ -267,3 +267,7 @@
   .about-page__cards { grid-template-columns: 1fr; }
   .about-page__stat-row { gap: 1.25rem; }
 }
+
+@media (max-width: 560px) {
+  .about-page__values-grid { grid-template-columns: 1fr; }
+}

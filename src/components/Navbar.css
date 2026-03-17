@@ -213,6 +213,11 @@
     display: flex;
   }
 
+  /* Hide cart button in navbar on mobile (shown in bottom nav instead) */
+  .navbar__cart-btn {
+    display: none;
+  }
+
   .navbar__links {
     display: none;
     flex-direction: column;
@@ -417,3 +422,79 @@
   color: #24ade3;
   background: #e0f2fe;
 }
+
+/* =========================================================
+   Link wrap (for items that are links AND have dropdowns)
+   ========================================================= */
+.navbar__link-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar__link-wrap .navbar__link {
+  flex: 1;
+}
+
+/* Toggle button (▾) for mobile accordion — shows on mobile only */
+.navbar__toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #1b365d;
+  font-size: 0.8rem;
+  transition: color 0.2s, transform 0.25s;
+  flex-shrink: 0;
+}
+
+.navbar__toggle-btn--open {
+  transform: rotate(180deg);
+  color: #24ade3;
+}
+
+@media (max-width: 900px) {
+  .navbar__toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .navbar__toggle-btn--sub {
+    font-size: 0.7rem;
+    min-width: 36px;
+    min-height: 36px;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+/* Desktop: hide toggle button, show caret inline */
+@media (min-width: 901px) {
+  .navbar__toggle-btn {
+    display: none;
+  }
+
+  /* Show caret on desktop as part of link text */
+  .navbar__link-wrap .navbar__link::after {
+    content: ' ▾';
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-left: 2px;
+  }
+}
+
+/* Mobile accordion row */
+.navbar__mobile-accordion-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.navbar__mobile-accordion-row .navbar__mobile-accordion-link {
+  border-bottom: none;
+  flex: 1;
+}
+

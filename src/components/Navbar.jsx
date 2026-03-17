@@ -42,6 +42,7 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [mobileExpanded, setMobileExpanded] = useState(null);
+  const [mobileSubExpanded, setMobileSubExpanded] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { cartCount } = useCart();
@@ -57,6 +58,7 @@ export default function Navbar() {
     setOpenDropdown(null);
     setOpenSubmenu(null);
     setMobileExpanded(null);
+    setMobileSubExpanded(null);
   };
 
   const NAV_LINKS = [
@@ -127,17 +129,35 @@ export default function Navbar() {
                     onMouseEnter={() => { setOpenDropdown(link.label); setOpenSubmenu(null); }}
                     onMouseLeave={() => { setOpenDropdown(null); setOpenSubmenu(null); }}
                   >
+                    {/* Desktop: link or span (for items without route) */}
                     {link.to ? (
-                      <Link to={link.to} className="navbar__link" onClick={handleLinkClick}>
-                        {link.label} <span className="navbar__caret">▾</span>
-                      </Link>
+                      <div className="navbar__link-wrap">
+                        <Link to={link.to} className="navbar__link" onClick={handleLinkClick}>
+                          {link.label}
+                        </Link>
+                        <button
+                          className={`navbar__toggle-btn${mobileExpanded === link.label ? ' navbar__toggle-btn--open' : ''}`}
+                          onClick={() => setMobileExpanded(prev => prev === link.label ? null : link.label)}
+                          aria-label={`Toggle ${link.label} submenu`}
+                        >
+                          <span className="navbar__caret">▾</span>
+                        </button>
+                      </div>
                     ) : (
-                      <span
-                        className="navbar__link navbar__link--noroute"
-                        onClick={() => setMobileExpanded(prev => prev === link.label ? null : link.label)}
-                      >
-                        {link.label} <span className="navbar__caret">▾</span>
-                      </span>
+                      <div className="navbar__link-wrap">
+                        <span
+                          className="navbar__link navbar__link--noroute"
+                        >
+                          {link.label}
+                        </span>
+                        <button
+                          className={`navbar__toggle-btn${mobileExpanded === link.label ? ' navbar__toggle-btn--open' : ''}`}
+                          onClick={() => setMobileExpanded(prev => prev === link.label ? null : link.label)}
+                          aria-label={`Toggle ${link.label} submenu`}
+                        >
+                          <span className="navbar__caret">▾</span>
+                        </button>
+                      </div>
                     )}
                     {/* Desktop dropdown */}
                     <ul className={`navbar__dropdown ${openDropdown === link.label ? 'navbar__dropdown--visible' : ''}`}>
@@ -171,19 +191,36 @@ export default function Navbar() {
                       <ul className="navbar__mobile-accordion">
                         {link.dropdown.map((sub) => (
                           <li key={sub.label}>
-                            <Link to={sub.to} className="navbar__mobile-accordion-link" onClick={handleLinkClick}>
-                              {sub.label}
-                            </Link>
-                            {sub.hasSub && sub.sub && (
-                              <ul className="navbar__mobile-sub">
-                                {sub.sub.map(item => (
-                                  <li key={item.label}>
-                                    <Link to={item.to} className="navbar__mobile-sub-link" onClick={handleLinkClick}>
-                                      {item.label}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
+                            {sub.hasSub ? (
+                              <>
+                                <div className="navbar__mobile-accordion-row">
+                                  <Link to={sub.to} className="navbar__mobile-accordion-link" onClick={handleLinkClick}>
+                                    {sub.label}
+                                  </Link>
+                                  <button
+                                    className={`navbar__toggle-btn navbar__toggle-btn--sub${mobileSubExpanded === sub.label ? ' navbar__toggle-btn--open' : ''}`}
+                                    onClick={() => setMobileSubExpanded(prev => prev === sub.label ? null : sub.label)}
+                                    aria-label={`Toggle ${sub.label} courses`}
+                                  >
+                                    <span className="navbar__caret">▾</span>
+                                  </button>
+                                </div>
+                                {mobileSubExpanded === sub.label && sub.sub && (
+                                  <ul className="navbar__mobile-sub">
+                                    {sub.sub.map(item => (
+                                      <li key={item.label}>
+                                        <Link to={item.to} className="navbar__mobile-sub-link" onClick={handleLinkClick}>
+                                          {item.label}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </>
+                            ) : (
+                              <Link to={sub.to} className="navbar__mobile-accordion-link" onClick={handleLinkClick}>
+                                {sub.label}
+                              </Link>
                             )}
                           </li>
                         ))}

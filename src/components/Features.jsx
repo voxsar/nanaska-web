@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useTilt } from '../hooks/useMouseAnimation';
 import './Features.css';
 
 const FEATURES = [
@@ -36,6 +37,7 @@ const FEATURES = [
 export default function Features() {
   const sectionRef = useRef(null);
   useScrollReveal(sectionRef);
+  const tiltRef = useTilt(6, 1.02);
 
   return (
     <section className="features" id="features" ref={sectionRef}>
@@ -49,9 +51,9 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="features__grid" data-reveal-stagger>
+        <div className="features__grid" data-reveal-stagger ref={tiltRef}>
           {FEATURES.map(({ icon, title, body, img, alt }) => (
-            <div key={title} className="features__card">
+            <div key={title} className="features__card tilt-card">
               <div className="features__card-img-wrap">
                 <img src={img} alt={alt} className="features__card-img" loading="lazy" />
               </div>
