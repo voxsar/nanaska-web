@@ -345,6 +345,44 @@
 }
 .t-dot--active { background: var(--t-cyan); width: 40px; }
 
+/* "More" button – compact/homepage mode */
+.t-slider__more {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
+.t-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--t-navy);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.85rem 2rem;
+  border-radius: 50px;
+  letter-spacing: 0.3px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(27,54,93,0.25);
+}
+
+.t-more-btn:hover {
+  background: #24ade3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(36,173,227,0.35);
+}
+
+.t-more-btn__arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s;
+}
+
+.t-more-btn:hover .t-more-btn__arrow {
+  transform: translateX(4px);
+}
+
 /* ═══════════════════════════════════════
    3. SEARCH & FILTER BAR
    ═══════════════════════════════════════ */
@@ -353,7 +391,7 @@
   border-bottom: 1px solid var(--t-border);
   padding: 1.5rem 0;
   position: sticky;
-  top: 104px;
+  top: 68px;
   z-index: 100;
   box-shadow: 0 4px 20px rgba(27,54,93,0.06);
 }

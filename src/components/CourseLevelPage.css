@@ -438,3 +438,83 @@
 @media (max-width: 400px) {
   .subject-selector { grid-template-columns: 1fr; }
 }
+
+/* Hero actions (enroll + cart) */
+.course-page__hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.course-page__add-level-btn {
+  display: inline-block;
+  background: rgba(255,255,255,0.12);
+  border: 2px solid rgba(255,255,255,0.5);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  backdrop-filter: blur(6px);
+}
+
+.course-page__add-level-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.22);
+  transform: translateY(-2px);
+}
+
+.course-page__add-level-btn--added,
+.course-page__add-level-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* Subject selector with cart button */
+.subject-selector__item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.subject-selector__item .subject-selector__btn {
+  flex: 1;
+  border-radius: 14px 0 0 14px;
+}
+
+.subject-selector__cart-btn {
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+  border-left: none;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 0.75rem;
+  cursor: pointer;
+  border-radius: 0 14px 14px 0;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.subject-selector__cart-btn:hover:not(:disabled) {
+  background: var(--level-color);
+  border-color: var(--level-color);
+  color: #fff;
+}
+
+.subject-selector__cart-btn--added,
+.subject-selector__cart-btn:disabled {
+  color: #16a34a;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  cursor: default;
+}
+
+/* Lecturer section within course page */
+.course-page__lecturer-section {
+  padding: 4rem 1.5rem;
+  background: #fff;
+}

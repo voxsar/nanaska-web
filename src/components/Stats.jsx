@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import './Stats.css';
 
 const STATS = [
@@ -40,6 +41,7 @@ function StatItem({ stat, active }) {
 export default function Stats() {
   const [active, setActive] = useState(false);
   const ref = useRef(null);
+  useScrollReveal(ref);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,7 +54,7 @@ export default function Stats() {
 
   return (
     <section className="stats" id="stats" ref={ref}>
-      <div className="stats__container">
+      <div className="stats__container" data-reveal-stagger>
         {STATS.map((stat) => (
           <StatItem key={stat.label} stat={stat} active={active} />
         ))}

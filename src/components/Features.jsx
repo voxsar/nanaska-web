@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+import { useScrollReveal } from '../hooks/useScrollReveal';
 import './Features.css';
 
 const FEATURES = [
@@ -32,10 +34,13 @@ const FEATURES = [
 ];
 
 export default function Features() {
+  const sectionRef = useRef(null);
+  useScrollReveal(sectionRef);
+
   return (
-    <section className="features" id="features">
+    <section className="features" id="features" ref={sectionRef}>
       <div className="features__inner">
-        <div className="features__header">
+        <div className="features__header" data-reveal="fade">
           <span className="features__eyebrow">Why Choose Nanaska</span>
           <h2 className="features__title">World-Class CIMA Tuition, Built Around You</h2>
           <p className="features__subtitle">
@@ -44,7 +49,7 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="features__grid">
+        <div className="features__grid" data-reveal-stagger>
           {FEATURES.map(({ icon, title, body, img, alt }) => (
             <div key={title} className="features__card">
               <div className="features__card-img-wrap">

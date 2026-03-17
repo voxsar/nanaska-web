@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import './Testimonials.css';
 import TESTIMONIALS_DATA, { EXAM_TAGS, INTAKE_YEARS, FEATURED_COUNT } from '../data/testimonialsData';
 
@@ -103,7 +104,7 @@ function StudentModal({ testimonial: t, onClose }) {
 }
 
 /* ─── Main Testimonials Section ─────────────────────────── */
-export default function Testimonials() {
+export default function Testimonials({ compact = false }) {
   /* Slider state */
   const [sliderPage, setSliderPage] = useState(0);
   const [sliderAnimDir, setSliderAnimDir] = useState(null);
@@ -276,121 +277,135 @@ export default function Testimonials() {
               &#8250;
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* ══ Search & Filters ══ */}
-      <div className="t-filter-bar">
-        <div className="t-filter-bar__container">
-          <div className="t-filter-bar__search-wrap">
-            <span className="t-filter-bar__search-icon" aria-hidden="true">🔍</span>
-            <input
-              type="search"
-              className="t-filter-bar__search"
-              placeholder="Search by name, country, exam…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Search testimonials"
-            />
-            {searchQuery && (
-              <button className="t-filter-bar__clear" onClick={() => setSearchQuery('')} aria-label="Clear search">✕</button>
-            )}
-          </div>
-
-          <div className="t-filter-bar__groups">
-            <div className="t-filter-group">
-              <span className="t-filter-group__label">Exam</span>
-              <div className="t-filter-group__chips">
-                {['All', ...EXAM_TAGS].map((tag) => (
-                  <button
-                    key={tag}
-                    className={`t-chip${selectedTag === tag ? ' t-chip--active' : ''} ${tag !== 'All' ? `t-chip--${TAG_COLORS[tag]}` : ''}`}
-                    onClick={() => setSelectedTag(tag)}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="t-filter-group">
-              <span className="t-filter-group__label">Year</span>
-              <div className="t-filter-group__chips">
-                {['All', ...INTAKE_YEARS].map((yr) => (
-                  <button
-                    key={yr}
-                    className={`t-chip${selectedYear === String(yr) || (yr === 'All' && selectedYear === 'All') ? ' t-chip--active' : ''}`}
-                    onClick={() => setSelectedYear(yr === 'All' ? 'All' : String(yr))}
-                  >
-                    {yr}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <p className="t-filter-bar__count">
-            Showing <strong>{filteredGrid.length}</strong> of {TESTIMONIALS_DATA.length} testimonials
-          </p>
-        </div>
-      </div>
-
-      {/* ══ Testimonials Grid ══ */}
-      <div className="t-grid-section">
-        <div className="t-grid-section__container">
-          {filteredGrid.length === 0 ? (
-            <div className="t-grid__empty">
-              <p>No testimonials match your search. <button className="t-grid__reset-btn" onClick={() => { setSearchQuery(''); setSelectedTag('All'); setSelectedYear('All'); }}>Reset filters</button></p>
-            </div>
-          ) : (
-            <div className="t-grid">
-              {filteredGrid.map((t) => (
-                <button
-                  key={t.id}
-                  className={`t-card t-card--${TAG_COLORS[t.tag]}`}
-                  onClick={() => setActiveTestimonial(t)}
-                  aria-label={`View ${t.name}'s testimonial`}
-                >
-                  <div className="t-card__header">
-                    <div className="t-card__photo-wrap">
-                      <StudentPhoto
-                        src={t.image}
-                        alt={t.name}
-                        initials={t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
-                        photoClass="t-card__photo"
-                        fallbackClass="t-card__photo-fallback"
-                      />
-                    </div>
-                    <div className="t-card__identity">
-                      <p className="t-card__name">{t.name}</p>
-                      <p className="t-card__country">{t.flag} {t.country}</p>
-                      <div className="t-card__chips">
-                        <span className={`t-tag t-tag--${TAG_COLORS[t.tag]}`}>{t.tag}</span>
-                        {t.badge && <span className="t-badge t-badge--sm">{t.badge}</span>}
-                      </div>
-                    </div>
-                    {t.marks && (
-                      <div className={`t-card__score${t.marks >= 90 ? ' t-card__score--high' : ''}`}>
-                        <span className="t-card__score-num">{t.marks}</span>
-                        <span className="t-card__score-label">marks</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="t-card__quote">
-                    &ldquo;{t.quote.length > 140 ? t.quote.slice(0, 137) + '…' : t.quote}&rdquo;
-                  </p>
-
-                  <div className="t-card__footer">
-                    <span className="t-card__period">{t.exam} · {t.period}</span>
-                    <span className="t-card__view">View profile →</span>
-                  </div>
-                </button>
-              ))}
+          {/* ── "More" button – shown only on homepage ── */}
+          {compact && (
+            <div className="t-slider__more">
+              <Link to="/testimonials" className="t-more-btn">
+                Read All Student Stories
+                <span className="t-more-btn__arrow">→</span>
+              </Link>
             </div>
           )}
         </div>
       </div>
+
+      {/* ══ Search & Filters — full page only ══ */}
+      {!compact && (
+        <div className="t-filter-bar">
+          <div className="t-filter-bar__container">
+            <div className="t-filter-bar__search-wrap">
+              <span className="t-filter-bar__search-icon" aria-hidden="true">🔍</span>
+              <input
+                type="search"
+                className="t-filter-bar__search"
+                placeholder="Search by name, country, exam…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search testimonials"
+              />
+              {searchQuery && (
+                <button className="t-filter-bar__clear" onClick={() => setSearchQuery('')} aria-label="Clear search">✕</button>
+              )}
+            </div>
+
+            <div className="t-filter-bar__groups">
+              <div className="t-filter-group">
+                <span className="t-filter-group__label">Exam</span>
+                <div className="t-filter-group__chips">
+                  {['All', ...EXAM_TAGS].map((tag) => (
+                    <button
+                      key={tag}
+                      className={`t-chip${selectedTag === tag ? ' t-chip--active' : ''} ${tag !== 'All' ? `t-chip--${TAG_COLORS[tag]}` : ''}`}
+                      onClick={() => setSelectedTag(tag)}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="t-filter-group">
+                <span className="t-filter-group__label">Year</span>
+                <div className="t-filter-group__chips">
+                  {['All', ...INTAKE_YEARS].map((yr) => (
+                    <button
+                      key={yr}
+                      className={`t-chip${selectedYear === String(yr) || (yr === 'All' && selectedYear === 'All') ? ' t-chip--active' : ''}`}
+                      onClick={() => setSelectedYear(yr === 'All' ? 'All' : String(yr))}
+                    >
+                      {yr}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <p className="t-filter-bar__count">
+              Showing <strong>{filteredGrid.length}</strong> of {TESTIMONIALS_DATA.length} testimonials
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ══ Testimonials Grid — full page only ══ */}
+      {!compact && (
+        <div className="t-grid-section">
+          <div className="t-grid-section__container">
+            {filteredGrid.length === 0 ? (
+              <div className="t-grid__empty">
+                <p>No testimonials match your search. <button className="t-grid__reset-btn" onClick={() => { setSearchQuery(''); setSelectedTag('All'); setSelectedYear('All'); }}>Reset filters</button></p>
+              </div>
+            ) : (
+              <div className="t-grid">
+                {filteredGrid.map((t) => (
+                  <button
+                    key={t.id}
+                    className={`t-card t-card--${TAG_COLORS[t.tag]}`}
+                    onClick={() => setActiveTestimonial(t)}
+                    aria-label={`View ${t.name}'s testimonial`}
+                  >
+                    <div className="t-card__header">
+                      <div className="t-card__photo-wrap">
+                        <StudentPhoto
+                          src={t.image}
+                          alt={t.name}
+                          initials={t.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
+                          photoClass="t-card__photo"
+                          fallbackClass="t-card__photo-fallback"
+                        />
+                      </div>
+                      <div className="t-card__identity">
+                        <p className="t-card__name">{t.name}</p>
+                        <p className="t-card__country">{t.flag} {t.country}</p>
+                        <div className="t-card__chips">
+                          <span className={`t-tag t-tag--${TAG_COLORS[t.tag]}`}>{t.tag}</span>
+                          {t.badge && <span className="t-badge t-badge--sm">{t.badge}</span>}
+                        </div>
+                      </div>
+                      {t.marks && (
+                        <div className={`t-card__score${t.marks >= 90 ? ' t-card__score--high' : ''}`}>
+                          <span className="t-card__score-num">{t.marks}</span>
+                          <span className="t-card__score-label">marks</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="t-card__quote">
+                      &ldquo;{t.quote.length > 140 ? t.quote.slice(0, 137) + '…' : t.quote}&rdquo;
+                    </p>
+
+                    <div className="t-card__footer">
+                      <span className="t-card__period">{t.exam} · {t.period}</span>
+                      <span className="t-card__view">View profile →</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ══ Modal ══ */}
       {activeTestimonial && (
