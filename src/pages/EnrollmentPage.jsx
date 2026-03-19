@@ -38,26 +38,51 @@ export default function EnrollmentPage() {
 
   /**
    * Attempt to pay online via the backend API.
-   * Requires VITE_API_URL to be set and the user to be logged in (JWT stored in localStorage).
+   * For logged-in users: uses the authenticated /payments/create endpoint.
+   * For guest users: uses /payments/guest-create with the form details already entered.
+   * Both paths redirect to the PayHere IPG checkout page.
    */
   const handlePayOnline = async (combinationId) => {
     if (!API_URL) return;
+
+    // Guests must have filled in at least their name and email first
     const token = localStorage.getItem('nanaska_token');
     if (!token) {
-      setPayError('Please log in to pay online.');
-      return;
+      if (!form.firstName || !form.email) {
+        setPayError('Please fill in your First Name and Email Address above before paying online.');
+        return;
+      }
     }
+
     setPayError('');
     setPaying(true);
     try {
-      const res = await fetch(`${API_URL}/payments/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ combinationId }),
-      });
+      let res;
+      if (token) {
+        // Authenticated user path
+        res = await fetch(`${API_URL}/payments/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ combinationId }),
+        });
+      } else {
+        // Guest user path – send form details with the request
+        res = await fetch(`${API_URL}/payments/guest-create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            combinationId,
+            firstName: form.firstName,
+            lastName: form.lastName,
+            email: form.email,
+            phone: form.phone || undefined,
+          }),
+        });
+      }
+
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || 'Payment initiation failed');
@@ -155,7 +180,7 @@ export default function EnrollmentPage() {
                   {API_URL && cartItems.length === 1 && cartItems[0].type === 'level' && (
                     <div className="enrollment-page__pay-online">
                       <p className="enrollment-page__pay-online-note">
-                        Pay securely online via our payment gateway:
+                        💳 Pay securely online via our payment gateway. Fill in your details in the form and click below — no account required.
                       </p>
                       {payError && <p className="enrollment-page__pay-error">{payError}</p>}
                       <button

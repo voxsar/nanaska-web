@@ -42,7 +42,7 @@ export default function IndividualCoursePage({ course, level }) {
           <div className="individual-course__meta">
             <span className="individual-course__meta-item">📚 {level.title}</span>
             <span className="individual-course__meta-item">⏱ {level.duration}</span>
-            <span className="individual-course__meta-item">💰 From ${course.price}</span>
+            <span className="individual-course__meta-item">💰 From LKR {course.price.toLocaleString()}</span>
           </div>
 
           <div className="individual-course__actions">
@@ -97,7 +97,7 @@ export default function IndividualCoursePage({ course, level }) {
                   <dt>Qualification</dt>
                   <dd>{level.qualification}</dd>
                   <dt>Price</dt>
-                  <dd>From ${course.price}</dd>
+                  <dd>From LKR {course.price.toLocaleString()}</dd>
                 </dl>
                 <a
                   href="https://www.nanaska.com/onboarding/courses/gather/students/registration/begin/entry/"

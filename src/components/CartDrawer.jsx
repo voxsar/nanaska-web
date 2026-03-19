@@ -44,7 +44,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                       </span>
                     )}
                   </div>
-                  <span className="cart-drawer__item-price">${item.price}</span>
+                  <span className="cart-drawer__item-price">LKR {item.price.toLocaleString()}</span>
                   <button
                     className="cart-drawer__item-remove"
                     onClick={() => removeItem(item.type === 'level' ? item.levelId : item.courseCode)}
@@ -63,7 +63,7 @@ export default function CartDrawer({ isOpen, onClose }) {
             </p>
             <div className="cart-drawer__total">
               <span>Estimated Total</span>
-              <span>${cartTotal}</span>
+              <span>LKR {cartTotal.toLocaleString()}</span>
             </div>
             <Link to="/enrollment" className="cart-drawer__proceed-btn" onClick={onClose}>
               Proceed to Enrollment →

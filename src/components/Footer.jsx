@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import nanaskaLogo from '../assets/nanaska-logo.png';
 import './Footer.css';
 
 const SOCIAL_LINKS = [
@@ -37,8 +38,7 @@ export default function Footer() {
           {/* Brand column */}
           <div className="footer__brand">
             <Link to="/" className="footer__logo">
-              <span className="footer__logo-nanaska">NAN</span>
-              <span className="footer__logo-accent">ASKA</span>
+              <img src={nanaskaLogo} alt="Nanaska – Building Better Leaders" className="footer__logo-img" />
             </Link>
 
             <p className="footer__tagline">

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { LEVELS } from '../data/coursesData';
 import { useCart } from '../context/CartContext';
 import CartDrawer from './CartDrawer';
+import nanaskaLogo from '../assets/nanaska-logo.png';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -116,8 +117,7 @@ export default function Navbar() {
         <nav className="navbar">
           <div className="navbar__container">
             <Link to="/" className="navbar__logo" onClick={handleLinkClick}>
-              <span className="navbar__logo-nanaska">NAN</span>
-              <span className="navbar__logo-accent">ASKA</span>
+              <img src={nanaskaLogo} alt="Nanaska – Building Better Leaders" className="navbar__logo-img" />
             </Link>
 
             <ul className={`navbar__links ${menuOpen ? 'navbar__links--open' : ''}`}>

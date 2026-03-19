@@ -66,16 +66,20 @@ model CourseCombinationItem {
 // ─── Orders ─────────────────────────────────────────────────────────────────
 model Order {
   id              String      @id @default(uuid())
-  userId          String      @map("user_id")
+  userId          String?     @map("user_id")
   combinationId   String      @map("combination_id")
   amount          Int                                // in LKR
   status          OrderStatus @default(PENDING)
   ipgMerchantRef  String?     @map("ipg_merchant_ref")
   ipgRef          String?     @map("ipg_ref")        // returned by IPG after payment
+  // Guest details (stored when no user account exists)
+  guestName       String?     @map("guest_name")
+  guestEmail      String?     @map("guest_email")
+  guestPhone      String?     @map("guest_phone")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt             @map("updated_at")
 
-  user        User               @relation(fields: [userId], references: [id])
+  user        User?              @relation(fields: [userId], references: [id])
   combination CourseCombination  @relation(fields: [combinationId], references: [id])
   userCourses UserCourse[]
 

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -24,6 +25,16 @@ export class PaymentsController {
   @Post('create')
   createPayment(@Body() dto: CreatePaymentDto, @Request() req) {
     return this.paymentsService.createPayment(req.user.userId, dto);
+  }
+
+  /**
+   * POST /payments/guest-create
+   * Unauthenticated – allows guest users to pay without an account.
+   * Guest details (name, email, phone) are stored on the order record.
+   */
+  @Post('guest-create')
+  createGuestPayment(@Body() dto: GuestPaymentDto) {
+    return this.paymentsService.createGuestPayment(dto);
   }
 
   /**

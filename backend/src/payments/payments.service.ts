@@ -7,6 +7,7 @@ import {
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 
 /**
@@ -52,6 +53,48 @@ export class PaymentsService {
 
     // Build signed IPG payload (PayHere format)
     const payload = this.buildIpgPayload(order.id, order.ipgMerchantRef!, combo.price, user);
+
+    return {
+      orderId: order.id,
+      merchantRef: order.ipgMerchantRef,
+      paymentUrl: process.env.IPG_BASE_URL,
+      payload,
+    };
+  }
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // POST /payments/guest-create
+  // ──────────────────────────────────────────────────────────────────────────
+  async createGuestPayment(dto: GuestPaymentDto) {
+    const combo = await this.prisma.courseCombination.findUnique({
+      where: { id: dto.combinationId },
+      include: { items: { include: { course: true } } },
+    });
+
+    if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
+
+    const fullName = [dto.firstName, dto.lastName].filter(Boolean).join(' ');
+    const phone = dto.phone || '';
+
+    // Create a PENDING order (no user account required)
+    const order = await this.prisma.order.create({
+      data: {
+        combinationId: combo.id,
+        amount: combo.price,
+        status: 'PENDING',
+        ipgMerchantRef: this.generateMerchantRef(),
+        guestName: fullName,
+        guestEmail: dto.email,
+        guestPhone: phone || null,
+      },
+    });
+
+    // Build signed IPG payload using provided guest details
+    const payload = this.buildIpgPayload(order.id, order.ipgMerchantRef!, combo.price, {
+      name: fullName,
+      email: dto.email,
+      phone,
+    });
 
     return {
       orderId: order.id,
@@ -119,17 +162,20 @@ export class PaymentsService {
         data: { status: 'PAID', ipgRef: body.payment_id ?? null },
       });
 
-      // Grant access to each subject in the combination
-      const courseIds = order.combination.items.map((i) => i.courseId);
-      for (const courseId of courseIds) {
-        await this.prisma.userCourse.upsert({
-          where: { userId_courseId: { userId: order.userId, courseId } },
-          update: {},
-          create: { userId: order.userId, courseId, orderId: order.id },
-        });
+      // Grant access to each subject in the combination (only for registered users)
+      if (order.userId) {
+        const courseIds = order.combination.items.map((i) => i.courseId);
+        for (const courseId of courseIds) {
+          await this.prisma.userCourse.upsert({
+            where: { userId_courseId: { userId: order.userId, courseId } },
+            update: {},
+            create: { userId: order.userId, courseId, orderId: order.id },
+          });
+        }
+        this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted to user ${order.userId}`);
+      } else {
+        this.logger.log(`Order ${order_id} marked PAID (guest order – no course access grants needed)`);
       }
-
-      this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted`);
       return { message: 'Payment successful' };
     }
 
@@ -163,7 +209,7 @@ export class PaymentsService {
     orderId: string,
     merchantRef: string,
     amountLkr: number,
-    user: { name: string; email: string },
+    user: { name: string; email: string; phone?: string },
   ) {
     const merchantId = process.env.IPG_MERCHANT_ID!;
     const merchantSecret = process.env.IPG_MERCHANT_SECRET!;
@@ -196,7 +242,7 @@ export class PaymentsService {
       first_name: firstName || '',
       last_name: rest.join(' ') || '',
       email: user.email,
-      phone: '',
+      phone: user.phone ?? '',
       address: '',
       city: '',
       country: 'Sri Lanka',
