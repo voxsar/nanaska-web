@@ -1,0 +1,121 @@
+[
+  {
+    "path": "/rest/payment/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:08.869+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payment/init\"}"
+  },
+  {
+    "path": "/rest/payment/initialize",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:08.962+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payment/initialize\"}"
+  },
+  {
+    "path": "/rest/payment/setup",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.014+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payment/setup\"}"
+  },
+  {
+    "path": "/rest/payment/checkout",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.111+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payment/checkout\"}"
+  },
+  {
+    "path": "/rest/payment/request",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.212+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payment/request\"}"
+  },
+  {
+    "path": "/rest/payments/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.312+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payments/init\"}"
+  },
+  {
+    "path": "/rest/payments/initialize",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.414+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/payments/initialize\"}"
+  },
+  {
+    "path": "/rest/merchant/payment/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.460+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/merchant/payment/init\"}"
+  },
+  {
+    "path": "/rest/ipg/payment/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.561+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/ipg/payment/init\"}"
+  },
+  {
+    "path": "/rest/ipg/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.609+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/ipg/init\"}"
+  },
+  {
+    "path": "/rest/checkout/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.659+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/checkout/init\"}"
+  },
+  {
+    "path": "/rest/checkout",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.704+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/checkout\"}"
+  },
+  {
+    "path": "/rest/pg/payment/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.753+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/pg/payment/init\"}"
+  },
+  {
+    "path": "/rest/pg/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.799+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/pg/init\"}"
+  },
+  {
+    "path": "/rest/transaction/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.849+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/transaction/init\"}"
+  },
+  {
+    "path": "/rest/service/payment",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:09.944+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/service/payment\"}"
+  },
+  {
+    "path": "/rest/service/payment/init",
+    "status": 404,
+    "server": "",
+    "ct": "application/json",
+    "body": "{\"timestamp\":\"2026-03-19T12:19:10.071+0000\",\"status\":404,\"error\":\"Not Found\",\"path\":\"/rest/service/payment/init\"}"
+  }
+]

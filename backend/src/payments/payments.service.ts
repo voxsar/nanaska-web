@@ -25,6 +25,14 @@ export class PaymentsService {
 
 	constructor(private readonly prisma: PrismaService) { }
 
+	/** HMAC-SHA256 of bodyJson signed with IPG_MERCHANT_SECRET, base64-encoded. */
+	private sign(bodyJson: string): string {
+		return crypto
+			.createHmac('sha256', process.env.IPG_MERCHANT_SECRET!)
+			.update(bodyJson)
+			.digest('base64');
+	}
+
 	// ──────────────────────────────────────────────────────────────────────────
 	// POST /payments/create
 	// ──────────────────────────────────────────────────────────────────────────
@@ -197,11 +205,11 @@ export class PaymentsService {
 
 	/**
 	 * Step 1 of 2: PAYMENT_INIT
-	 * Calls the PayCorp SMP proxy endpoint to create a hosted payment page session.
 	 *
-	 * Auth: xauthtoken (merchant session/API token) sent as header.
-	 * Body uses the SMP proxy envelope: serviceId / resource / action / requestData.
-	 * On success the payment URL is in response.body.responseData.paymentUrl.
+	 * Calls the PayCorp merchant API to create a hosted payment page session.
+	 * Auth: AUTHTOKEN header (merchant UUID) + HMAC header (HMAC-SHA256 of body).
+	 * On success PayCorp returns { paymentPageUrl, reqid }.
+	 * The caller redirects the browser to paymentPageUrl.
 	 */
 	private async callPayCorpCheckout(
 		orderId: string,
@@ -210,56 +218,34 @@ export class PaymentsService {
 		user: { name: string; email: string; phone?: string },
 	): Promise<string> {
 		const clientId = parseInt(process.env.IPG_MERCHANT_ID!, 10);
-		const sessionToken = process.env.IPG_AUTH_TOKEN!;  // merchant session/API token → xauthtoken
-		const apiUrl = process.env.IPG_BASE_URL!;
+		const initUrl = process.env.IPG_INIT_URL || process.env.IPG_BASE_URL!;
 
-		// Unique per-request IV phrase used as DeviceId seed (required by SMP)
-		const ivPhrase = crypto.randomBytes(16).toString('hex');
-		const deviceId = crypto.createHash('md5').update(ivPhrase).digest('hex');
-
-		// SMP proxy envelope – matches the createPaymentUrl action in the Bancstac SPA
-		const requestData = {
-			transactionType: 'PURCHASE',
+		const body = {
 			clientId,
-			expiryInMins: 30,
-			transactionAmount: amountLkr,
-			clientRef: merchantRef,
+			type: 'PURCHASE',
+			amount: {
+				paymentAmount: amountLkr,
+				currency: process.env.IPG_CURRENCY || 'LKR',
+			},
 			redirect: {
 				returnUrl: process.env.IPG_RETURN_URL!,
 				returnMethod: 'GET',
 			},
-			pageType: 'HOSTED',
-			paymentType: 'PURCHASE',
+			clientRef: merchantRef,
 		};
 
-		const requestBody = {
-			serviceId: 'paycentre',
-			resource: 'PAYMENT',
-			action: 'INIT',
-			msgId: String(Date.now()),
-			requestDate: new Date().toISOString(),
-			version: '1.0.4',
-			validateOnly: false,
-			requestData,
-		};
+		const bodyJson = JSON.stringify(body);
+		const hmac = this.sign(bodyJson);
 
-		const bodyJson = JSON.stringify(requestBody);
+		this.logger.log(`PayCorp PAYMENT_INIT → ${initUrl}\n  Body: ${bodyJson}`);
 
-		this.logger.log(
-			`PayCorp PAYMENT_INIT → ${apiUrl}\n` +
-			`  Headers: xauthtoken=*****, DeviceId=${deviceId}\n` +
-			`  Body: ${bodyJson}`,
-		);
-
-		const res = await fetch(apiUrl, {
+		const res = await fetch(initUrl, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
-				'xauthtoken': sessionToken,
-				'requestSource': 'CONSOLE',
-				'DeviceId': deviceId,
-				'IvPhrase': ivPhrase,
+				'AUTHTOKEN': process.env.IPG_AUTH_TOKEN!,
+				'HMAC': hmac,
 			},
 			body: bodyJson,
 		});
@@ -269,25 +255,23 @@ export class PaymentsService {
 
 		if (!res.ok) {
 			throw new BadRequestException(
-				data?.responseData?.errorMessage || data?.message || data?.error || `PayCorp error ${res.status}`,
+				data?.message || data?.error || `PayCorp error ${res.status}`,
 			);
 		}
 
-		// Response shape: { responseData: { paymentUrl: '...', clientRef: '...' } }
 		const paymentPageUrl: string =
-			data?.responseData?.paymentUrl ??
-			data?.responseData?.paymentPageUrl ??
-			data?.responseData?.redirectUrl ??
-			data?.paymentUrl ??
-			data?.paymentPageUrl;
+			data?.paymentPageUrl ??
+			data?.paymentURL ??
+			data?.redirectUrl ??
+			data?.data?.paymentPageUrl;
 
 		if (!paymentPageUrl) {
-			this.logger.error(`PayCorp PAYMENT_INIT missing paymentUrl: ${JSON.stringify(data)}`);
+			this.logger.error(`PayCorp PAYMENT_INIT – no paymentPageUrl in response: ${JSON.stringify(data)}`);
 			throw new BadRequestException('PayCorp did not return a payment page URL');
 		}
 
-		// Store the reqid / reference so PAYMENT_COMPLETE can reference it
-		const reqid = data?.responseData?.reqid ?? data?.responseData?.requestId ?? data?.reqid;
+		// Persist the reqid so PAYMENT_COMPLETE can look up the order
+		const reqid = data?.reqid ?? data?.ReqID ?? data?.requestId;
 		if (reqid) {
 			await this.prisma.order.updateMany({
 				where: { ipgMerchantRef: merchantRef },
@@ -305,47 +289,38 @@ export class PaymentsService {
 	 * Returns { success, redirectTo } so the controller can redirect the browser.
 	 * Ref: Paycenter Web 4.0 §6.9
 	 */
+	/**
+	 * Step 2 of 2: PAYMENT_COMPLETE
+	 *
+	 * Called when PayCorp GETs the merchant returnUrl with ?ReqID=xxx.
+	 * Submits the ReqID back to PayCorp to finalise and get the transaction result.
+	 */
 	async completePayment(reqid: string): Promise<{ success: boolean; redirectTo: string }> {
 		const clientId = parseInt(process.env.IPG_MERCHANT_ID!, 10);
-		const sessionToken = process.env.IPG_AUTH_TOKEN!;
-		const apiUrl = process.env.IPG_BASE_URL!;
+		const completeUrl = process.env.IPG_COMPLETE_URL || process.env.IPG_BASE_URL!;
 
-		const ivPhrase = crypto.randomBytes(16).toString('hex');
-		const deviceId = crypto.createHash('md5').update(ivPhrase).digest('hex');
+		const body = { clientId, reqid };
+		const bodyJson = JSON.stringify(body);
+		const hmac = this.sign(bodyJson);
 
-		// Proxy envelope for PAYMENT_ENQUIRE – gets current status for a reqid
-		const requestBody = {
-			serviceId: 'paycentre',
-			resource: 'PAYMENT',
-			action: 'ENQUIRE',
-			msgId: String(Date.now()),
-			requestDate: new Date().toISOString(),
-			version: '1.0.4',
-			validateOnly: false,
-			requestData: { clientId, reqid },
-		};
-		const bodyJson = JSON.stringify(requestBody);
+		this.logger.log(`PayCorp PAYMENT_COMPLETE reqid=${reqid}`);
 
-		this.logger.log(`PayCorp PAYMENT_ENQUIRE reqid=${reqid}`);
-
-		const res = await fetch(apiUrl, {
+		const res = await fetch(completeUrl, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'Accept': 'application/json',
-				'xauthtoken': sessionToken,
-				'requestSource': 'CONSOLE',
-				'DeviceId': deviceId,
-				'IvPhrase': ivPhrase,
+				'AUTHTOKEN': process.env.IPG_AUTH_TOKEN!,
+				'HMAC': hmac,
 			},
 			body: bodyJson,
 		});
 
 		const data: any = await res.json().catch(() => ({}));
-		this.logger.log(`PayCorp PAYMENT_ENQUIRE response (${res.status}): ${JSON.stringify(data)}`);
+		this.logger.log(`PayCorp PAYMENT_COMPLETE response (${res.status}): ${JSON.stringify(data)}`);
 
-		const responseCode: string = data?.responseData?.responseCode ?? data?.responseCode ?? '';
-		const txnRef: string = String(data?.responseData?.txnReference ?? data?.responseData?.transactionRef ?? data?.txnReference ?? '');
+		const responseCode: string = data?.responseCode ?? data?.data?.responseCode ?? '';
+		const txnRef: string = String(data?.txnReference ?? data?.data?.txnReference ?? data?.transactionRef ?? '');
 		const success = res.ok && responseCode === '00';
 
 		// Find and update the order
