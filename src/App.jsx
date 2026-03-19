@@ -5,15 +5,16 @@ import Footer from './components/Footer';
 import FloatingWidgets from './components/FloatingWidgets';
 import MobileBottomNav from './components/MobileBottomNav';
 import { CartProvider } from './context/CartContext';
+import { PricingProvider } from './context/PricingContext';
 
 /* Scrolls to the top of the page on every route change */
 function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'instant' });
-  }, [pathname]);
-  return null;
+	const { pathname } = useLocation();
+	useEffect(() => {
+		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'instant' });
+	}, [pathname]);
+	return null;
 }
 
 import HomePage from './pages/HomePage';
@@ -45,76 +46,78 @@ import './App.css';
 
 /* Handles dynamic course routes */
 function CourseRouteWrapper() {
-  const { courseSlug } = useParams();
+	const { courseSlug } = useParams();
 
-  const course = getCourseBySlug(courseSlug);
+	const course = getCourseBySlug(courseSlug);
 
-  if (!course) {
-    return <Navigate to="/" replace />;
-  }
+	if (!course) {
+		return <Navigate to="/" replace />;
+	}
 
-  const level = getLevelById(course.levelId);
+	const level = getLevelById(course.levelId);
 
-  return <IndividualCoursePage course={course} level={level} />;
+	return <IndividualCoursePage course={course} level={level} />;
 }
 
 
 /* Shared layout (Navbar + Footer + Floating widgets) */
 function Layout() {
-  return (
-    <>
-      <Navbar />
-      <Outlet />
-      <Footer />
-      <FloatingWidgets />
-      <MobileBottomNav />
-    </>
-  );
+	return (
+		<>
+			<Navbar />
+			<Outlet />
+			<Footer />
+			<FloatingWidgets />
+			<MobileBottomNav />
+		</>
+	);
 }
 
 
 function App() {
-  return (
-    <BrowserRouter>
-      <CartProvider>
-        <ScrollToTop />
-        <Routes>
+	return (
+		<BrowserRouter>
+			<PricingProvider>
+				<CartProvider>
+					<ScrollToTop />
+					<Routes>
 
-          {/* Funnel landing pages (no navbar/footer) */}
-          <Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />
-          <Route path="/case-study" element={<CaseStudyPage />} />
-          <Route path="/certificate-level-intake" element={<CertificateLevelIntakePage />} />
+						{/* Funnel landing pages (no navbar/footer) */}
+						<Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />
+						<Route path="/case-study" element={<CaseStudyPage />} />
+						<Route path="/certificate-level-intake" element={<CertificateLevelIntakePage />} />
 
-          {/* Regular pages with layout */}
-          <Route element={<Layout />}>
+						{/* Regular pages with layout */}
+						<Route element={<Layout />}>
 
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/our-faculty" element={<OurFacultyPage />} />
-            <Route path="/our-specialty" element={<OurSpecialtyPage />} />
-            <Route path="/nanaska-alumni" element={<NanaskaAlumniPage />} />
+							<Route path="/" element={<HomePage />} />
+							<Route path="/about" element={<AboutPage />} />
+							<Route path="/our-faculty" element={<OurFacultyPage />} />
+							<Route path="/our-specialty" element={<OurSpecialtyPage />} />
+							<Route path="/nanaska-alumni" element={<NanaskaAlumniPage />} />
 
-            <Route path="/cima-certificate-level" element={<CertificateLevelPage />} />
-            <Route path="/cima-operational-level" element={<OperationalLevelPage />} />
-            <Route path="/cima-management-level" element={<ManagementLevelPage />} />
-            <Route path="/cima-strategic-level" element={<StrategicLevelPage />} />
+							<Route path="/cima-certificate-level" element={<CertificateLevelPage />} />
+							<Route path="/cima-operational-level" element={<OperationalLevelPage />} />
+							<Route path="/cima-management-level" element={<ManagementLevelPage />} />
+							<Route path="/cima-strategic-level" element={<StrategicLevelPage />} />
 
-            <Route path="/testimonials" element={<TestimonialsPage />} />
+							<Route path="/testimonials" element={<TestimonialsPage />} />
 
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/lecturers" element={<LecturersPage />} />
-            <Route path="/enrollment" element={<EnrollmentPage />} />
+							<Route path="/contact" element={<ContactPage />} />
+							<Route path="/lecturers" element={<LecturersPage />} />
+							<Route path="/enrollment" element={<EnrollmentPage />} />
 
-            {/* Dynamic course pages */}
-            <Route path="/:courseSlug" element={<CourseRouteWrapper />} />
+							{/* Dynamic course pages */}
+							<Route path="/:courseSlug" element={<CourseRouteWrapper />} />
 
-          </Route>
+						</Route>
 
-        </Routes>
+					</Routes>
 
-      </CartProvider>
-    </BrowserRouter>
-  );
+				</CartProvider>
+			</PricingProvider>
+		</BrowserRouter>
+	);
 }
 
 export default App;

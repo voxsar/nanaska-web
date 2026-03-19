@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { usePricing } from '../context/PricingContext';
+import { getCombinationIdForLevel } from '../data/pricingData';
 import './EnrollmentPage.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
@@ -18,18 +20,22 @@ const COUNTRIES = [
 ];
 
 export default function EnrollmentPage() {
-	const { cartItems, cartTotal, clearCart } = useCart();
+	const { cartItems, clearCart, getItemPrice, getCartTotal } = useCart();
+	const { selectedCountry, setSelectedCountry, formatAmount } = usePricing();
 	const [submitted, setSubmitted] = useState(false);
 	const [showCimaId, setShowCimaId] = useState(false);
 	const [form, setForm] = useState({
 		firstName: '', lastName: '', email: '', phone: '', whatsapp: '',
 		cimaId: '', cimaStage: '', dob: '', gender: '',
-		country: '', street: '', city: '', postcode: '',
+		country: selectedCountry || '', street: '', city: '', postcode: '',
 		notes: '', terms: false,
 	});
 
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
+		if (name === 'country') {
+			setSelectedCountry(value);
+		}
 		setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
 	};
 
@@ -44,6 +50,10 @@ export default function EnrollmentPage() {
 	 */
 	const handlePayOnline = async (combinationId) => {
 		if (!API_URL) return;
+		if (!combinationId) {
+			setPayError('No payment package is configured for this selection yet.');
+			return;
+		}
 
 		// Guests must have filled in at least their name and email first
 		const token = localStorage.getItem('nanaska_token');
@@ -108,6 +118,8 @@ export default function EnrollmentPage() {
 		}
 	};
 
+	const cartTotal = getCartTotal(form.country || selectedCountry);
+
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		setSubmitted(true);
@@ -164,13 +176,13 @@ export default function EnrollmentPage() {
 														</span>
 													)}
 												</div>
-												<span className="enrollment-page__summary-price">LKR {item.price.toLocaleString()}</span>
+												<span className="enrollment-page__summary-price">{formatAmount(getItemPrice(item, form.country || selectedCountry))}</span>
 											</li>
 										))}
 									</ul>
 									<div className="enrollment-page__summary-total">
 										<span>Estimated Total</span>
-										<span>LKR {cartTotal.toLocaleString()}</span>
+										<span>{formatAmount(cartTotal)}</span>
 									</div>
 									<p className="enrollment-page__summary-note">
 										ℹ️ Final pricing will be confirmed by our team upon enrollment review.
@@ -187,7 +199,7 @@ export default function EnrollmentPage() {
 												type="button"
 												className="enrollment-page__pay-btn"
 												disabled={paying}
-												onClick={() => handlePayOnline(cartItems[0].levelId + '_full')}
+												onClick={() => handlePayOnline(getCombinationIdForLevel(cartItems[0].levelId))}
 											>
 												{paying ? 'Redirecting…' : '💳 Pay Online Now'}
 											</button>
