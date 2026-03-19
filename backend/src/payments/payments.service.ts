@@ -25,12 +25,36 @@ export class PaymentsService {
 
 	constructor(private readonly prisma: PrismaService) { }
 
-	/** HMAC-SHA256 of bodyJson signed with IPG_MERCHANT_SECRET, base64-encoded. */
-	private sign(bodyJson: string): string {
+	/** HMAC-SHA256 of envelopeJson signed with IPG_HMAC_SECRET (hex-encoded, as required by PayCorp). */
+	private sign(envelopeJson: string): string {
 		return crypto
-			.createHmac('sha256', process.env.IPG_MERCHANT_SECRET!)
-			.update(bodyJson)
-			.digest('base64');
+			.createHmac('sha256', process.env.IPG_HMAC_SECRET!)
+			.update(envelopeJson, 'utf8')
+			.digest('hex');
+	}
+
+	/**
+	 * Wraps requestData in the PayCorp API envelope.
+	 * The HMAC must be computed over the JSON of this envelope.
+	 */
+	private buildEnvelope(operation: string, requestData: object): object {
+		const now = new Date();
+		const requestDate =
+			now.getFullYear() + '-' +
+			String(now.getMonth() + 1).padStart(2, '0') + '-' +
+			String(now.getDate()).padStart(2, '0') + ' ' +
+			String(now.getHours()).padStart(2, '0') + ':' +
+			String(now.getMinutes()).padStart(2, '0') + ':' +
+			String(now.getSeconds()).padStart(2, '0');
+
+		return {
+			version: '1.5.6',
+			msgId: crypto.randomUUID(),
+			operation,
+			requestDate,
+			validateOnly: false,
+			requestData,
+		};
 	}
 
 	// ──────────────────────────────────────────────────────────────────────────
@@ -116,7 +140,7 @@ export class PaymentsService {
 		const { merchant_id, order_id, payhere_amount, payhere_currency, status_code, md5sig } = body;
 
 		// 1. Verify merchant identity
-		if (merchant_id !== process.env.IPG_MERCHANT_ID) {
+		if (merchant_id !== process.env.IPG_CUSTOMER_ID) {
 			this.logger.warn('Webhook: merchant_id mismatch');
 			throw new BadRequestException('Invalid merchant');
 		}
@@ -217,29 +241,34 @@ export class PaymentsService {
 		amountLkr: number,
 		user: { name: string; email: string; phone?: string },
 	): Promise<string> {
-		const clientId = parseInt(process.env.IPG_MERCHANT_ID!, 10);
-		const initUrl = process.env.IPG_INIT_URL || process.env.IPG_BASE_URL!;
+		const clientId = parseInt(process.env.IPG_CLIENT_ID!, 10);
+		const serviceEndpoint = process.env.IPG_SERVICE_ENDPOINT || process.env.IPG_BASE_URL!
 
-		const body = {
+		const requestData = {
 			clientId,
-			type: 'PURCHASE',
-			amount: {
+			transactionType: 'PURCHASE',
+			transactionAmount: {
+				totalAmount: amountLkr,
 				paymentAmount: amountLkr,
+				serviceFeeAmount: 0,
 				currency: process.env.IPG_CURRENCY || 'LKR',
 			},
 			redirect: {
 				returnUrl: process.env.IPG_RETURN_URL!,
+				cancelUrl: process.env.IPG_CANCEL_URL || process.env.IPG_RETURN_URL!,
 				returnMethod: 'GET',
 			},
 			clientRef: merchantRef,
+			tokenize: false,
 		};
 
-		const bodyJson = JSON.stringify(body);
-		const hmac = this.sign(bodyJson);
+		const envelope = this.buildEnvelope('PAYMENT_INIT', requestData);
+		const envelopeJson = JSON.stringify(envelope);
+		const hmac = this.sign(envelopeJson);
 
-		this.logger.log(`PayCorp PAYMENT_INIT → ${initUrl}\n  Body: ${bodyJson}`);
+		this.logger.log(`PayCorp PAYMENT_INIT → ${serviceEndpoint}\n  Body: ${envelopeJson}`);
 
-		const res = await fetch(initUrl, {
+		const res = await fetch(serviceEndpoint, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -247,7 +276,7 @@ export class PaymentsService {
 				'AUTHTOKEN': process.env.IPG_AUTH_TOKEN!,
 				'HMAC': hmac,
 			},
-			body: bodyJson,
+			body: envelopeJson,
 		});
 
 		const data: any = await res.json().catch(() => ({}));
@@ -259,11 +288,12 @@ export class PaymentsService {
 			);
 		}
 
+		// PayCorp wraps the result under responseData
+		const rd = data?.responseData ?? data;
 		const paymentPageUrl: string =
-			data?.paymentPageUrl ??
-			data?.paymentURL ??
-			data?.redirectUrl ??
-			data?.data?.paymentPageUrl;
+			rd?.paymentPageUrl ??
+			rd?.paymentURL ??
+			rd?.redirectUrl;
 
 		if (!paymentPageUrl) {
 			this.logger.error(`PayCorp PAYMENT_INIT – no paymentPageUrl in response: ${JSON.stringify(data)}`);
@@ -271,7 +301,7 @@ export class PaymentsService {
 		}
 
 		// Persist the reqid so PAYMENT_COMPLETE can look up the order
-		const reqid = data?.reqid ?? data?.ReqID ?? data?.requestId;
+		const reqid = rd?.reqid ?? rd?.ReqID ?? rd?.requestId;
 		if (reqid) {
 			await this.prisma.order.updateMany({
 				where: { ipgMerchantRef: merchantRef },
@@ -296,16 +326,17 @@ export class PaymentsService {
 	 * Submits the ReqID back to PayCorp to finalise and get the transaction result.
 	 */
 	async completePayment(reqid: string): Promise<{ success: boolean; redirectTo: string }> {
-		const clientId = parseInt(process.env.IPG_MERCHANT_ID!, 10);
-		const completeUrl = process.env.IPG_COMPLETE_URL || process.env.IPG_BASE_URL!;
+		const clientId = parseInt(process.env.IPG_CLIENT_ID!, 10);
+		const serviceEndpoint = process.env.IPG_SERVICE_ENDPOINT || process.env.IPG_BASE_URL!
 
-		const body = { clientId, reqid };
-		const bodyJson = JSON.stringify(body);
-		const hmac = this.sign(bodyJson);
+		const requestData = { clientId, reqid };
+		const envelope = this.buildEnvelope('PAYMENT_COMPLETE', requestData);
+		const envelopeJson = JSON.stringify(envelope);
+		const hmac = this.sign(envelopeJson);
 
 		this.logger.log(`PayCorp PAYMENT_COMPLETE reqid=${reqid}`);
 
-		const res = await fetch(completeUrl, {
+		const res = await fetch(serviceEndpoint, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -313,14 +344,16 @@ export class PaymentsService {
 				'AUTHTOKEN': process.env.IPG_AUTH_TOKEN!,
 				'HMAC': hmac,
 			},
-			body: bodyJson,
+			body: envelopeJson,
 		});
 
 		const data: any = await res.json().catch(() => ({}));
 		this.logger.log(`PayCorp PAYMENT_COMPLETE response (${res.status}): ${JSON.stringify(data)}`);
 
-		const responseCode: string = data?.responseCode ?? data?.data?.responseCode ?? '';
-		const txnRef: string = String(data?.txnReference ?? data?.data?.txnReference ?? data?.transactionRef ?? '');
+		// PayCorp wraps results under responseData
+		const rd = data?.responseData ?? data;
+		const responseCode: string = rd?.responseCode ?? '';
+		const txnRef: string = String(rd?.txnReference ?? rd?.transactionRef ?? '');
 		const success = res.ok && responseCode === '00';
 
 		// Find and update the order
