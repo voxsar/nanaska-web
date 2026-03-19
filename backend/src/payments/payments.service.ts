@@ -207,12 +207,12 @@ export class PaymentsService {
 		amountLkr: number,
 		user: { name: string; email: string; phone?: string },
 	): Promise<string> {
-		const clientId    = process.env.IPG_MERCHANT_ID!;
-		const authToken   = process.env.IPG_AUTH_TOKEN!;
-		const hmacSecret  = process.env.IPG_MERCHANT_SECRET!;
-		const currency    = process.env.IPG_CURRENCY || 'LKR';
-		const amount      = amountLkr.toFixed(2);
-		const apiUrl      = process.env.IPG_BASE_URL!;
+		const clientId = process.env.IPG_MERCHANT_ID!;
+		const authToken = process.env.IPG_AUTH_TOKEN!;
+		const hmacSecret = process.env.IPG_MERCHANT_SECRET!;
+		const currency = process.env.IPG_CURRENCY || 'LKR';
+		const amount = amountLkr.toFixed(2);
+		const apiUrl = process.env.IPG_BASE_URL!;
 
 		const [firstName, ...rest] = user.name.split(' ');
 
@@ -221,12 +221,12 @@ export class PaymentsService {
 			amount,
 			currency,
 			customerFirstName: firstName || '',
-			customerLastName:  rest.join(' ') || '',
-			customerEmail:     user.email,
-			customerMobile:    user.phone ?? '',
-			returnUrl:  process.env.IPG_RETURN_URL,
-			cancelUrl:  process.env.IPG_CANCEL_URL,
-			notifyUrl:  process.env.IPG_NOTIFY_URL,
+			customerLastName: rest.join(' ') || '',
+			customerEmail: user.email,
+			customerMobile: user.phone ?? '',
+			returnUrl: process.env.IPG_RETURN_URL,
+			cancelUrl: process.env.IPG_CANCEL_URL,
+			notifyUrl: process.env.IPG_NOTIFY_URL,
 		};
 
 		const bodyJson = JSON.stringify(requestBody);
@@ -243,9 +243,9 @@ export class PaymentsService {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'client_id':    clientId,
-				'auth_token':   authToken,
-				'hash':         hash,
+				'client_id': clientId,
+				'auth_token': authToken,
+				'hash': hash,
 			},
 			body: bodyJson,
 		});
