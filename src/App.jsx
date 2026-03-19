@@ -108,7 +108,7 @@ function App() {
 							<Route path="/contact" element={<ContactPage />} />
 							<Route path="/lecturers" element={<LecturersPage />} />
 							<Route path="/enrollment" element={<EnrollmentPage />} />						<Route path="/payment-success" element={<PaymentSuccessPage />} />
-						<Route path="/payment-cancel" element={<PaymentCancelPage />} />
+							<Route path="/payment-cancel" element={<PaymentCancelPage />} />
 							{/* Dynamic course pages */}
 							<Route path="/:courseSlug" element={<CourseRouteWrapper />} />
 
