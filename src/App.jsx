@@ -6,6 +6,7 @@ import FloatingWidgets from './components/FloatingWidgets';
 import MobileBottomNav from './components/MobileBottomNav';
 import { CartProvider } from './context/CartContext';
 import { PricingProvider } from './context/PricingContext';
+import AdminApp from './admin/AdminApp';
 
 /* Scrolls to the top of the page on every route change */
 function ScrollToTop() {
@@ -83,6 +84,9 @@ function App() {
 				<CartProvider>
 					<ScrollToTop />
 					<Routes>
+
+						{/* Admin panel – completely separate layout */}
+						<Route path="/admin/*" element={<AdminApp />} />
 
 						{/* Funnel landing pages (no navbar/footer) */}
 						<Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />

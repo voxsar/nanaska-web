@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { CoursesService } from './courses.service';
+import { AdminJwtAuthGuard } from '../admin/admin-jwt-auth.guard';
 
 @Controller('courses')
 export class CoursesController {
@@ -27,5 +28,26 @@ export class CoursesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.coursesService.findOne(id);
+  }
+
+  /** Admin: create course */
+  @UseGuards(AdminJwtAuthGuard)
+  @Post()
+  create(@Body() data: { id: string; name: string; price: number; level: string; slug: string; description?: string }) {
+    return this.coursesService.create(data);
+  }
+
+  /** Admin: update course */
+  @UseGuards(AdminJwtAuthGuard)
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: Partial<{ name: string; price: number; level: string; slug: string; description: string }>) {
+    return this.coursesService.update(id, data);
+  }
+
+  /** Admin: delete course */
+  @UseGuards(AdminJwtAuthGuard)
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.coursesService.remove(id);
   }
 }
