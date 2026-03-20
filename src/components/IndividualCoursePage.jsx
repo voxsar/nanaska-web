@@ -15,9 +15,22 @@ export default function IndividualCoursePage({ course, level }) {
 
 	const { data: apiLecturers } = useApi('/lecturers?active=true');
 	const { data: dbCourse } = useApi(`/courses/${course.code}`);
-	const LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
+	const ALL_LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
 	// Overlay DB fields (icon, subtitle, highlights, syllabus, outcomes) over static course data
 	const mergedCourse = dbCourse ? { ...course, ...dbCourse, code: course.code } : course;
+
+	// Pick lecturers for this course: use lecturerIds if set, otherwise fall back to first lecturer
+	const courseLecturers = (() => {
+		const ids = mergedCourse.lecturerIds;
+		if (Array.isArray(ids) && ids.length > 0) {
+			const matched = ids.map((lid) => ALL_LECTURERS.find((l) => String(l.id) === String(lid))).filter(Boolean);
+			if (matched.length > 0) return matched;
+		}
+		return ALL_LECTURERS.slice(0, 1);
+	})();
+
+	// Duration: prefer course-level override, then level default
+	const displayDuration = mergedCourse.duration || level.duration;
 
 	const inCart = isInCart(course.code);
 	const levelInCart = isLevelInCart(level.levelId);
@@ -52,7 +65,7 @@ export default function IndividualCoursePage({ course, level }) {
 
 					<div className="individual-course__meta">
 						<span className="individual-course__meta-item">📚 {level.title}</span>
-						<span className="individual-course__meta-item">⏱ {level.duration}</span>
+					<span className="individual-course__meta-item">⏱ {displayDuration}</span>
 						<span className="individual-course__meta-item">💰 From {formatAmount(coursePrice)}</span>
 					</div>
 
@@ -96,7 +109,7 @@ export default function IndividualCoursePage({ course, level }) {
 									<dt>Level</dt>
 									<dd>{level.title}</dd>
 									<dt>Duration</dt>
-									<dd>{level.duration}</dd>
+									<dd>{displayDuration}</dd>
 									<dt>Qualification</dt>
 									<dd>{level.qualification}</dd>
 									<dt>Price</dt>
@@ -171,11 +184,15 @@ export default function IndividualCoursePage({ course, level }) {
 				</div>
 			</section>
 
-			{/* Lecturer */}
+			{/* Lecturer(s) */}
 			<section className="individual-course__lecturer">
 				<div className="individual-course__container">
-					<h2 className="individual-course__section-title">Your Lecturer</h2>
-					<LecturerPanel lecturer={LECTURERS[0]} compact={true} />
+					<h2 className="individual-course__section-title">
+						{courseLecturers.length === 1 ? 'Your Lecturer' : 'Your Lecturers'}
+					</h2>
+					{courseLecturers.map((lec) => (
+						<LecturerPanel key={lec.id ?? lec.name} lecturer={lec} compact={true} />
+					))}
 				</div>
 			</section>
 

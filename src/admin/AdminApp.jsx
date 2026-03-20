@@ -7,6 +7,7 @@ import BlogListPage from './pages/blog/BlogListPage';
 import BlogEditorPage from './pages/blog/BlogEditorPage';
 import LecturersPage from './pages/lecturers/LecturersPage';
 import CoursesPage from './pages/courses/CoursesPage';
+import CourseEditorPage from './pages/courses/CourseEditorPage';
 import StudentsPage from './pages/StudentsPage';
 import NewsletterPage from './pages/NewsletterPage';
 import PaymentsPage from './pages/PaymentsPage';
@@ -30,6 +31,8 @@ export default function AdminApp() {
           <Route path="blog/:id/edit" element={<BlogEditorPage />} />
           <Route path="lecturers" element={<LecturersPage />} />
           <Route path="courses" element={<CoursesPage />} />
+          <Route path="courses/new" element={<CourseEditorPage />} />
+          <Route path="courses/:id/edit" element={<CourseEditorPage />} />
           <Route path="students" element={<StudentsPage />} />
           <Route path="newsletter" element={<NewsletterPage />} />
           <Route path="payments" element={<PaymentsPage />} />

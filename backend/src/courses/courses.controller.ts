@@ -33,14 +33,14 @@ export class CoursesController {
 	/** Admin: create course */
 	@UseGuards(AdminJwtAuthGuard)
 	@Post()
-	create(@Body() data: { id: string; name: string; price: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string }) {
+	create(@Body() data: { id: string; name: string; price: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string; duration?: string; lecturerIds?: string[] }) {
 		return this.coursesService.create(data);
 	}
 
 	/** Admin: update course */
 	@UseGuards(AdminJwtAuthGuard)
 	@Put(':id')
-	update(@Param('id') id: string, @Body() data: Partial<{ name: string; price: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string }>) {
+	update(@Param('id') id: string, @Body() data: Partial<{ name: string; price: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string; duration: string; lecturerIds: string[] }>) {
 		return this.coursesService.update(id, data);
 	}
 

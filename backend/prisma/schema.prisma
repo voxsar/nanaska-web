@@ -38,6 +38,8 @@ model Course {
   syllabus    Json    @default("[]")
   outcomes    String[]
   lecturerName String? @map("lecturer_name")
+  duration    String?
+  lecturerIds String[]
 
   combinationItems CourseCombinationItem[]
   userCourses      UserCourse[]

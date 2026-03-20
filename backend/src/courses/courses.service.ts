@@ -43,12 +43,39 @@ export class CoursesService {
 		return combo;
 	}
 
-	async create(data: { id: string; name: string; price: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string }) {
-		return this.prisma.course.create({ data });
+	async create(data: { id: string; name: string; price: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string; duration?: string; lecturerIds?: string[] }) {
+		const course = await this.prisma.course.create({ data });
+
+		// Auto-create a single-course CourseCombination so payment works immediately
+		const comboId = `${data.level.slice(0, 4)}_${data.id.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+		const existing = await this.prisma.courseCombination.findUnique({ where: { id: comboId } });
+		if (!existing) {
+			await this.prisma.courseCombination.create({
+				data: {
+					id: comboId,
+					level: data.level,
+					price: data.price,
+					items: { create: { courseId: data.id } },
+				},
+			});
+		}
+
+		return course;
 	}
 
-	async update(id: string, data: Partial<{ name: string; price: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string }>) {
-		return this.prisma.course.update({ where: { id }, data });
+	async update(id: string, data: Partial<{ name: string; price: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string; duration: string; lecturerIds: string[] }>) {
+		const course = await this.prisma.course.update({ where: { id }, data });
+
+		// Keep the auto-generated combination price in sync
+		if (data.price !== undefined) {
+			const comboId = `${course.level.slice(0, 4)}_${id.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+			await this.prisma.courseCombination.updateMany({
+				where: { id: comboId },
+				data: { price: data.price },
+			});
+		}
+
+		return course;
 	}
 
 	async remove(id: string) {

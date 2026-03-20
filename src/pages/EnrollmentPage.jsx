@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
@@ -23,6 +23,15 @@ export default function EnrollmentPage() {
 	const { cartItems, getItemPrice, getCartTotal } = useCart();
 	const { selectedCountry, setSelectedCountry, formatAmount, isSriLanka, currency } = usePricing();
 	const [submitted, setSubmitted] = useState(false);
+	// Fetch all combinations from API to look up IDs for admin-created courses
+	const [apiCombinations, setApiCombinations] = useState(null);
+	useEffect(() => {
+		if (!API_URL) return;
+		fetch(`${API_URL}/courses/combinations`)
+			.then((r) => r.ok ? r.json() : [])
+			.then(setApiCombinations)
+			.catch(() => {});
+	}, []);
 	// Country list: Sri Lanka is only shown to visitors detected as being in Sri Lanka.
 	const availableCountries = isSriLanka
 		? COUNTRIES
@@ -121,7 +130,18 @@ export default function EnrollmentPage() {
 		if (cartItems.length !== 1) return '';
 		const item = cartItems[0];
 		if (item.type === 'level') return getCombinationIdForLevel(item.levelId);
-		if (item.type === 'course') return getCombinationIdForCourse(item.courseCode);
+		if (item.type === 'course') {
+			// Try static map first
+			const staticId = getCombinationIdForCourse(item.courseCode);
+			if (staticId) return staticId;
+			// Fall back to API combinations — find one that contains this course and has exactly 1 item
+			if (apiCombinations) {
+				const found = apiCombinations.find(
+					(combo) => combo.items?.length === 1 && combo.items[0]?.course?.id === item.courseCode
+				);
+				if (found) return found.id;
+			}
+		}
 		return '';
 	};
 
