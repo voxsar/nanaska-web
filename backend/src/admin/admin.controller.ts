@@ -37,6 +37,18 @@ export class AdminController {
   }
 
   @UseGuards(AdminJwtAuthGuard)
+  @Get('enrollment-submissions')
+  getEnrollmentSubmissions() {
+    return this.adminService.getEnrollmentSubmissions();
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
+  @Get('paid-students')
+  getPaidStudents() {
+    return this.adminService.getPaidStudents();
+  }
+
+  @UseGuards(AdminJwtAuthGuard)
   @Get('newsletter')
   getNewsletter() {
     return this.adminService.getNewsletter();

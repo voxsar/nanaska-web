@@ -13,6 +13,8 @@ export default function LecturersPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const load = () => {
     api.get('/lecturers').then((r) => setLecturers(r.data)).finally(() => setLoading(false));
@@ -88,6 +90,7 @@ export default function LecturersPage() {
       {loading ? (
         <div className="admin-loading">Loading…</div>
       ) : (
+        <>
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>
@@ -101,7 +104,7 @@ export default function LecturersPage() {
               </tr>
             </thead>
             <tbody>
-              {lecturers.map((l) => (
+              {lecturers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((l) => (
                 <tr key={l.id}>
                   <td>
                     {l.imageUrl ? (
@@ -132,6 +135,14 @@ export default function LecturersPage() {
             </tbody>
           </table>
         </div>
+        {Math.ceil(lecturers.length / PAGE_SIZE) > 1 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, justifyContent: 'flex-end' }}>
+            <button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>‹</button>
+            <span style={{ fontSize: '0.875rem', color: '#64748b' }}>Page {page} / {Math.ceil(lecturers.length / PAGE_SIZE)}</span>
+            <button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page === Math.ceil(lecturers.length / PAGE_SIZE)}>›</button>
+          </div>
+        )}
+        </>
       )}
 
       {modal && (

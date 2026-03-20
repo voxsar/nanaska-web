@@ -147,6 +147,35 @@ export default function EnrollmentPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		// Save enrollment form data to backend before redirecting to payment
+		if (API_URL && form.firstName && form.email) {
+			try {
+				await fetch(`${API_URL}/payments/enrollment-submit`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						firstName: form.firstName,
+						lastName: form.lastName,
+						email: form.email,
+						phone: form.phone || undefined,
+						whatsapp: form.whatsapp || undefined,
+						cimaId: form.cimaId || undefined,
+						cimaStage: form.cimaStage || undefined,
+						dob: form.dob || undefined,
+						gender: form.gender || undefined,
+						country: form.country || undefined,
+						city: form.city || undefined,
+						postcode: form.postcode || undefined,
+						notes: form.notes || undefined,
+						cartItems,
+						currency: currency || 'GBP',
+						amount: cartTotal,
+					}),
+				});
+			} catch (_) {
+				// Non-blocking – proceed to payment even if save fails
+			}
+		}
 		await handlePayOnline(getCartCombinationId());
 	};
 

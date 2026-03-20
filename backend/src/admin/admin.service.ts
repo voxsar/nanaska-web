@@ -49,6 +49,23 @@ export class AdminService {
     });
   }
 
+  async getEnrollmentSubmissions() {
+    return this.prisma.enrollmentSubmission.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async getPaidStudents() {
+    return this.prisma.order.findMany({
+      where: { status: 'PAID' },
+      include: {
+        user: { select: { id: true, email: true, name: true } },
+        combination: { include: { items: { include: { course: true } } } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async getNewsletter() {
     return this.prisma.newsletterSignup.findMany({ orderBy: { createdAt: 'desc' } });
   }

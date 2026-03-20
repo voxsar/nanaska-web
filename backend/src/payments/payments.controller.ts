@@ -16,6 +16,7 @@ import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
+import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('payments')
@@ -40,6 +41,15 @@ export class PaymentsController {
 	@Post('guest-create')
 	createGuestPayment(@Body() dto: GuestPaymentDto, @Headers('origin') origin: string) {
 		return this.paymentsService.createGuestPayment(dto, origin);
+	}
+
+	/**
+	 * POST /payments/enrollment-submit
+	 * Saves enrollment form data (unauthenticated) before the user is redirected to payment.
+	 */
+	@Post('enrollment-submit')
+	saveEnrollment(@Body() dto: EnrollmentSubmitDto) {
+		return this.paymentsService.saveEnrollment(dto);
 	}
 
 	/**

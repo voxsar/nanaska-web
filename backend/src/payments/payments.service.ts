@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
+import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 
 /**
  * PaymentsService
@@ -238,6 +239,31 @@ export class PaymentsService {
 		return `NAN-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 	}
 
+	/** Saves enrollment form data so admin can see unpaid submissions. */
+	async saveEnrollment(dto: EnrollmentSubmitDto): Promise<{ id: string }> {
+		const record = await this.prisma.enrollmentSubmission.create({
+			data: {
+				firstName: dto.firstName,
+				lastName: dto.lastName,
+				email: dto.email,
+				phone: dto.phone || null,
+				whatsapp: dto.whatsapp || null,
+				cimaId: dto.cimaId || null,
+				cimaStage: dto.cimaStage || null,
+				dob: dto.dob || null,
+				gender: dto.gender || null,
+				country: dto.country || null,
+				city: dto.city || null,
+				postcode: dto.postcode || null,
+				notes: dto.notes || null,
+				cartJson: (dto.cartItems || []) as any,
+				currency: dto.currency || 'GBP',
+				amount: dto.amount || 0,
+			},
+		});
+		return { id: record.id };
+	}
+
 	/**
 	 * Step 1 of 2: PAYMENT_INIT
 	 *
@@ -275,8 +301,8 @@ export class PaymentsService {
 			clientId,
 			transactionType: 'PURCHASE',
 			transactionAmount: {
-				totalAmount: amount,
-				paymentAmount: amount,
+				totalAmount: amount * 100,
+				paymentAmount: amount * 100,
 				serviceFeeAmount: 0,
 				currency,
 			},

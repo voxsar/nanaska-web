@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import './Contact.css';
 import { useApi } from '../hooks/useApi';
 
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
+
 // Office coordinates – Galle Road, Colombo 03, Sri Lanka
 const DEFAULT_MAP_LAT = 6.8955;
 const DEFAULT_MAP_LNG = 79.8527;
@@ -143,18 +145,23 @@ export default function Contact() {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setSending(true);
-    // Submit via Netlify Forms (works when deployed to Netlify)
-    const formData = new FormData(e.target);
-    fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(formData).toString() })
-      .then(() => {
+    fetch(`${API_URL}/settings/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    })
+      .then((res) => {
         setSending(false);
-        setSubmitted(true);
-        setFields({ name: '', email: '', phone: '', subject: SUBJECTS[0], message: '' });
+        if (res.ok) {
+          setSubmitted(true);
+          setFields({ name: '', email: '', phone: '', subject: SUBJECTS[0], message: '' });
+        } else {
+          setErrors({ message: 'Submission failed. Please try again.' });
+        }
       })
       .catch(() => {
         setSending(false);
-        setSubmitted(true);
-        setFields({ name: '', email: '', phone: '', subject: SUBJECTS[0], message: '' });
+        setErrors({ message: 'Network error. Please try again.' });
       });
   }
 
@@ -208,10 +215,7 @@ export default function Contact() {
               className="contact__form"
               onSubmit={handleSubmit}
               noValidate
-              data-netlify="true"
-              name="contact"
             >
-              <input type="hidden" name="form-name" value="contact" />
 
               <div className="contact__form-row">
                 <div className={`contact__field${errors.name ? ' contact__field--error' : ''}`}>

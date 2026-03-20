@@ -119,6 +119,31 @@ model UserCourse {
   @@map("user_courses")
 }
 
+// ─── Enrollment Submissions ───────────────────────────────────────────────────
+model EnrollmentSubmission {
+  id        String   @id @default(uuid())
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
+  email     String
+  phone     String?
+  whatsapp  String?
+  cimaId    String?  @map("cima_id")
+  cimaStage String?  @map("cima_stage")
+  dob       String?
+  gender    String?
+  country   String?
+  city      String?
+  postcode  String?
+  notes     String?  @db.Text
+  cartJson  Json     @default("[]") @map("cart_json")
+  currency  String   @default("GBP")
+  amount    Int      @default(0)
+  orderId   String?  @map("order_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("enrollment_submissions")
+}
+
 // ─── Admin Users ─────────────────────────────────────────────────────────────
 model AdminUser {
   id           String    @id @default(uuid())

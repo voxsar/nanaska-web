@@ -76,6 +76,8 @@ export default function CoursesPage() {
 	const [loading, setLoading] = useState(true);
 	const [filterLevel, setFilterLevel] = useState('');
 	const [success, setSuccess] = useState('');
+	const [page, setPage] = useState(1);
+	const PAGE_SIZE = 20;
 
 	useEffect(() => {
 		Promise.all([
@@ -102,6 +104,8 @@ export default function CoursesPage() {
 	};
 
 	const filtered = courses.filter((c) => !filterLevel || c.level === filterLevel);
+	const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
 	return (
 		<div>
@@ -115,7 +119,7 @@ export default function CoursesPage() {
 			<div className="admin-filter-bar">
 				<select
 					value={filterLevel}
-					onChange={(e) => setFilterLevel(e.target.value)}
+					onChange={(e) => { setFilterLevel(e.target.value); setPage(1); }}
 					style={{ padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '8px', fontSize: '0.875rem' }}
 				>
 					<option value="">All Levels</option>
@@ -127,6 +131,7 @@ export default function CoursesPage() {
 			{loading ? (
 				<div className="admin-loading">Loading…</div>
 			) : (
+				<>
 				<div className="admin-table-wrap">
 					<table className="admin-table">
 						<thead>
@@ -141,7 +146,7 @@ export default function CoursesPage() {
 							</tr>
 						</thead>
 						<tbody>
-							{filtered.map((c) => (
+							{paginated.map((c) => (
 								<tr key={c.id}>
 									<td style={{ fontWeight: 600, color: '#3b82f6' }}>{c.id}</td>
 									<td style={{ fontWeight: 500 }}>{c.name}</td>
@@ -163,12 +168,20 @@ export default function CoursesPage() {
 									</td>
 								</tr>
 							))}
-							{filtered.length === 0 && (
+							{paginated.length === 0 && (
 								<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No courses found</td></tr>
 							)}
 						</tbody>
 					</table>
 				</div>
+				{totalPages > 1 && (
+					<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, justifyContent: 'flex-end' }}>
+						<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>‹</button>
+						<span style={{ fontSize: '0.875rem', color: '#64748b' }}>Page {page} / {totalPages}</span>
+						<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>›</button>
+					</div>
+				)}
+				</>
 			)}
 		</div>
 	);

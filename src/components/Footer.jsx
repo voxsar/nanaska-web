@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import nanaskaLogo from '../assets/nanaska-logo.png';
 import './Footer.css';
 
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
+
 const SOCIAL_LINKS = [
   { label: 'Facebook', href: 'https://www.facebook.com/LearnCIMA', initial: 'f' },
   { label: 'Instagram', href: 'https://www.instagram.com/nanaska__/', initial: 'in' },
@@ -22,12 +24,26 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
+  const [subError, setSubError] = useState('');
+
   const handleSubscribe = (e) => {
     e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail('');
-    }
+    if (!email) return;
+    setSubError('');
+    fetch(`${API_URL}/settings/newsletter/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          setSubscribed(true);
+          setEmail('');
+        } else {
+          setSubError('Subscription failed. Please try again.');
+        }
+      })
+      .catch(() => setSubError('Network error. Please try again.'));
   };
 
   return (
@@ -162,6 +178,7 @@ export default function Footer() {
                 </button>
               </form>
             )}
+            {subError && <p className="footer__subscribe-error">{subError}</p>}
           </div>
 
         </div>

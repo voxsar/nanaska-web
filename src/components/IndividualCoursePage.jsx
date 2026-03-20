@@ -10,6 +10,7 @@ import './IndividualCoursePage.css';
 
 export default function IndividualCoursePage({ course, level }) {
 	const [activeTab, setActiveTab] = useState('overview');
+	const [lecturerIdx, setLecturerIdx] = useState(0);
 	const { addCourse, isInCart, isLevelInCart } = useCart();
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
 
@@ -190,9 +191,39 @@ export default function IndividualCoursePage({ course, level }) {
 					<h2 className="individual-course__section-title">
 						{courseLecturers.length === 1 ? 'Your Lecturer' : 'Your Lecturers'}
 					</h2>
-					{courseLecturers.map((lec) => (
-						<LecturerPanel key={lec.id ?? lec.name} lecturer={lec} compact={true} />
-					))}
+					{courseLecturers.length <= 1 ? (
+						courseLecturers.map((lec) => (
+							<LecturerPanel key={lec.id ?? lec.name} lecturer={lec} compact={true} />
+						))
+					) : (
+						<div style={{ position: 'relative' }}>
+							<LecturerPanel lecturer={courseLecturers[lecturerIdx]} compact={true} />
+							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 20 }}>
+								<button
+									onClick={() => setLecturerIdx(i => Math.max(0, i - 1))}
+									disabled={lecturerIdx === 0}
+									style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid #24ADE3', background: lecturerIdx === 0 ? '#f1f5f9' : '#24ADE3', color: lecturerIdx === 0 ? '#94a3b8' : '#fff', fontSize: '1.2rem', cursor: lecturerIdx === 0 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+								>‹</button>
+								<div style={{ display: 'flex', gap: 6 }}>
+									{courseLecturers.map((_, i) => (
+										<button
+											key={i}
+											onClick={() => setLecturerIdx(i)}
+											style={{ width: 10, height: 10, borderRadius: '50%', border: 'none', background: i === lecturerIdx ? '#24ADE3' : '#cbd5e1', cursor: 'pointer', padding: 0 }}
+										/>
+									))}
+								</div>
+								<button
+									onClick={() => setLecturerIdx(i => Math.min(courseLecturers.length - 1, i + 1))}
+									disabled={lecturerIdx === courseLecturers.length - 1}
+									style={{ width: 40, height: 40, borderRadius: '50%', border: '2px solid #24ADE3', background: lecturerIdx === courseLecturers.length - 1 ? '#f1f5f9' : '#24ADE3', color: lecturerIdx === courseLecturers.length - 1 ? '#94a3b8' : '#fff', fontSize: '1.2rem', cursor: lecturerIdx === courseLecturers.length - 1 ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+								>›</button>
+							</div>
+							<p style={{ textAlign: 'center', color: '#64748b', fontSize: '0.85rem', marginTop: 8 }}>
+								{lecturerIdx + 1} of {courseLecturers.length}
+							</p>
+						</div>
+					)}
 				</div>
 			</section>
 
