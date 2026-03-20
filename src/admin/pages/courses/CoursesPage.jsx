@@ -132,55 +132,55 @@ export default function CoursesPage() {
 				<div className="admin-loading">Loading…</div>
 			) : (
 				<>
-				<div className="admin-table-wrap">
-					<table className="admin-table">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Name</th>
-								<th>Level</th>
-								<th>Price (LKR)</th>
-								<th>Duration</th>
-								<th>Lecturers</th>
-								<th>Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{paginated.map((c) => (
-								<tr key={c.id}>
-									<td style={{ fontWeight: 600, color: '#3b82f6' }}>{c.id}</td>
-									<td style={{ fontWeight: 500 }}>{c.name}</td>
-									<td>
-										<span className={`badge ${LEVEL_COLORS[c.level] || 'badge-gray'}`}>
-											{c.level}
-										</span>
-									</td>
-									<td>{c.price?.toLocaleString()}</td>
-									<td style={{ color: '#64748b', fontSize: '0.85rem' }}>{c.duration || '—'}</td>
-									<td>
-										<LecturerSlider ids={c.lecturerIds || []} lecturerMap={lecturerMap} />
-									</td>
-									<td>
-										<div style={{ display: 'flex', gap: '8px' }}>
-											<Link to={`/admin/courses/${c.id}/edit`} className="btn btn-secondary btn-sm">Edit</Link>
-											<button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>Delete</button>
-										</div>
-									</td>
+					<div className="admin-table-wrap">
+						<table className="admin-table">
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>Name</th>
+									<th>Level</th>
+									<th>Price (LKR)</th>
+									<th>Duration</th>
+									<th>Lecturers</th>
+									<th>Actions</th>
 								</tr>
-							))}
-							{paginated.length === 0 && (
-								<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No courses found</td></tr>
-							)}
-						</tbody>
-					</table>
-				</div>
-				{totalPages > 1 && (
-					<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, justifyContent: 'flex-end' }}>
-						<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>‹</button>
-						<span style={{ fontSize: '0.875rem', color: '#64748b' }}>Page {page} / {totalPages}</span>
-						<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>›</button>
+							</thead>
+							<tbody>
+								{paginated.map((c) => (
+									<tr key={c.id}>
+										<td style={{ fontWeight: 600, color: '#3b82f6' }}>{c.id}</td>
+										<td style={{ fontWeight: 500 }}>{c.name}</td>
+										<td>
+											<span className={`badge ${LEVEL_COLORS[c.level] || 'badge-gray'}`}>
+												{c.level}
+											</span>
+										</td>
+										<td>{c.price?.toLocaleString()}</td>
+										<td style={{ color: '#64748b', fontSize: '0.85rem' }}>{c.duration || '—'}</td>
+										<td>
+											<LecturerSlider ids={c.lecturerIds || []} lecturerMap={lecturerMap} />
+										</td>
+										<td>
+											<div style={{ display: 'flex', gap: '8px' }}>
+												<Link to={`/admin/courses/${c.id}/edit`} className="btn btn-secondary btn-sm">Edit</Link>
+												<button className="btn btn-danger btn-sm" onClick={() => handleDelete(c.id)}>Delete</button>
+											</div>
+										</td>
+									</tr>
+								))}
+								{paginated.length === 0 && (
+									<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No courses found</td></tr>
+								)}
+							</tbody>
+						</table>
 					</div>
-				)}
+					{totalPages > 1 && (
+						<div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 16, justifyContent: 'flex-end' }}>
+							<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>‹</button>
+							<span style={{ fontSize: '0.875rem', color: '#64748b' }}>Page {page} / {totalPages}</span>
+							<button className="btn btn-secondary btn-sm" onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>›</button>
+						</div>
+					)}
 				</>
 			)}
 		</div>
