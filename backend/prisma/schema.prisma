@@ -29,6 +29,7 @@ model Course {
   id          String  @id                    // e.g. "BA1", "E1"
   name        String
   price       Int                            // in LKR (whole units, e.g. 16000)
+  priceGbp    Int     @default(0)            @map("price_gbp") // in GBP (whole units, e.g. 105)
   level       String                         // certificate | operational | management | strategic
   slug        String  @unique
   description String? @db.Text
@@ -52,6 +53,7 @@ model CourseCombination {
   id    String @id                           // e.g. "cert_ba1_ba2"
   level String
   price Int                                  // total price in LKR
+  priceGbp Int @default(0)                  @map("price_gbp") // total price in GBP
 
   items  CourseCombinationItem[]
   orders Order[]

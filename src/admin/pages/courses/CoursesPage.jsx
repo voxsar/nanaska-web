@@ -155,8 +155,9 @@ export default function CoursesPage() {
 												{c.level}
 											</span>
 										</td>
-										<td>{c.price?.toLocaleString()}</td>
-										<td style={{ color: '#64748b', fontSize: '0.85rem' }}>{c.duration || '—'}</td>
+										<td>{c.price?.toLocaleString()}</td>									<td style={{ color: c.priceGbp ? '#16a34a' : '#ef4444', fontWeight: c.priceGbp ? 400 : 600 }}>
+											{c.priceGbp ? `£${c.priceGbp.toLocaleString()}` : '⚠ Not set'}
+										</td>										<td style={{ color: '#64748b', fontSize: '0.85rem' }}>{c.duration || '—'}</td>
 										<td>
 											<LecturerSlider ids={c.lecturerIds || []} lecturerMap={lecturerMap} />
 										</td>
@@ -169,7 +170,7 @@ export default function CoursesPage() {
 									</tr>
 								))}
 								{paginated.length === 0 && (
-									<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No courses found</td></tr>
+									<tr><td colSpan={8} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No courses found</td></tr>
 								)}
 							</tbody>
 						</table>

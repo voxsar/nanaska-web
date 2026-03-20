@@ -9,6 +9,7 @@ const EMPTY_FORM = {
 	id: '',
 	name: '',
 	price: 0,
+	priceGbp: 0,
 	level: 'certificate',
 	slug: '',
 	description: '',
@@ -49,6 +50,7 @@ export default function CourseEditorPage() {
 					id: c.id || '',
 					name: c.name || '',
 					price: c.price || 0,
+					priceGbp: c.priceGbp || 0,
 					level: c.level || 'certificate',
 					slug: c.slug || '',
 					description: c.description || '',
@@ -70,7 +72,7 @@ export default function CourseEditorPage() {
 		const { name, value } = e.target;
 		setForm((prev) => ({
 			...prev,
-			[name]: name === 'price' ? Number(value) : value,
+			[name]: (name === 'price' || name === 'priceGbp') ? Number(value) : value,
 			...(name === 'name' && !isEdit
 				? { slug: value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') }
 				: {}),
@@ -179,8 +181,10 @@ export default function CourseEditorPage() {
 						<div className="form-group">
 							<label>Price (LKR) *</label>
 							<input name="price" type="number" required min={0} value={form.price} onChange={handleChange} />
-						</div>
-						<div className="form-group">
+						</div>					<div className="form-group">
+							<label>Price (GBP) *</label>
+							<input name="priceGbp" type="number" required min={0} value={form.priceGbp} onChange={handleChange} placeholder="e.g. 105" />
+						</div>						<div className="form-group">
 							<label>Slug *</label>
 							<input name="slug" required value={form.slug} onChange={handleChange} placeholder="auto-generated from name" />
 						</div>

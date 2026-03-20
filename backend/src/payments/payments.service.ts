@@ -74,7 +74,9 @@ export class PaymentsService {
 		if (!user) throw new NotFoundException('User not found');
 
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
-		const amount = currency === 'GBP' && dto.amount ? dto.amount : combo.price;
+		const amount = currency === 'GBP'
+			? (combo.priceGbp && combo.priceGbp > 0 ? combo.priceGbp : (dto.amount || combo.priceGbp || 0))
+			: combo.price;
 		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order
@@ -113,7 +115,9 @@ export class PaymentsService {
 		const fullName = [dto.firstName, dto.lastName].filter(Boolean).join(' ');
 		const phone = dto.phone || '';
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
-		const amount = currency === 'GBP' && dto.amount ? dto.amount : combo.price;
+		const amount = currency === 'GBP'
+			? (combo.priceGbp && combo.priceGbp > 0 ? combo.priceGbp : (dto.amount || combo.priceGbp || 0))
+			: combo.price;
 		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order (no user account required)

@@ -43,7 +43,7 @@ export class CoursesService {
 		return combo;
 	}
 
-	async create(data: { id: string; name: string; price: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string; duration?: string; lecturerIds?: string[] }) {
+	async create(data: { id: string; name: string; price: number; priceGbp?: number; level: string; slug: string; description?: string; icon?: string; subtitle?: string; highlights?: string[]; syllabus?: any; outcomes?: string[]; lecturerName?: string; duration?: string; lecturerIds?: string[] }) {
 		const course = await this.prisma.course.create({ data });
 
 		// Auto-create a single-course CourseCombination so payment works immediately
@@ -55,6 +55,7 @@ export class CoursesService {
 					id: comboId,
 					level: data.level,
 					price: data.price,
+					priceGbp: data.priceGbp || 0,
 					items: { create: { courseId: data.id } },
 				},
 			});
@@ -63,15 +64,18 @@ export class CoursesService {
 		return course;
 	}
 
-	async update(id: string, data: Partial<{ name: string; price: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string; duration: string; lecturerIds: string[] }>) {
+	async update(id: string, data: Partial<{ name: string; price: number; priceGbp: number; level: string; slug: string; description: string; icon: string; subtitle: string; highlights: string[]; syllabus: any; outcomes: string[]; lecturerName: string; duration: string; lecturerIds: string[] }>) {
 		const course = await this.prisma.course.update({ where: { id }, data });
 
 		// Keep the auto-generated combination price in sync
-		if (data.price !== undefined) {
+		if (data.price !== undefined || data.priceGbp !== undefined) {
 			const comboId = `${course.level.slice(0, 4)}_${id.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+			const updateData: any = {};
+			if (data.price !== undefined) updateData.price = data.price;
+			if (data.priceGbp !== undefined) updateData.priceGbp = data.priceGbp;
 			await this.prisma.courseCombination.updateMany({
 				where: { id: comboId },
-				data: { price: data.price },
+				data: updateData,
 			});
 		}
 
