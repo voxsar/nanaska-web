@@ -20,9 +20,13 @@ const COUNTRIES = [
 ];
 
 export default function EnrollmentPage() {
-	const { cartItems, clearCart, getItemPrice, getCartTotal } = useCart();
-	const { selectedCountry, setSelectedCountry, formatAmount } = usePricing();
+	const { cartItems, getItemPrice, getCartTotal } = useCart();
+	const { selectedCountry, setSelectedCountry, formatAmount, isSriLanka } = usePricing();
 	const [submitted, setSubmitted] = useState(false);
+	// Country list: Sri Lanka is only shown to visitors detected as being in Sri Lanka.
+	const availableCountries = isSriLanka
+		? COUNTRIES
+		: COUNTRIES.filter((c) => c !== 'Sri Lanka');
 	const [showCimaId, setShowCimaId] = useState(false);
 	const [form, setForm] = useState({
 		firstName: '', lastName: '', email: '', phone: '', whatsapp: '',
@@ -310,7 +314,7 @@ export default function EnrollmentPage() {
 										value={form.country} onChange={handleChange} required
 									>
 										<option value="">Select country...</option>
-										{COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+										{availableCountries.map(c => <option key={c} value={c}>{c}</option>)}
 									</select>
 								</div>
 								<div className="enrollment-page__field">
