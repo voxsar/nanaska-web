@@ -18,9 +18,9 @@ export class TestimonialsService {
   }
 
   async findOne(id: string) {
-    const t = await this.prisma.testimonial.findUnique({ where: { id } });
-    if (!t) throw new NotFoundException(`Testimonial ${id} not found`);
-    return t;
+    const testimonial = await this.prisma.testimonial.findUnique({ where: { id } });
+    if (!testimonial) throw new NotFoundException(`Testimonial ${id} not found`);
+    return testimonial;
   }
 
   create(dto: CreateTestimonialDto) {

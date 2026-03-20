@@ -1405,10 +1405,16 @@ async function main() {
   console.log('Seeding courses …');
   for (const s of subjects) {
     const { syllabus, highlights, outcomes, ...rest } = s as any;
+    const courseData = {
+      ...rest,
+      highlights: highlights || [],
+      syllabus: syllabus ? (syllabus as any) : [],
+      outcomes: outcomes || [],
+    };
     await prisma.course.upsert({
       where: { id: s.id },
-      update: { ...rest, highlights: highlights || [], syllabus: syllabus ? syllabus as any : [], outcomes: outcomes || [] },
-      create: { ...rest, highlights: highlights || [], syllabus: syllabus ? syllabus as any : [], outcomes: outcomes || [] },
+      update: courseData,
+      create: courseData,
     });
   }
 
@@ -1429,7 +1435,7 @@ async function main() {
     }
   }
 
-    console.log('Seeding testimonials …');
+  console.log('Seeding testimonials …');
   for (const t of testimonials) {
     const existing = await prisma.testimonial.findFirst({
       where: { studentName: t.studentName, period: t.period },
