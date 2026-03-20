@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
+import { useApi } from './hooks/useApi';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingWidgets from './components/FloatingWidgets';
@@ -49,19 +50,54 @@ import { getCourseBySlug, getLevelById } from './data/coursesData';
 import './App.css';
 
 
+/* Fallback: load a course from the API when it isn't in the static data */
+function ApiCourseLoader({ slug }) {
+	const { data: apiCourses, loading } = useApi('/courses');
+
+	if (loading) {
+		return (
+			<div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280' }}>
+				Loading…
+			</div>
+		);
+	}
+
+	const apiCourse = apiCourses?.find((c) => c.slug === slug);
+	if (!apiCourse) return <Navigate to="/" replace />;
+
+	const level = getLevelById(apiCourse.level);
+	if (!level) return <Navigate to="/" replace />;
+
+	const course = {
+		code: apiCourse.id,
+		name: apiCourse.name,
+		slug: apiCourse.slug,
+		price: apiCourse.price,
+		levelId: apiCourse.level,
+		description: apiCourse.description || '',
+		icon: apiCourse.icon || '📘',
+		subtitle: apiCourse.subtitle || '',
+		highlights: apiCourse.highlights || [],
+		syllabus: apiCourse.syllabus || [],
+		outcomes: apiCourse.outcomes || [],
+	};
+
+	return <IndividualCoursePage course={course} level={level} />;
+}
+
 /* Handles dynamic course routes */
 function CourseRouteWrapper() {
 	const { courseSlug } = useParams();
 
-	const course = getCourseBySlug(courseSlug);
+	const staticCourse = getCourseBySlug(courseSlug);
 
-	if (!course) {
-		return <Navigate to="/" replace />;
+	if (staticCourse) {
+		const level = getLevelById(staticCourse.levelId);
+		return <IndividualCoursePage course={staticCourse} level={level} />;
 	}
 
-	const level = getLevelById(course.levelId);
-
-	return <IndividualCoursePage course={course} level={level} />;
+	// Course not found in static data — try loading from the API (admin-created courses)
+	return <ApiCourseLoader slug={courseSlug} />;
 }
 
 
