@@ -6,6 +6,7 @@ import {
 	Query,
 	Request,
 	Res,
+	Headers,
 	UseGuards,
 	HttpCode,
 	HttpStatus,
@@ -27,8 +28,8 @@ export class PaymentsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post('create')
-	createPayment(@Body() dto: CreatePaymentDto, @Request() req) {
-		return this.paymentsService.createPayment(req.user.userId, dto);
+	createPayment(@Body() dto: CreatePaymentDto, @Request() req, @Headers('origin') origin: string) {
+		return this.paymentsService.createPayment(req.user.userId, dto, origin);
 	}
 
 	/**
@@ -37,8 +38,8 @@ export class PaymentsController {
 	 * Guest details (name, email, phone) are stored on the order record.
 	 */
 	@Post('guest-create')
-	createGuestPayment(@Body() dto: GuestPaymentDto) {
-		return this.paymentsService.createGuestPayment(dto);
+	createGuestPayment(@Body() dto: GuestPaymentDto, @Headers('origin') origin: string) {
+		return this.paymentsService.createGuestPayment(dto, origin);
 	}
 
 	/**

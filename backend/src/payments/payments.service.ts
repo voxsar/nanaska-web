@@ -60,7 +60,7 @@ export class PaymentsService {
 	// ──────────────────────────────────────────────────────────────────────────
 	// POST /payments/create
 	// ──────────────────────────────────────────────────────────────────────────
-	async createPayment(userId: string, dto: CreatePaymentDto) {
+	async createPayment(userId: string, dto: CreatePaymentDto, origin?: string) {
 		const [combo, user] = await Promise.all([
 			this.prisma.courseCombination.findUnique({
 				where: { id: dto.combinationId },
@@ -74,6 +74,7 @@ export class PaymentsService {
 
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
 		const amount = currency === 'GBP' && dto.amount ? dto.amount : combo.price;
+		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order
 		const order = await this.prisma.order.create({
@@ -84,6 +85,7 @@ export class PaymentsService {
 				currency,
 				status: 'PENDING',
 				ipgMerchantRef: this.generateMerchantRef(),
+				frontendOrigin,
 			},
 		});
 
@@ -91,7 +93,7 @@ export class PaymentsService {
 			name: user.name,
 			email: user.email,
 			phone: (user as any).phone ?? '',
-		});
+		}, frontendOrigin);
 
 		return { orderId: order.id, paymentUrl: checkoutUrl };
 	}
@@ -99,7 +101,7 @@ export class PaymentsService {
 	// ──────────────────────────────────────────────────────────────────────────
 	// POST /payments/guest-create
 	// ──────────────────────────────────────────────────────────────────────────
-	async createGuestPayment(dto: GuestPaymentDto) {
+	async createGuestPayment(dto: GuestPaymentDto, origin?: string) {
 		const combo = await this.prisma.courseCombination.findUnique({
 			where: { id: dto.combinationId },
 			include: { items: { include: { course: true } } },
@@ -111,6 +113,7 @@ export class PaymentsService {
 		const phone = dto.phone || '';
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
 		const amount = currency === 'GBP' && dto.amount ? dto.amount : combo.price;
+		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order (no user account required)
 		const order = await this.prisma.order.create({
@@ -123,6 +126,7 @@ export class PaymentsService {
 				guestName: fullName,
 				guestEmail: dto.email,
 				guestPhone: phone || null,
+				frontendOrigin,
 			},
 		});
 
@@ -130,7 +134,7 @@ export class PaymentsService {
 			name: fullName,
 			email: dto.email,
 			phone,
-		});
+		}, frontendOrigin);
 
 		return {
 			orderId: order.id,
@@ -242,12 +246,25 @@ export class PaymentsService {
 	 * On success PayCorp returns { paymentPageUrl, reqid }.
 	 * The caller redirects the browser to paymentPageUrl.
 	 */
+	/** Returns the first allowed origin from FRONTEND_URL, or validates the provided origin against the whitelist. */
+	private resolveOrigin(requestOrigin?: string): string {
+		const allowed = (process.env.FRONTEND_URL || 'https://nanaska.com')
+			.split(',')
+			.map((o) => o.trim())
+			.filter(Boolean);
+		if (requestOrigin && allowed.includes(requestOrigin)) {
+			return requestOrigin;
+		}
+		return allowed[0];
+	}
+
 	private async callPayCorpCheckout(
 		orderId: string,
 		merchantRef: string,
 		amount: number,
 		currency: string,
 		user: { name: string; email: string; phone?: string },
+		frontendOrigin?: string,
 	): Promise<string> {
 		const clientId = currency === 'GBP'
 			? parseInt(process.env.IPG_GBP_CLIENT_ID || '14004406', 10)
@@ -265,7 +282,9 @@ export class PaymentsService {
 			},
 			redirect: {
 				returnUrl: process.env.IPG_RETURN_URL!,
-				cancelUrl: process.env.IPG_CANCEL_URL || process.env.IPG_RETURN_URL!,
+				cancelUrl: frontendOrigin
+					? `${frontendOrigin}/payment-cancel`
+					: process.env.IPG_CANCEL_URL || process.env.IPG_RETURN_URL!,
 				returnMethod: 'GET',
 			},
 			clientRef: merchantRef,
@@ -398,7 +417,7 @@ export class PaymentsService {
 			this.logger.warn(`PAYMENT_COMPLETE: no order found for reqid=${reqid}`);
 		}
 
-		const frontendBase = (process.env.FRONTEND_URL || 'https://nanaska.com').split(',')[0].trim();
+		const frontendBase = order?.frontendOrigin || (process.env.FRONTEND_URL || 'https://nanaska.com').split(',')[0].trim();
 		const redirectTo = success
 			? `${frontendBase}/payment-success?ref=${txnRef}`
 			: `${frontendBase}/payment-cancel?reason=${encodeURIComponent(data?.responseText ?? 'Payment failed')}`;

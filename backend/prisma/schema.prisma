@@ -85,6 +85,7 @@ model Order {
   guestName       String?     @map("guest_name")
   guestEmail      String?     @map("guest_email")
   guestPhone      String?     @map("guest_phone")
+  frontendOrigin  String?     @map("frontend_origin") // origin that initiated the payment
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt             @map("updated_at")
 
