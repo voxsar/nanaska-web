@@ -1,38 +1,47 @@
-import { IsString, IsOptional, IsBoolean, IsArray, IsInt, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsInt } from 'class-validator';
 
 export class CreateLecturerDto {
-  @IsString()
-  name: string;
+	@IsOptional()
+	id?: string;
 
-  @IsString()
-  title: string;
+	@IsOptional()
+	createdAt?: any;
 
-  @IsArray()
-  credentials: string[];
+	@IsOptional()
+	updatedAt?: any;
 
-  @IsString()
-  bio: string;
+	@IsString()
+	name: string;
 
-  @IsOptional()
-  @IsString()
-  bio2?: string;
+	@IsString()
+	title: string;
 
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
+	@IsArray()
+	credentials: string[];
 
-  @IsOptional()
-  stats?: Array<{ number: string; label: string }>;
+	@IsString()
+	bio: string;
 
-  @IsOptional()
-  @IsArray()
-  specialties?: string[];
+	@IsOptional()
+	@IsString()
+	bio2?: string;
 
-  @IsOptional()
-  @IsInt()
-  sortOrder?: number;
+	@IsOptional()
+	@IsString()
+	imageUrl?: string;
 
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
+	@IsOptional()
+	stats?: Array<{ number: string; label: string }>;
+
+	@IsOptional()
+	@IsArray()
+	specialties?: string[];
+
+	@IsOptional()
+	@IsInt()
+	sortOrder?: number;
+
+	@IsOptional()
+	@IsBoolean()
+	active?: boolean;
 }

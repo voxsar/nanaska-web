@@ -2,60 +2,69 @@ import { IsString, IsOptional, IsInt, IsBoolean } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class CreateTestimonialDto {
-  @IsString()
-  studentName: string;
+	@IsOptional()
+	id?: string;
 
-  @IsString()
-  country: string;
+	@IsOptional()
+	createdAt?: any;
 
-  @IsString()
-  flag: string;
+	@IsOptional()
+	updatedAt?: any;
 
-  @IsString()
-  tag: string;
+	@IsString()
+	studentName: string;
 
-  @IsString()
-  exam: string;
+	@IsString()
+	country: string;
 
-  @IsString()
-  period: string;
+	@IsString()
+	flag: string;
 
-  @Type(() => Number)
-  @IsInt()
-  year: number;
+	@IsString()
+	tag: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  marks?: number;
+	@IsString()
+	exam: string;
 
-  @IsOptional()
-  @IsString()
-  imageUrl?: string;
+	@IsString()
+	period: string;
 
-  @IsString()
-  quote: string;
+	@Type(() => Number)
+	@IsInt()
+	year: number;
 
-  @IsOptional()
-  @IsString()
-  videoUrl?: string;
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	marks?: number;
 
-  @IsOptional()
-  @IsString()
-  badge?: string;
+	@IsOptional()
+	@IsString()
+	imageUrl?: string;
 
-  @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  @IsBoolean()
-  isPrizeWinner?: boolean;
+	@IsString()
+	quote: string;
 
-  @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  @IsBoolean()
-  published?: boolean;
+	@IsOptional()
+	@IsString()
+	videoUrl?: string;
 
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  sortOrder?: number;
+	@IsOptional()
+	@IsString()
+	badge?: string;
+
+	@IsOptional()
+	@Transform(({ value }) => value === 'true' || value === true)
+	@IsBoolean()
+	isPrizeWinner?: boolean;
+
+	@IsOptional()
+	@Transform(({ value }) => value === 'true' || value === true)
+	@IsBoolean()
+	published?: boolean;
+
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	sortOrder?: number;
 }

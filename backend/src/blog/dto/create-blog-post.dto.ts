@@ -1,29 +1,41 @@
 import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateBlogPostDto {
-  @IsString()
-  title: string;
+	@IsOptional()
+	id?: string;
 
-  @IsString()
-  content: string;
+	@IsOptional()
+	createdAt?: any;
 
-  @IsOptional()
-  @IsString()
-  slug?: string;
+	@IsOptional()
+	updatedAt?: any;
 
-  @IsOptional()
-  @IsString()
-  coverUrl?: string;
+	@IsOptional()
+	authorId?: string;
 
-  @IsOptional()
-  @IsBoolean()
-  published?: boolean;
+	@IsString()
+	title: string;
 
-  @IsOptional()
-  @IsString()
-  metaTitle?: string;
+	@IsString()
+	content: string;
 
-  @IsOptional()
-  @IsString()
-  metaDesc?: string;
+	@IsOptional()
+	@IsString()
+	slug?: string;
+
+	@IsOptional()
+	@IsString()
+	coverUrl?: string;
+
+	@IsOptional()
+	@IsBoolean()
+	published?: boolean;
+
+	@IsOptional()
+	@IsString()
+	metaTitle?: string;
+
+	@IsOptional()
+	@IsString()
+	metaDesc?: string;
 }
