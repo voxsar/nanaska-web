@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useApi } from '../hooks/useApi';
 import './OurFacultyPage.css';
 
-const FACULTY = [
+const STATIC_FACULTY = [
 	{
 		id: 'channa',
 		name: 'Channa Gunawardana',
@@ -110,6 +111,32 @@ export default function OurFacultyPage() {
 	const pageRef = useRef(null);
 	useScrollReveal(pageRef);
 
+	const { data: apiLecturers } = useApi('/lecturers?active=true');
+	const deriveFacultyTag = (l) => {
+		if (l.sortOrder === 1) return '🏆 Lead';
+		const s = (l.specialties || []).join(' ');
+		if (s.includes('E3')) return '📐 E3';
+		if (s.includes('P3')) return '🔐 P3';
+		if (s.includes('F3')) return '📊 F3';
+		if (s.includes('F2') || s.includes('BA3')) return '📈 F2 & BA3';
+		if (s.includes('P2')) return '📋 P2';
+		if (s.includes('BA1')) return '🎓 BA1';
+		if (s.includes('BA2')) return '📗 BA2';
+		if (s.includes('Law') || s.includes('HRM')) return '⚖️ Law & HRM';
+		return '🌐 Lecturer';
+	};
+	const FACULTY_DATA = apiLecturers?.length
+		? apiLecturers.map((l) => ({
+			id: l.id || l.name,
+			name: l.name,
+			credentials: (l.credentials || []).join(', '),
+			role: l.title,
+			img: l.imageUrl,
+			bio: l.bio,
+			tag: deriveFacultyTag(l),
+		}))
+		: STATIC_FACULTY;
+
 	return (
 		<div className="faculty-page" ref={pageRef}>
 			{/* Hero */}
@@ -135,7 +162,7 @@ export default function OurFacultyPage() {
 			<section className="faculty-page__grid-section">
 				<div className="faculty-page__container">
 					<div className="faculty-grid" data-reveal-stagger>
-						{FACULTY.map((member) => (
+						{FACULTY_DATA.map((member) => (
 							<div
 								key={member.id}
 								className={`faculty-card ${active === member.id ? 'faculty-card--active' : ''}`}

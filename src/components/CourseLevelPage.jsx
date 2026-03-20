@@ -4,7 +4,8 @@ import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
 import { getLevelPricesById, getCoursePricesByCode } from '../data/pricingData';
 import LecturerPanel from './LecturerPanel';
-import { LECTURERS } from '../data/lecturersData';
+import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
+import { useApi } from '../hooks/useApi';
 import './CourseLevelPage.css';
 
 export default function CourseLevelPage({ level }) {
@@ -15,6 +16,9 @@ export default function CourseLevelPage({ level }) {
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
 	const levelPrices = getLevelPricesById(level.levelId);
 	const levelAmount = getAmountForCountry(levelPrices, selectedCountry);
+
+	const { data: apiLecturers } = useApi('/lecturers?active=true');
+	const LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
 
 	const levelInCart = isLevelInCart(level.levelId);
 

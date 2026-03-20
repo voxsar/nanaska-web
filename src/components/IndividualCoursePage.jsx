@@ -4,13 +4,20 @@ import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
 import { getCoursePricesByCode } from '../data/pricingData';
 import LecturerPanel from './LecturerPanel';
-import { LECTURERS } from '../data/lecturersData';
+import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
+import { useApi } from '../hooks/useApi';
 import './IndividualCoursePage.css';
 
 export default function IndividualCoursePage({ course, level }) {
 	const [activeTab, setActiveTab] = useState('overview');
 	const { addCourse, isInCart, isLevelInCart } = useCart();
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
+
+	const { data: apiLecturers } = useApi('/lecturers?active=true');
+	const { data: dbCourse } = useApi(`/courses/${course.code}`);
+	const LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
+	// Overlay DB fields (icon, subtitle, highlights, syllabus, outcomes) over static course data
+	const mergedCourse = dbCourse ? { ...course, ...dbCourse, code: course.code } : course;
 
 	const inCart = isInCart(course.code);
 	const levelInCart = isLevelInCart(level.levelId);
@@ -35,13 +42,13 @@ export default function IndividualCoursePage({ course, level }) {
 						<span>{course.code}</span>
 					</nav>
 
-					<div className="individual-course__icon">{course.icon}</div>
+					<div className="individual-course__icon">{mergedCourse.icon}</div>
 					<div className="individual-course__level-badge">{level.badge} {level.title}</div>
 					<h1 className="individual-course__title">
 						<span className="individual-course__code">{course.code}</span>
-						{course.name}
+						{mergedCourse.name}
 					</h1>
-					<p className="individual-course__subtitle">{course.subtitle}</p>
+					<p className="individual-course__subtitle">{mergedCourse.subtitle}</p>
 
 					<div className="individual-course__meta">
 						<span className="individual-course__meta-item">📚 {level.title}</span>
@@ -72,9 +79,9 @@ export default function IndividualCoursePage({ course, level }) {
 					<div className="individual-course__desc-grid">
 						<div className="individual-course__desc-main">
 							<h2>About This Course</h2>
-							<p>{course.description}</p>
+							<p>{mergedCourse.description}</p>
 							<div className="individual-course__highlights">
-								{course.highlights.map(h => (
+								{(mergedCourse.highlights || []).map(h => (
 									<div key={h} className="individual-course__highlight">
 										<span className="individual-course__highlight-check">✓</span>
 										<span>{h}</span>
@@ -120,13 +127,13 @@ export default function IndividualCoursePage({ course, level }) {
 						{activeTab === 'overview' && (
 							<div className="individual-course__overview">
 								<div className="individual-course__header-block">
-									<div className="individual-course__big-icon">{course.icon}</div>
+									<div className="individual-course__big-icon">{mergedCourse.icon}</div>
 									<div>
-										<h3>{course.code} — {course.name}</h3>
-										<p>{course.subtitle}</p>
+										<h3>{course.code} — {mergedCourse.name}</h3>
+										<p>{mergedCourse.subtitle}</p>
 									</div>
 								</div>
-								<p>{course.description}</p>
+								<p>{mergedCourse.description}</p>
 							</div>
 						)}
 
@@ -134,7 +141,7 @@ export default function IndividualCoursePage({ course, level }) {
 							<div>
 								<h3>{course.code} — Syllabus Overview</h3>
 								<div className="individual-course__syllabus">
-									{course.syllabus.map((item, idx) => (
+									{(mergedCourse.syllabus || []).map((item, idx) => (
 										<div key={idx} className="individual-course__syllabus-item">
 											<span className="individual-course__syllabus-num">{String(idx + 1).padStart(2, '0')}</span>
 											<div>
@@ -151,7 +158,7 @@ export default function IndividualCoursePage({ course, level }) {
 							<div>
 								<h3>{course.code} — Learning Outcomes</h3>
 								<ul className="individual-course__outcomes">
-									{course.outcomes.map((o, idx) => (
+									{(mergedCourse.outcomes || []).map((o, idx) => (
 										<li key={idx} className="individual-course__outcome">
 											<span className="individual-course__outcome-icon">🎯</span>
 											<span>{o}</span>

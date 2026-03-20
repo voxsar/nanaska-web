@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import FunnelHeader from '../components/FunnelHeader';
 import { useSEO } from '../hooks/useSEO';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useApi } from '../hooks/useApi';
 import './CertificateLevelIntakePage.css';
 
 /* ─── Data ────────────────────────────────────────────────────── */
@@ -45,7 +46,7 @@ const SUBJECTS = [
 	},
 ];
 
-const LECTURERS = [
+const STATIC_LECTURERS = [
 	{
 		name: 'Channa Gunawardana',
 		code: 'Lead',
@@ -126,6 +127,23 @@ export default function CertificateLevelIntakePage() {
 	});
 
 	useScrollReveal(pageRef);
+
+	const { data: apiLecturers } = useApi('/lecturers?active=true');
+	const extractCode = (title) => {
+		const parts = title.split('–').map((s) => s.trim());
+		if (parts.length > 1) return parts[1].split(' ')[0];
+		if (title.includes('CEO') || title.includes('Lead')) return 'Lead';
+		return 'Lecturer';
+	};
+	const LECTURERS = apiLecturers?.length
+		? apiLecturers.map((l) => ({
+			name: l.name,
+			code: extractCode(l.title),
+			quals: (l.credentials || []).join(', '),
+			img: l.imageUrl || null,
+			bio: l.bio || null,
+		}))
+		: STATIC_LECTURERS;
 
 	return (
 		<div className="cl-page" ref={pageRef}>

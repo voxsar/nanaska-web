@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import FunnelHeader from '../components/FunnelHeader';
 import { useSEO } from '../hooks/useSEO';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useApi } from '../hooks/useApi';
 import './FinancialLeadershipPage.css';
 
 /* ─── Data ────────────────────────────────────────────────────── */
@@ -16,7 +17,7 @@ const WHY_POINTS = [
 	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/cup.png', title: 'Delivering High Achievers & Prize Winners', alt: 'Trophy icon' },
 ];
 
-const LECTURERS = {
+const STATIC_LECTURERS = {
 	operational: [
 		{ name: 'Aloka Seneviratne', subject: 'Digital Finance', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/4.png' },
 		{ name: 'Ali Raheem', subject: 'Management Accounting', quals: 'B.Sc (Hons) — University of Sri Jayewardenepura, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/1.png' },
@@ -106,6 +107,29 @@ export default function FinancialLeadershipPage() {
 	});
 
 	useScrollReveal(pageRef);
+
+	const { data: apiLecturers } = useApi('/lecturers?active=true');
+	const LECTURERS = !apiLecturers?.length
+		? STATIC_LECTURERS
+		: (() => {
+			const byName = {};
+			apiLecturers.forEach((l) => { byName[l.name.toLowerCase()] = l; });
+			const merge = (entry) => {
+				const key = entry.name.toLowerCase();
+				const dbL =
+					byName[key] ||
+					Object.values(byName).find((l) =>
+						key.includes(l.name.split(' ')[0].toLowerCase()),
+					);
+				if (!dbL) return entry;
+				return { ...entry, quals: (dbL.credentials || []).join(', ') || entry.quals };
+			};
+			return {
+				operational: STATIC_LECTURERS.operational.map(merge),
+				management: STATIC_LECTURERS.management.map(merge),
+				strategic: STATIC_LECTURERS.strategic.map(merge),
+			};
+		})()
 
 	const prevTracker = () => setTrackerIdx((i) => (i - 1 + FAST_TRACKERS.length) % FAST_TRACKERS.length);
 	const nextTracker = () => setTrackerIdx((i) => (i + 1) % FAST_TRACKERS.length);
