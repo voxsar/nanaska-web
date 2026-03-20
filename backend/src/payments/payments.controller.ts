@@ -59,7 +59,7 @@ export class PaymentsController {
 	 */
 	@Get('complete')
 	async complete(@Query('reqid') reqid: string, @Res() res: Response) {
-		const frontendBase = process.env.FRONTEND_URL || 'https://nanaska.com';
+		const frontendBase = (process.env.FRONTEND_URL || 'https://nanaska.com').split(',')[0].trim();
 		if (!reqid) {
 			return res.redirect(`${frontendBase}/payment-cancel?reason=missing_reqid`);
 		}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
 
@@ -11,14 +11,82 @@ const LEVEL_COLORS = {
 	strategic: 'badge-red',
 };
 
+function LecturerSlider({ ids, lecturerMap }) {
+	const [index, setIndex] = useState(0);
+	const timerRef = useRef(null);
+
+	const lecturers = ids.map((id) => lecturerMap[id]).filter(Boolean);
+
+	const advance = useCallback(() => {
+		setIndex((i) => (i + 1) % lecturers.length);
+	}, [lecturers.length]);
+
+	useEffect(() => {
+		if (lecturers.length <= 1) return;
+		timerRef.current = setInterval(advance, 3000);
+		return () => clearInterval(timerRef.current);
+	}, [advance, lecturers.length]);
+
+	const handleClick = () => {
+		if (lecturers.length <= 1) return;
+		clearInterval(timerRef.current);
+		advance();
+		timerRef.current = setInterval(advance, 3000);
+	};
+
+	if (lecturers.length === 0) return <span style={{ color: '#94a3b8' }}>—</span>;
+
+	const lec = lecturers[index];
+
+	return (
+		<div
+			onClick={handleClick}
+			title={lecturers.length > 1 ? 'Click to cycle' : undefined}
+			style={{
+				display: 'flex',
+				alignItems: 'center',
+				gap: '6px',
+				cursor: lecturers.length > 1 ? 'pointer' : 'default',
+				userSelect: 'none',
+				minWidth: 0,
+			}}
+		>
+			{lec.imageUrl && (
+				<img
+					src={lec.imageUrl}
+					alt={lec.name}
+					style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1.5px solid #e2e8f0' }}
+				/>
+			)}
+			<span style={{ fontSize: '0.8rem', color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 130 }}>
+				{lec.name}
+			</span>
+			{lecturers.length > 1 && (
+				<span style={{ fontSize: '0.7rem', color: '#94a3b8', flexShrink: 0 }}>
+					{index + 1}/{lecturers.length}
+				</span>
+			)}
+		</div>
+	);
+}
+
 export default function CoursesPage() {
 	const [courses, setCourses] = useState([]);
+	const [lecturerMap, setLecturerMap] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [filterLevel, setFilterLevel] = useState('');
 	const [success, setSuccess] = useState('');
 
 	useEffect(() => {
-		api.get('/courses').then((r) => setCourses(r.data)).finally(() => setLoading(false));
+		Promise.all([
+			api.get('/courses'),
+			api.get('/lecturers'),
+		]).then(([coursesRes, lecturersRes]) => {
+			setCourses(coursesRes.data);
+			const map = {};
+			for (const l of lecturersRes.data) map[l.id] = l;
+			setLecturerMap(map);
+		}).finally(() => setLoading(false));
 	}, []);
 
 	const handleDelete = async (id) => {
@@ -84,8 +152,8 @@ export default function CoursesPage() {
 									</td>
 									<td>{c.price?.toLocaleString()}</td>
 									<td style={{ color: '#64748b', fontSize: '0.85rem' }}>{c.duration || '—'}</td>
-									<td style={{ fontSize: '0.8rem', color: '#64748b' }}>
-										{Array.isArray(c.lecturerIds) && c.lecturerIds.length > 0 ? `${c.lecturerIds.length} assigned` : '—'}
+									<td>
+										<LecturerSlider ids={c.lecturerIds || []} lecturerMap={lecturerMap} />
 									</td>
 									<td>
 										<div style={{ display: 'flex', gap: '8px' }}>

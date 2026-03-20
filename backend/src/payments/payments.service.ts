@@ -398,7 +398,7 @@ export class PaymentsService {
 			this.logger.warn(`PAYMENT_COMPLETE: no order found for reqid=${reqid}`);
 		}
 
-		const frontendBase = process.env.FRONTEND_URL || 'https://nanaska.com';
+		const frontendBase = (process.env.FRONTEND_URL || 'https://nanaska.com').split(',')[0].trim();
 		const redirectTo = success
 			? `${frontendBase}/payment-success?ref=${txnRef}`
 			: `${frontendBase}/payment-cancel?reason=${encodeURIComponent(data?.responseText ?? 'Payment failed')}`;
