@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Put, Body, Param, Query, UseGuards,
+  Controller, Get, Post, Put, Body, Param, Query, UseGuards, BadRequestException,
 } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { UpsertSettingDto } from './dto/upsert-setting.dto';
@@ -28,6 +28,13 @@ export class SettingsController {
   @Get('page-meta')
   findPageMeta(@Query('path') path: string) {
     return this.settingsService.findPageMeta(path);
+  }
+
+  // Public: get settings by category (for contact info etc.)
+  @Get('public')
+  findPublic(@Query('category') category: string) {
+    if (!category) throw new BadRequestException('category query parameter is required');
+    return this.settingsService.findByCategory(category);
   }
 
   // Admin: list all settings

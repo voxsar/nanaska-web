@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import './Contact.css';
+import { useApi } from '../hooks/useApi';
 
 // Office coordinates – Galle Road, Colombo 03, Sri Lanka
-const MAP_LAT = 6.8955;
-const MAP_LNG = 79.8527;
-const MAP_BBOX = `${MAP_LNG - 0.004}%2C${MAP_LAT - 0.004}%2C${MAP_LNG + 0.004}%2C${MAP_LAT + 0.004}`;
-const MAP_EMBED_SRC = `https://www.openstreetmap.org/export/embed.html?bbox=${MAP_BBOX}&layer=mapnik&marker=${MAP_LAT}%2C${MAP_LNG}`;
-const MAP_LINK = `https://www.openstreetmap.org/?mlat=${MAP_LAT}&mlon=${MAP_LNG}#map=17/${MAP_LAT}/${MAP_LNG}`;
+const DEFAULT_MAP_LAT = 6.8955;
+const DEFAULT_MAP_LNG = 79.8527;
 
-const INFO_CARDS = [
+const STATIC_INFO_CARDS = [
   {
     icon: '📞',
     title: 'Call Us',
@@ -27,7 +25,7 @@ const INFO_CARDS = [
     icon: '📍',
     title: 'Visit Us',
     lines: ['No. 464/1/1, Galle Road,', 'Colombo 03, Sri Lanka'],
-    href: MAP_LINK,
+    href: `https://www.openstreetmap.org/?mlat=${DEFAULT_MAP_LAT}&mlon=${DEFAULT_MAP_LNG}#map=17/${DEFAULT_MAP_LAT}/${DEFAULT_MAP_LNG}`,
     cta: 'Get directions',
   },
 ];
@@ -91,6 +89,32 @@ export default function Contact() {
   const [headerRef, headerVisible] = useVisible(0.1);
   const [formRef, formVisible] = useVisible(0.1);
   const [mapRef, mapVisible] = useVisible(0.1);
+
+  const { data: contactSettings } = useApi('/settings/public?category=contact');
+
+  const settingsMap = {};
+  if (contactSettings && Array.isArray(contactSettings)) {
+    contactSettings.forEach((s) => { settingsMap[s.key] = s.value; });
+  }
+
+  const MAP_LAT = settingsMap.contact_map_lat ? parseFloat(settingsMap.contact_map_lat) : DEFAULT_MAP_LAT;
+  const MAP_LNG = settingsMap.contact_map_lng ? parseFloat(settingsMap.contact_map_lng) : DEFAULT_MAP_LNG;
+  const MAP_BBOX = `${MAP_LNG - 0.004}%2C${MAP_LAT - 0.004}%2C${MAP_LNG + 0.004}%2C${MAP_LAT + 0.004}`;
+  const MAP_EMBED_SRC = `https://www.openstreetmap.org/export/embed.html?bbox=${MAP_BBOX}&layer=mapnik&marker=${MAP_LAT}%2C${MAP_LNG}`;
+  const MAP_LINK = `https://www.openstreetmap.org/?mlat=${MAP_LAT}&mlon=${MAP_LNG}#map=17/${MAP_LAT}/${MAP_LNG}`;
+
+  let phones = ['+94 77 499 7338', '+94 77 711 8902', '+94 112 575 016'];
+  if (settingsMap.contact_phones) {
+    try { phones = JSON.parse(settingsMap.contact_phones); } catch { phones = ['+94 77 499 7338', '+94 77 711 8902', '+94 112 575 016']; }
+  }
+  const email = settingsMap.contact_email || 'info@nanaska.com';
+  const address = settingsMap.contact_address || 'No. 464/1/1, Galle Road, Colombo 03, Sri Lanka';
+
+  const INFO_CARDS = [
+    { icon: '📞', title: 'Call Us', lines: phones, href: `tel:${phones[0].replace(/\s/g, '')}`, cta: 'Call now' },
+    { icon: '✉️', title: 'Email Us', lines: [email], href: `mailto:${email}`, cta: 'Send email' },
+    { icon: '📍', title: 'Visit Us', lines: [address], href: MAP_LINK, cta: 'Get directions' },
+  ];
 
   const [fields, setFields] = useState({
     name: '', email: '', phone: '', subject: SUBJECTS[0], message: '',

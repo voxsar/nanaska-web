@@ -15,6 +15,8 @@ import MetaTagsPage from './pages/MetaTagsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import PaymentSettingsPage from './pages/PaymentSettingsPage';
 import DatabaseViewerPage from './pages/DatabaseViewerPage';
+import TestimonialsAdminPage from './pages/testimonials/TestimonialsPage';
+import ContactSettingsPage from './pages/ContactSettingsPage';
 
 export default function AdminApp() {
   return (
@@ -36,6 +38,8 @@ export default function AdminApp() {
           <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="payment-settings" element={<PaymentSettingsPage />} />
           <Route path="database" element={<DatabaseViewerPage />} />
+          <Route path="testimonials" element={<TestimonialsAdminPage />} />
+          <Route path="contact-settings" element={<ContactSettingsPage />} />
         </Route>
       </Routes>
     </AdminAuthProvider>

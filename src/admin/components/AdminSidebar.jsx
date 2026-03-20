@@ -9,6 +9,7 @@ const contentItems = [
   { label: 'Blog Posts', icon: '📝', to: '/admin/blog' },
   { label: 'Lecturers', icon: '👨‍🏫', to: '/admin/lecturers' },
   { label: 'Courses', icon: '📚', to: '/admin/courses' },
+  { label: 'Testimonials', icon: '💬', to: '/admin/testimonials' },
 ];
 
 const dataItems = [
@@ -22,6 +23,7 @@ const settingItems = [
   { label: 'Meta Tags', icon: '🏷️', to: '/admin/meta-tags' },
   { label: 'Analytics & Pixels', icon: '📈', to: '/admin/analytics' },
   { label: 'Payment Settings', icon: '⚙️', to: '/admin/payment-settings' },
+  { label: 'Contact Settings', icon: '📞', to: '/admin/contact-settings' },
 ];
 
 const superadminItems = [
