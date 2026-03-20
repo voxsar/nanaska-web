@@ -74,32 +74,49 @@ export class AdminService {
       SELECT table_name
       FROM information_schema.tables
       WHERE table_schema = 'public'
+        AND table_type = 'BASE TABLE'
       ORDER BY table_name
     `;
     return tables.map((t) => t.table_name);
   }
 
+  private async getAllowedTables(): Promise<string[]> {
+    const tables = await this.listTables();
+    return tables;
+  }
+
   async getTableData(tableName: string) {
-    // Validate table name to prevent SQL injection – only alphanumeric + underscore
-    if (!/^[a-z_][a-z0-9_]*$/.test(tableName)) {
-      throw new UnauthorizedException('Invalid table name');
+    const allowed = await this.getAllowedTables();
+    if (!allowed.includes(tableName)) {
+      throw new UnauthorizedException('Table not found or not accessible');
     }
     const rows = await this.prisma.$queryRawUnsafe(`SELECT * FROM "${tableName}" LIMIT 500`);
     return rows;
   }
 
   async updateTableRow(tableName: string, id: string, data: Record<string, unknown>) {
-    if (!/^[a-z_][a-z0-9_]*$/.test(tableName)) {
-      throw new UnauthorizedException('Invalid table name');
+    // Validate table name against allowed tables from the DB itself
+    const allowed = await this.getAllowedTables();
+    if (!allowed.includes(tableName)) {
+      throw new UnauthorizedException('Table not found or not accessible');
     }
-    const sets = Object.keys(data)
-      .filter((k) => k !== 'id')
-      .map((k, i) => `"${k}" = $${i + 2}`)
-      .join(', ');
-    const values = Object.keys(data)
-      .filter((k) => k !== 'id')
-      .map((k) => data[k]);
-    if (!sets) return { message: 'No fields to update' };
+
+    // Get table columns from information_schema to whitelist column names
+    const columnsResult: Array<{ column_name: string }> = await this.prisma.$queryRaw`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = ${tableName}
+    `;
+    const allowedColumns = new Set(columnsResult.map((c) => c.column_name));
+
+    const updateFields = Object.keys(data).filter(
+      (k) => k !== 'id' && allowedColumns.has(k),
+    );
+    if (updateFields.length === 0) return { message: 'No valid fields to update' };
+
+    const sets = updateFields.map((k, i) => `"${k}" = $${i + 2}`).join(', ');
+    const values = updateFields.map((k) => data[k]);
+
     await this.prisma.$queryRawUnsafe(
       `UPDATE "${tableName}" SET ${sets} WHERE id = $1`,
       id,
