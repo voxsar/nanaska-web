@@ -110,8 +110,8 @@ function App() {
 							<Route path="/cima-strategic-level" element={<StrategicLevelPage />} />
 
 							<Route path="/testimonials" element={<TestimonialsPage />} />
-								<Route path="/blog" element={<BlogPage />} />
-								<Route path="/blog/:slug" element={<BlogPostPage />} />
+							<Route path="/blog" element={<BlogPage />} />
+							<Route path="/blog/:slug" element={<BlogPostPage />} />
 							<Route path="/contact" element={<ContactPage />} />
 							<Route path="/lecturers" element={<LecturersPage />} />
 							<Route path="/enrollment" element={<EnrollmentPage />} />						<Route path="/payment-success" element={<PaymentSuccessPage />} />
