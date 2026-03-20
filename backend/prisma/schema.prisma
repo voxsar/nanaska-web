@@ -109,3 +109,110 @@ model UserCourse {
   @@unique([userId, courseId])
   @@map("user_courses")
 }
+
+// ─── Admin Users ─────────────────────────────────────────────────────────────
+model AdminUser {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  role         AdminRole @default(admin)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@map("admin_users")
+}
+
+enum AdminRole {
+  admin
+  superadmin
+}
+
+// ─── Blog Posts ──────────────────────────────────────────────────────────────
+model BlogPost {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  coverUrl    String?  @map("cover_url")
+  content     String   @db.Text
+  published   Boolean  @default(false)
+  authorId    String?  @map("author_id")
+  metaTitle   String?  @map("meta_title")
+  metaDesc    String?  @map("meta_desc")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+// ─── Lecturers ───────────────────────────────────────────────────────────────
+model Lecturer {
+  id          String   @id @default(uuid())
+  name        String
+  title       String
+  credentials String[]
+  bio         String   @db.Text
+  bio2        String?  @db.Text
+  imageUrl    String?  @map("image_url")
+  stats       Json     @default("[]")
+  specialties String[]
+  sortOrder   Int      @default(0) @map("sort_order")
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("lecturers")
+}
+
+// ─── Site Settings ───────────────────────────────────────────────────────────
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  category  String   @default("general")
+  label     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+// ─── Page Meta Tags ───────────────────────────────────────────────────────────
+model PageMeta {
+  id          String   @id @default(uuid())
+  pagePath    String   @unique @map("page_path")
+  pageTitle   String   @map("page_title")
+  metaTitle   String?  @map("meta_title")
+  metaDesc    String?  @map("meta_desc")
+  metaKeywords String? @map("meta_keywords")
+  ogTitle     String?  @map("og_title")
+  ogDesc      String?  @map("og_desc")
+  ogImage     String?  @map("og_image")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("page_meta")
+}
+
+// ─── Newsletter Signups ───────────────────────────────────────────────────────
+model NewsletterSignup {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("newsletter_signups")
+}
+
+// ─── Contact Form Submissions ─────────────────────────────────────────────────
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("contact_submissions")
+}
