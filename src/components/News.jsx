@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import './News.css';
+import { useApi } from '../hooks/useApi';
 
-const NEWS = [
+const STATIC_NEWS = [
   {
     id: 1,
     category: 'Prize Winner',
@@ -60,7 +61,25 @@ const NEWS = [
 
 const VISIBLE = 3;
 
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
 export default function News() {
+  const { data: blogData } = useApi('/blog?published=true');
+  const NEWS = (blogData && blogData.length > 0)
+    ? blogData.map((post) => ({
+        id: post.id,
+        category: 'News',
+        date: formatDate(post.createdAt),
+        title: post.title,
+        excerpt: post.metaDesc || post.content.substring(0, 180),
+        img: post.coverUrl,
+      }))
+    : STATIC_NEWS;
+
   const [startIdx, setStartIdx] = useState(0);
   const [animDir, setAnimDir] = useState(null);
   const timerRef = useRef(null);

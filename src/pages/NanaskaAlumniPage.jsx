@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './NanaskaAlumniPage.css';
+import { useApi } from '../hooks/useApi';
 
 const INITIAL = { name: '', email: '', phone: '', occupation: '', address: '' };
 
@@ -8,6 +9,8 @@ export default function NanaskaAlumniPage() {
   const [form, setForm] = useState(INITIAL);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  const { data: prizeWinners } = useApi('/testimonials?prizeWinner=true&published=true');
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -168,22 +171,27 @@ export default function NanaskaAlumniPage() {
             exams. Here are some of our outstanding achievers:
           </p>
           <div className="alumni-showcase-grid">
-            {[
-              { name: 'Luong Thi Thuy Linh', exam: 'Strategic Case Study Nov 2020', country: 'Malaysia', badge: 'Global Prize Winner' },
-              { name: 'Hassan Ariff', exam: 'Strategic Case Study Aug 2020', country: 'Sri Lanka', badge: 'Prize Winner' },
-              { name: 'Nimesh Jayawardana', exam: 'Strategic Case Study', country: 'Sri Lanka', badge: 'Joint Prize Winner' },
-              { name: 'Chinthaka Abeydeera', exam: 'Strategic Case Study', country: 'Sri Lanka', badge: 'Joint Prize Winner' },
-              { name: 'Lakshika Kalubowila', exam: 'Management Case Study Nov 2020', country: 'Sri Lanka', badge: 'Prize Winner' },
-              { name: 'Saman Edirimannage', exam: 'CIMA Gateway Aug 2020', country: 'Oman', badge: 'Joint Prize Winner' },
-            ].map((w) => (
-              <div key={w.name} className="alumni-showcase-card">
-                <div className="alumni-showcase-avatar">
-                  {w.name.split(' ').map(n => n[0]).slice(0, 2).join('')}
-                </div>
-                <h4 className="alumni-showcase-card__name">{w.name}</h4>
+            {(prizeWinners && prizeWinners.length > 0 ? prizeWinners : [
+              { studentName: 'Luong Thi Thuy Linh', exam: 'Strategic Case Study Nov 2020', country: 'Malaysia', badge: 'Global Prize Winner', imageUrl: null, quote: '' },
+              { studentName: 'Hassan Ariff', exam: 'Strategic Case Study Aug 2020', country: 'Sri Lanka', badge: 'Prize Winner', imageUrl: null, quote: '' },
+              { studentName: 'Nimesh Jayawardana', exam: 'Strategic Case Study', country: 'Sri Lanka', badge: 'Joint Prize Winner', imageUrl: null, quote: '' },
+              { studentName: 'Chinthaka Abeydeera', exam: 'Strategic Case Study', country: 'Sri Lanka', badge: 'Joint Prize Winner', imageUrl: null, quote: '' },
+              { studentName: 'Lakshika Kalubowila', exam: 'Management Case Study Nov 2020', country: 'Sri Lanka', badge: 'Prize Winner', imageUrl: null, quote: '' },
+              { studentName: 'Saman Edirimannage', exam: 'CIMA Gateway Aug 2020', country: 'Oman', badge: 'Joint Prize Winner', imageUrl: null, quote: '' },
+            ]).map((w) => (
+              <div key={w.studentName || w.name} className="alumni-showcase-card">
+                {w.imageUrl ? (
+                  <img src={w.imageUrl} alt={w.studentName || w.name} className="alumni-showcase-avatar alumni-showcase-avatar--img" loading="lazy" />
+                ) : (
+                  <div className="alumni-showcase-avatar">
+                    {(w.studentName || w.name || '').split(' ').map(n => n[0]).slice(0, 2).join('')}
+                  </div>
+                )}
+                <h4 className="alumni-showcase-card__name">{w.studentName || w.name}</h4>
                 <p className="alumni-showcase-card__exam">{w.exam}</p>
                 <p className="alumni-showcase-card__country">📍 {w.country}</p>
-                <span className="alumni-showcase-card__badge">🏅 {w.badge}</span>
+                {w.badge && <span className="alumni-showcase-card__badge">🏅 {w.badge}</span>}
+                {w.quote && <p className="alumni-showcase-card__quote">"{w.quote.substring(0, 120)}{w.quote.length > 120 ? '…' : ''}"</p>}
               </div>
             ))}
           </div>

@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import './Testimonials.css';
-import TESTIMONIALS_DATA, { EXAM_TAGS, INTAKE_YEARS, FEATURED_COUNT } from '../data/testimonialsData';
+import STATIC_TESTIMONIALS, { EXAM_TAGS, INTAKE_YEARS, FEATURED_COUNT } from '../data/testimonialsData';
+import { useApi } from '../hooks/useApi';
 
 const TAG_COLORS = { SCS: 'navy', MCS: 'cyan', OCS: 'orange' };
 const SLIDER_PAGE_SIZE = 3;
-const SLIDER_PAGES = Math.ceil(FEATURED_COUNT / SLIDER_PAGE_SIZE); // 3
-const FEATURED = TESTIMONIALS_DATA.slice(0, FEATURED_COUNT);
 const INTERVAL = 5000;
 
 /* ─── Graceful image with initials fallback ─────────────── */
@@ -105,6 +104,13 @@ function StudentModal({ testimonial: t, onClose }) {
 
 /* ─── Main Testimonials Section ─────────────────────────── */
 export default function Testimonials({ compact = false }) {
+  const { data: apiData } = useApi('/testimonials?published=true');
+  const TESTIMONIALS_DATA = (apiData && apiData.length > 0)
+    ? apiData.map((t) => ({ ...t, name: t.studentName, image: t.imageUrl }))
+    : STATIC_TESTIMONIALS;
+  const FEATURED = TESTIMONIALS_DATA.slice(0, FEATURED_COUNT);
+  const SLIDER_PAGES = Math.ceil(FEATURED_COUNT / SLIDER_PAGE_SIZE);
+
   /* Slider state */
   const [sliderPage, setSliderPage] = useState(0);
   const [sliderAnimDir, setSliderAnimDir] = useState(null);
@@ -158,11 +164,11 @@ export default function Testimonials({ compact = false }) {
         t.quote.toLowerCase().includes(q);
       return matchTag && matchYear && matchSearch;
     });
-  }, [searchQuery, selectedTag, selectedYear]);
+  }, [searchQuery, selectedTag, selectedYear, TESTIMONIALS_DATA]);
 
   const totalCountries = useMemo(
     () => new Set(TESTIMONIALS_DATA.map((t) => t.country)).size,
-    []
+    [TESTIMONIALS_DATA]
   );
 
   return (

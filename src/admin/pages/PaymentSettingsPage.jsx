@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import api from '../api';
 
 const PAYMENT_KEYS = [
-  { key: 'payment_gateway_client_id', label: 'Payment Gateway Client ID', placeholder: 'Your client ID', category: 'payment' },
-  { key: 'payment_gateway_secret', label: 'Payment Gateway Secret', placeholder: '••••••••••', category: 'payment', isSecret: true },
+  { key: 'ipg_lkr_client_id', label: 'IPG LKR Client ID', placeholder: '14004606', category: 'payment' },
+  { key: 'ipg_gbp_client_id', label: 'IPG GBP Client ID', placeholder: '14004406', category: 'payment' },
   { key: 'payment_success_url', label: 'Payment Success URL', placeholder: '/payment-success', category: 'payment' },
   { key: 'payment_cancel_url', label: 'Payment Cancel URL', placeholder: '/payment-cancel', category: 'payment' },
   { key: 'site_name', label: 'Site Name', placeholder: 'Nanaska', category: 'general' },
@@ -16,7 +16,6 @@ export default function PaymentSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
-  const [showSecrets, setShowSecrets] = useState(false);
 
   useEffect(() => {
     api.get('/settings').then((r) => {
@@ -55,13 +54,6 @@ export default function PaymentSettingsPage() {
     <div>
       <div className="page-title-row">
         <h1>Payment & Site Settings</h1>
-        <button
-          type="button"
-          className="btn btn-secondary btn-sm"
-          onClick={() => setShowSecrets((v) => !v)}
-        >
-          {showSecrets ? '🙈 Hide Secrets' : '👁 Show Secrets'}
-        </button>
       </div>
 
       {success && <div className="admin-alert admin-alert-success">{success}</div>}
@@ -71,11 +63,11 @@ export default function PaymentSettingsPage() {
         <div className="admin-card">
           <p className="admin-card-title">Payment Gateway</p>
           <div className="admin-form-grid single">
-            {PAYMENT_KEYS.filter((k) => k.category === 'payment').map(({ key, label, placeholder, isSecret }) => (
+            {PAYMENT_KEYS.filter((k) => k.category === 'payment').map(({ key, label, placeholder }) => (
               <div key={key} className="form-group">
                 <label>{label}</label>
                 <input
-                  type={isSecret && !showSecrets ? 'password' : 'text'}
+                  type="text"
                   value={settings[key] || ''}
                   onChange={(e) => handleChange(key, e.target.value)}
                   placeholder={placeholder}

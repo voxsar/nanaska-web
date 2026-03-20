@@ -1,8 +1,11 @@
 import LecturerPanel from '../components/LecturerPanel';
-import { LECTURERS } from '../data/lecturersData';
+import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
+import { useApi } from '../hooks/useApi';
 import './LecturersPage.css';
 
 export default function LecturersPage() {
+  const { data: apiData } = useApi('/lecturers?active=true');
+  const LECTURERS = (apiData && apiData.length > 0) ? apiData : STATIC_LECTURERS;
   return (
     <div className="lecturers-page">
       <section className="lecturers-page__hero">

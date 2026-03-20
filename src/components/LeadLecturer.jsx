@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { LECTURERS } from '../data/lecturersData';
+import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
+import { useApi } from '../hooks/useApi';
 import './LeadLecturer.css';
 
 const INTERVAL = 6000;
 
 export default function LeadLecturer() {
+  const { data: apiData } = useApi('/lecturers?active=true');
+  const LECTURERS = (apiData && apiData.length > 0) ? apiData : STATIC_LECTURERS;
+
   const [current, setCurrent] = useState(0);
   const [animDir, setAnimDir] = useState(null);
   const [paused, setPaused] = useState(false);
