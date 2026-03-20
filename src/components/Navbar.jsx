@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LEVELS } from '../data/coursesData';
 import { useCart } from '../context/CartContext';
+import { useApi } from '../hooks/useApi';
 import CartDrawer from './CartDrawer';
 import nanaskaLogo from '../assets/nanaska-logo.png';
 import './Navbar.css';
@@ -47,6 +48,30 @@ export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { cartCount } = useCart();
+  const { data: apiCourses } = useApi('/courses');
+
+  const LEVEL_META = [
+    { id: 'certificate', label: 'Certificate Level', to: '/cima-certificate-level' },
+    { id: 'operational', label: 'Operational Level', to: '/cima-operational-level' },
+    { id: 'management', label: 'Management Level', to: '/cima-management-level' },
+    { id: 'strategic', label: 'Strategic Level', to: '/cima-strategic-level' },
+  ];
+
+  const coursesDropdown = apiCourses?.length
+    ? LEVEL_META.map((lvl) => ({
+        label: lvl.label,
+        to: lvl.to,
+        hasSub: true,
+        sub: apiCourses
+          .filter((c) => c.level === lvl.id)
+          .map((c) => ({ label: `${c.id} – ${c.name}`, to: `/${c.slug}` })),
+      }))
+    : LEVELS.map((level) => ({
+        label: level.title.replace('CIMA ', ''),
+        to: level.currentPath,
+        hasSub: true,
+        sub: level.subjects.map((s) => ({ label: `${s.code} – ${s.name}`, to: `/${s.slug}` })),
+      }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -77,15 +102,10 @@ export default function Navbar() {
     {
       label: 'Courses',
       to: null,
-      dropdown: LEVELS.map(level => ({
-        label: level.title.replace('CIMA ', ''),
-        to: level.currentPath,
-        hasSub: true,
-        sub: level.subjects.map(s => ({ label: `${s.code} – ${s.name}`, to: `/${s.slug}` })),
-      })),
+      dropdown: coursesDropdown,
     },
     { label: 'Testimonials', to: '/testimonials' },
-    { label: 'Blog', to: '/#blog' },
+    { label: 'Blog', to: '/blog' },
     { label: 'Contact Us', to: '/contact' },
   ];
 

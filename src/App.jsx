@@ -40,6 +40,8 @@ import CaseStudyPage from './pages/CaseStudyPage';
 import CertificateLevelIntakePage from './pages/CertificateLevelIntakePage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
+import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
 
 import IndividualCoursePage from './components/IndividualCoursePage';
 import { getCourseBySlug, getLevelById } from './data/coursesData';
@@ -108,7 +110,8 @@ function App() {
 							<Route path="/cima-strategic-level" element={<StrategicLevelPage />} />
 
 							<Route path="/testimonials" element={<TestimonialsPage />} />
-
+								<Route path="/blog" element={<BlogPage />} />
+								<Route path="/blog/:slug" element={<BlogPostPage />} />
 							<Route path="/contact" element={<ContactPage />} />
 							<Route path="/lecturers" element={<LecturersPage />} />
 							<Route path="/enrollment" element={<EnrollmentPage />} />						<Route path="/payment-success" element={<PaymentSuccessPage />} />
