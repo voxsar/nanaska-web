@@ -20,31 +20,31 @@ import TestimonialsAdminPage from './pages/testimonials/TestimonialsPage';
 import ContactSettingsPage from './pages/ContactSettingsPage';
 
 export default function AdminApp() {
-  return (
-    <AdminAuthProvider>
-      <Routes>
-        <Route path="login" element={<AdminLoginPage />} />
-        <Route element={<AdminLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="blog" element={<BlogListPage />} />
-          <Route path="blog/new" element={<BlogEditorPage />} />
-          <Route path="blog/:id/edit" element={<BlogEditorPage />} />
-          <Route path="lecturers" element={<LecturersPage />} />
-          <Route path="courses" element={<CoursesPage />} />
-          <Route path="courses/new" element={<CourseEditorPage />} />
-          <Route path="courses/:id/edit" element={<CourseEditorPage />} />
-          <Route path="students" element={<StudentsPage />} />
-          <Route path="newsletter" element={<NewsletterPage />} />
-          <Route path="payments" element={<PaymentsPage />} />
-          <Route path="form-data" element={<FormDataPage />} />
-          <Route path="meta-tags" element={<MetaTagsPage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="payment-settings" element={<PaymentSettingsPage />} />
-          <Route path="database" element={<DatabaseViewerPage />} />
-          <Route path="testimonials" element={<TestimonialsAdminPage />} />
-          <Route path="contact-settings" element={<ContactSettingsPage />} />
-        </Route>
-      </Routes>
-    </AdminAuthProvider>
-  );
+	return (
+		<AdminAuthProvider>
+			<Routes>
+				<Route path="login" element={<AdminLoginPage />} />
+				<Route element={<AdminLayout />}>
+					<Route index element={<DashboardPage />} />
+					<Route path="blog" element={<BlogListPage />} />
+					<Route path="blog/new" element={<BlogEditorPage />} />
+					<Route path="blog/:id/edit" element={<BlogEditorPage />} />
+					<Route path="lecturers" element={<LecturersPage />} />
+					<Route path="courses" element={<CoursesPage />} />
+					<Route path="courses/new" element={<CourseEditorPage />} />
+					<Route path="courses/:id/edit" element={<CourseEditorPage />} />
+					<Route path="students" element={<StudentsPage />} />
+					<Route path="newsletter" element={<NewsletterPage />} />
+					<Route path="payments" element={<PaymentsPage />} />
+					<Route path="form-data" element={<FormDataPage />} />
+					<Route path="meta-tags" element={<MetaTagsPage />} />
+					<Route path="analytics" element={<AnalyticsPage />} />
+					<Route path="payment-settings" element={<PaymentSettingsPage />} />
+					<Route path="database" element={<DatabaseViewerPage />} />
+					<Route path="testimonials" element={<TestimonialsAdminPage />} />
+					<Route path="contact-settings" element={<ContactSettingsPage />} />
+				</Route>
+			</Routes>
+		</AdminAuthProvider>
+	);
 }

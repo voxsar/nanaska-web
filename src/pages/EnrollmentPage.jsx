@@ -30,7 +30,7 @@ export default function EnrollmentPage() {
 		fetch(`${API_URL}/courses/combinations`)
 			.then((r) => r.ok ? r.json() : [])
 			.then(setApiCombinations)
-			.catch(() => {});
+			.catch(() => { });
 	}, []);
 	// Country list: Sri Lanka is only shown to visitors detected as being in Sri Lanka.
 	const availableCountries = isSriLanka

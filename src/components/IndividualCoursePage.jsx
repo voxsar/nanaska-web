@@ -65,7 +65,7 @@ export default function IndividualCoursePage({ course, level }) {
 
 					<div className="individual-course__meta">
 						<span className="individual-course__meta-item">📚 {level.title}</span>
-					<span className="individual-course__meta-item">⏱ {displayDuration}</span>
+						<span className="individual-course__meta-item">⏱ {displayDuration}</span>
 						<span className="individual-course__meta-item">💰 From {formatAmount(coursePrice)}</span>
 					</div>
 

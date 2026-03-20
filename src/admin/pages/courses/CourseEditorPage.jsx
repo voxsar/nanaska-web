@@ -36,7 +36,7 @@ export default function CourseEditorPage() {
 
 	// Load lecturers
 	useEffect(() => {
-		api.get('/lecturers').then((r) => setLecturers(r.data)).catch(() => {});
+		api.get('/lecturers').then((r) => setLecturers(r.data)).catch(() => { });
 	}, []);
 
 	// Load existing course for edit
