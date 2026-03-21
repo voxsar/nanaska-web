@@ -51,7 +51,7 @@ const STATIC_LECTURERS = [
 		name: 'Channa Gunawardana',
 		code: 'Lead',
 		quals: 'MBA, FCA, FCMA, BSC FIRST CLASS',
-		img: 'https://www.nanaska.com/wp-content/uploads/2021/04/Channa.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2021/04/Channa.png',
 		bio: 'Founder and lead lecturer at Nanaska, Member of CIMA Global Council, and renowned CIMA Case Study Specialist.',
 	},
 	{
@@ -72,7 +72,7 @@ const STATIC_LECTURERS = [
 		name: 'Ali Raheem',
 		code: 'BA2 & BA3',
 		quals: 'BSC (Hons) USJ, CIMA EXAMS COMPLETE',
-		img: 'https://www.nanaska.com/wp-content/uploads/2024/06/Ali_Raheem-removebg-preview.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2024/06/Ali_Raheem-removebg-preview.png',
 		bio: null,
 	},
 	{
@@ -86,21 +86,21 @@ const STATIC_LECTURERS = [
 		name: 'Sanuda Minuraka',
 		code: 'BA1',
 		quals: 'BSc (Hons) Accounting & Finance First Class (UOP UK), CIMA Passed Finalist',
-		img: 'https://www.nanaska.com/wp-content/uploads/2025/01/IMG_0606.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2025/01/IMG_0606.jpg',
 		bio: null,
 	},
 	{
 		name: 'Shervin Perera',
 		code: 'BA3',
 		quals: 'ACMA(UK) CGMA, MBA(UOS)',
-		img: 'https://www.nanaska.com/wp-content/uploads/2024/06/Shervin_Perera-removebg-preview.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2024/06/Shervin_Perera-removebg-preview.png',
 		bio: null,
 	},
 	{
 		name: 'Janith Jayasinghe',
 		code: 'BA4',
 		quals: 'LLB (Hons), Attorney-at-Law, Notary Public, Professional Qualification in HRM (CIPM)',
-		img: 'https://www.nanaska.com/wp-content/uploads/2024/06/Mr.Janith-Jayasinghe-1.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2024/06/Mr.Janith-Jayasinghe-1.jpg',
 		bio: null,
 	},
 ];
@@ -122,7 +122,7 @@ export default function CertificateLevelIntakePage() {
 		description:
 			'Join Nanaska\'s JAN 2026 CIMA Certificate in Business Accounting intake. Specialist lecturers, live sessions, individual attention, 5 mock exams, LMS access. Early bird discount available. Sri Lanka\'s leading CIMA provider.',
 		keywords: 'CIMA Certificate Level, Cert BA, Nanaska, CIMA Sri Lanka, JAN 2026 intake, early bird, BA1 BA2 BA3 BA4',
-		ogImage: 'https://www.nanaska.com/wp-content/uploads/2021/04/Channa.png',
+		ogImage: 'https://images.nanaska.com/wp-content/uploads/2021/04/Channa.png',
 		canonical: 'https://www.nanaska.com/certificate-level-intake/',
 	});
 
@@ -215,7 +215,7 @@ export default function CertificateLevelIntakePage() {
 						</div>
 						<div className="cl-about__img">
 							<img
-								src="https://www.nanaska.com/wp-content/uploads/2021/04/Channa.png"
+								src="https://images.nanaska.com/wp-content/uploads/2021/04/Channa.png"
 								alt="Channa Gunawardana, CEO and lead lecturer at Nanaska"
 								loading="lazy"
 							/>

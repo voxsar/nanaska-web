@@ -10,7 +10,7 @@ const LEVELS = [
 		label: 'Certificate Level',
 		tag: 'Entry Point',
 		color: '#24ade3',
-		img: 'https://www.nanaska.com/wp-content/uploads/2021/03/cert-level.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2021/03/cert-level.jpg',
 		description:
 			'The Certificate Level is the ideal entry point into the CIMA qualification, covering the fundamentals of finance, accounting, and business.',
 		subjects: ['Business Accounting', 'Management Accounting', 'Business Mathematics', 'Corporate & Business Law'],
@@ -20,7 +20,7 @@ const LEVELS = [
 		label: 'Operational Level',
 		tag: 'Foundation',
 		color: '#1b365d',
-		img: 'https://www.nanaska.com/wp-content/uploads/2021/03/opera-level.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2021/03/opera-level.jpg',
 		description:
 			'The Operational Level builds core financial and management accounting competencies essential for day-to-day business decision-making.',
 		subjects: ['Management Accounting', 'Financial Reporting', 'Business Finance', 'Enterprise Operations'],
@@ -30,7 +30,7 @@ const LEVELS = [
 		label: 'Management Level',
 		tag: 'Intermediate',
 		color: '#f5a623',
-		img: 'https://www.nanaska.com/wp-content/uploads/2021/03/manage-level.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2021/03/manage-level.jpg',
 		description:
 			'The Management Level develops strategic analysis and decision-making skills, equipping you to manage resources and advise on complex challenges.',
 		subjects: ['Advanced Management Accounting', 'Advanced Financial Reporting', 'Risk Management', 'Enterprise Management'],
@@ -40,7 +40,7 @@ const LEVELS = [
 		label: 'Strategic Level',
 		tag: 'Advanced',
 		color: '#1b365d',
-		img: 'https://www.nanaska.com/wp-content/uploads/2021/03/strat-level.jpg',
+		img: 'https://images.nanaska.com/wp-content/uploads/2021/03/strat-level.jpg',
 		description:
 			'The Strategic Level is the pinnacle of the CIMA qualification, focusing on leadership, governance, and high-level strategic decision-making.',
 		subjects: ['Strategic Management', 'Strategic Financial Management', 'Risk & Control Strategy', 'Business Strategy'],

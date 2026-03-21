@@ -9,46 +9,46 @@ import './FinancialLeadershipPage.css';
 /* ─── Data ────────────────────────────────────────────────────── */
 
 const WHY_POINTS = [
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/certificate.png', title: 'Official Partner for CGMA FLP', alt: 'Certificate icon' },
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/world-map.png', title: 'World Class Case Study Program', alt: 'World map icon' },
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/support.png', title: 'Exceptional Student Support System', alt: 'Support icon' },
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/personalized.png', title: 'Personalized Attention', alt: 'Personalized icon' },
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/medical-prescription.png', title: 'Proven Track Record', alt: 'Track record icon' },
-	{ icon: 'https://www.nanaska.com/wp-content/uploads/2025/07/cup.png', title: 'Delivering High Achievers & Prize Winners', alt: 'Trophy icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/certificate.png', title: 'Official Partner for CGMA FLP', alt: 'Certificate icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/world-map.png', title: 'World Class Case Study Program', alt: 'World map icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/support.png', title: 'Exceptional Student Support System', alt: 'Support icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/personalized.png', title: 'Personalized Attention', alt: 'Personalized icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/medical-prescription.png', title: 'Proven Track Record', alt: 'Track record icon' },
+	{ icon: 'https://images.nanaska.com/wp-content/uploads/2025/07/cup.png', title: 'Delivering High Achievers & Prize Winners', alt: 'Trophy icon' },
 ];
 
 const STATIC_LECTURERS = {
 	operational: [
-		{ name: 'Aloka Seneviratne', subject: 'Digital Finance', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/4.png' },
-		{ name: 'Ali Raheem', subject: 'Management Accounting', quals: 'B.Sc (Hons) — University of Sri Jayewardenepura, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/1.png' },
-		{ name: 'Osmand Fernando', subject: 'Financial Reporting / OCS', quals: 'MBA (UK), ACMA, CGMA', img: 'https://www.nanaska.com/wp-content/uploads/2025/09/Untitled-design-1.png' },
-		{ name: 'Mark Gunathilake', subject: 'Digital Finance', quals: 'B.Sc (Hons) — USJ, ACMA, CGMA', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/2.png' },
+		{ name: 'Aloka Seneviratne', subject: 'Digital Finance', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/4.png' },
+		{ name: 'Ali Raheem', subject: 'Management Accounting', quals: 'B.Sc (Hons) — University of Sri Jayewardenepura, CIMA Passed Finalist', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/1.png' },
+		{ name: 'Osmand Fernando', subject: 'Financial Reporting / OCS', quals: 'MBA (UK), ACMA, CGMA', img: 'https://images.nanaska.com/wp-content/uploads/2025/09/Untitled-design-1.png' },
+		{ name: 'Mark Gunathilake', subject: 'Digital Finance', quals: 'B.Sc (Hons) — USJ, ACMA, CGMA', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/2.png' },
 	],
 	management: [
-		{ name: 'Aloka Seneviratne', subject: 'Managing Performance', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/4.png' },
-		{ name: 'Lasantha Vidanagamage', subject: 'Advance Management Accounting', quals: 'MPAcc, BPharm — USJ, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/3-2.png' },
-		{ name: 'Shervin Perera', subject: 'Advance Financial Reporting / MCS', quals: 'ACMA, CGMA, MBA (UOS)', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/2-3.png' },
-		{ name: 'Channa Gunawardena', subject: 'MCS', quals: 'MBA, FCA, FCMA, B.Sc (First Class) — USJ', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/Untitled-design.png' },
+		{ name: 'Aloka Seneviratne', subject: 'Managing Performance', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/4.png' },
+		{ name: 'Lasantha Vidanagamage', subject: 'Advance Management Accounting', quals: 'MPAcc, BPharm — USJ, CIMA Passed Finalist', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/3-2.png' },
+		{ name: 'Shervin Perera', subject: 'Advance Financial Reporting / MCS', quals: 'ACMA, CGMA, MBA (UOS)', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/2-3.png' },
+		{ name: 'Channa Gunawardena', subject: 'MCS', quals: 'MBA, FCA, FCMA, B.Sc (First Class) — USJ', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/Untitled-design.png' },
 	],
 	strategic: [
-		{ name: 'Ruchira Perera', subject: 'Financial Strategy', quals: 'B.Sc (First Class) — USJ, MBA (PIM-USJ), ACMA, CPA, FCMA (SL)', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/1-3.png' },
-		{ name: 'Indika Rajakaruna', subject: 'Risk Management', quals: 'CISA (ISCA USA), AIB (IBSL), Executive MSc in Marketing', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/Untitled-design-1-2.png' },
-		{ name: 'Aloka Seneviratne', subject: 'Advance Financial Reporting', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/4.png' },
-		{ name: 'Channa Gunawardena', subject: 'SCS', quals: 'MBA, FCA, FCMA, B.Sc (First Class) — USJ', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/Untitled-design.png' },
+		{ name: 'Ruchira Perera', subject: 'Financial Strategy', quals: 'B.Sc (First Class) — USJ, MBA (PIM-USJ), ACMA, CPA, FCMA (SL)', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/1-3.png' },
+		{ name: 'Indika Rajakaruna', subject: 'Risk Management', quals: 'CISA (ISCA USA), AIB (IBSL), Executive MSc in Marketing', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/Untitled-design-1-2.png' },
+		{ name: 'Aloka Seneviratne', subject: 'Advance Financial Reporting', quals: 'DipM, B.Sc (Hons) Engineering Physics, CIMA Passed Finalist', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/4.png' },
+		{ name: 'Channa Gunawardena', subject: 'SCS', quals: 'MBA, FCA, FCMA, B.Sc (First Class) — USJ', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/Untitled-design.png' },
 	],
 };
 
 const FAST_TRACKERS = [
-	{ name: 'Chenuka Pasindu', org: 'Cinec Campus', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/1-5.png' },
-	{ name: 'Pramodhya Loku Gamage', org: 'Account Assistant — PML Seafrigo UK', time: '6 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/8-1-300x300.png' },
-	{ name: 'Vishwa Peiris', org: 'Senior Credit Solutions Manager — Scotiabank', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/Untitled-design-2-300x300.png' },
-	{ name: 'K. L. Upeshika', org: 'Assistant Manager Finance — InQube Global (Pvt) Ltd', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/12-1-300x300.png' },
-	{ name: 'Sanuda Minuraka Vidyaratna', org: 'Academic Associate / Lecturer — BMS Campus', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/9-1-300x300.png' },
-	{ name: 'Daminda Bandara', org: 'Finance Manager — OI Vietnam', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/4-2-300x300.png' },
-	{ name: 'Thisal Liyanage', org: 'Assistant Manager Finance — MAS Nayon Lanka', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/11-1-300x300.png' },
-	{ name: 'Dulan Sankalpa', org: 'Assistant Manager — First Capital Treasuries PLC', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/6-1-300x300.png' },
-	{ name: 'Thilini Thilakarathne', org: 'Senior Consultant — IFS R&D International (Pvt) Ltd', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/10-1-300x300.png' },
-	{ name: 'Aruna Premasooriya', org: 'Head of Finance — AMC Advertising & Marketing', time: '10 Months', img: 'https://www.nanaska.com/wp-content/uploads/2025/07/2-5-300x300.png' },
+	{ name: 'Chenuka Pasindu', org: 'Cinec Campus', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/1-5.png' },
+	{ name: 'Pramodhya Loku Gamage', org: 'Account Assistant — PML Seafrigo UK', time: '6 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/8-1-300x300.png' },
+	{ name: 'Vishwa Peiris', org: 'Senior Credit Solutions Manager — Scotiabank', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/Untitled-design-2-300x300.png' },
+	{ name: 'K. L. Upeshika', org: 'Assistant Manager Finance — InQube Global (Pvt) Ltd', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/12-1-300x300.png' },
+	{ name: 'Sanuda Minuraka Vidyaratna', org: 'Academic Associate / Lecturer — BMS Campus', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/9-1-300x300.png' },
+	{ name: 'Daminda Bandara', org: 'Finance Manager — OI Vietnam', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/4-2-300x300.png' },
+	{ name: 'Thisal Liyanage', org: 'Assistant Manager Finance — MAS Nayon Lanka', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/11-1-300x300.png' },
+	{ name: 'Dulan Sankalpa', org: 'Assistant Manager — First Capital Treasuries PLC', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/6-1-300x300.png' },
+	{ name: 'Thilini Thilakarathne', org: 'Senior Consultant — IFS R&D International (Pvt) Ltd', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/10-1-300x300.png' },
+	{ name: 'Aruna Premasooriya', org: 'Head of Finance — AMC Advertising & Marketing', time: '10 Months', img: 'https://images.nanaska.com/wp-content/uploads/2025/07/2-5-300x300.png' },
 ];
 
 const BENEFITS = [
@@ -71,20 +71,20 @@ const ENTRY_POINTS = [
 const PROGRAM_TABS = [
 	{
 		label: 'Operational Level',
-		img: 'https://www.nanaska.com/wp-content/uploads/2023/08/Group-335-1.png',
-		photo: 'https://www.nanaska.com/wp-content/uploads/2023/08/sdsd.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Group-335-1.png',
+		photo: 'https://images.nanaska.com/wp-content/uploads/2023/08/sdsd.png',
 		photoAlt: 'Person at board representing Operational Level teaching',
 	},
 	{
 		label: 'Management Level',
-		img: 'https://www.nanaska.com/wp-content/uploads/2023/08/Group-336-1.png',
-		photo: 'https://www.nanaska.com/wp-content/uploads/2023/08/Rectangle-194.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Group-336-1.png',
+		photo: 'https://images.nanaska.com/wp-content/uploads/2023/08/Rectangle-194.png',
 		photoAlt: 'Hands together representing Management Level teamwork',
 	},
 	{
 		label: 'Strategic Level',
-		img: 'https://www.nanaska.com/wp-content/uploads/2023/08/Group-337-2.png',
-		photo: 'https://www.nanaska.com/wp-content/uploads/2023/08/sdsds.png',
+		img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Group-337-2.png',
+		photo: 'https://images.nanaska.com/wp-content/uploads/2023/08/sdsds.png',
 		photoAlt: 'Person writing representing Strategic Level exam prep',
 	},
 ];
@@ -102,7 +102,7 @@ export default function FinancialLeadershipPage() {
 		description:
 			'Qualify CIMA in 12 months with only 3 exams through the CGMA Finance Leadership Program at Nanaska — Sri Lanka\'s official CGMA FLP partner. Expert lecturers, prize winners, personalised support.',
 		keywords: 'CGMA FLP, Finance Leadership Program, CIMA Sri Lanka, CIMA qualification, Nanaska, ACMA, CGMA designation',
-		ogImage: 'https://www.nanaska.com/wp-content/uploads/2023/10/Nanaska_FLP_Spetember-23-Introductory-Post-Web-Slider-1920x1080-1.png',
+		ogImage: 'https://images.nanaska.com/wp-content/uploads/2023/10/Nanaska_FLP_Spetember-23-Introductory-Post-Web-Slider-1920x1080-1.png',
 		canonical: 'https://www.nanaska.com/financial-leadership-program/',
 	});
 
@@ -155,7 +155,7 @@ export default function FinancialLeadershipPage() {
 					<div className="flp-hero__actions">
 						<a href="#register" className="flp-btn flp-btn--primary">Get In Touch</a>
 						<a
-							href="https://www.nanaska.com/wp-content/uploads/2025/07/Nanaska-FLP-Pathway.pdf"
+							href="https://images.nanaska.com/wp-content/uploads/2025/07/Nanaska-FLP-Pathway.pdf"
 							className="flp-btn flp-btn--outline"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -239,7 +239,7 @@ export default function FinancialLeadershipPage() {
 							leadership roles while accelerating their CIMA career progression.
 						</p>
 						<a
-							href="https://www.nanaska.com/wp-content/uploads/2025/07/Nanaska-FLP-Pathway.pdf"
+							href="https://images.nanaska.com/wp-content/uploads/2025/07/Nanaska-FLP-Pathway.pdf"
 							className="flp-btn flp-btn--primary"
 							target="_blank"
 							rel="noopener noreferrer"
@@ -250,7 +250,7 @@ export default function FinancialLeadershipPage() {
 					</div>
 					<div className="flp-about__img" data-reveal>
 						<img
-							src="https://www.nanaska.com/wp-content/uploads/2025/07/Brochure-Cover-scaled.webp"
+							src="https://images.nanaska.com/wp-content/uploads/2025/07/Brochure-Cover-scaled.webp"
 							alt="Nanaska FLP Brochure Cover"
 							loading="lazy"
 						/>
@@ -353,9 +353,9 @@ export default function FinancialLeadershipPage() {
 						))}
 					</div>
 					<div className="flp-eligibility__imgs" data-reveal>
-						<img src="https://www.nanaska.com/wp-content/uploads/2023/08/Group-254.png" alt="Strategic Level qualification diagram" loading="lazy" />
-						<img src="https://www.nanaska.com/wp-content/uploads/2023/08/Group-255-1.png" alt="Operational Level qualification diagram" loading="lazy" />
-						<img src="https://www.nanaska.com/wp-content/uploads/2023/08/Group-255.png" alt="Management Level qualification diagram" loading="lazy" />
+						<img src="https://images.nanaska.com/wp-content/uploads/2023/08/Group-254.png" alt="Strategic Level qualification diagram" loading="lazy" />
+						<img src="https://images.nanaska.com/wp-content/uploads/2023/08/Group-255-1.png" alt="Operational Level qualification diagram" loading="lazy" />
+						<img src="https://images.nanaska.com/wp-content/uploads/2023/08/Group-255.png" alt="Management Level qualification diagram" loading="lazy" />
 					</div>
 				</div>
 			</section>
@@ -399,7 +399,7 @@ export default function FinancialLeadershipPage() {
 					<div className="flp-cost__inner" data-reveal>
 						<div className="flp-cost__left">
 							<img
-								src="https://www.nanaska.com/wp-content/uploads/2023/07/Rectangle-47-2.png"
+								src="https://images.nanaska.com/wp-content/uploads/2023/07/Rectangle-47-2.png"
 								alt="Students learning at Nanaska"
 								loading="lazy"
 							/>
