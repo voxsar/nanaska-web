@@ -433,7 +433,7 @@ const combinations = [
 	{ id: 'cert_ba2_ba4', level: 'certificate', subjects: ['BA2', 'BA4'], price: 32000 },
 	{ id: 'cert_ba3_ba4', level: 'certificate', subjects: ['BA3', 'BA4'], price: 32000 },
 	// Certificate – full
-	{ id: 'cert_full', level: 'certificate', subjects: ['BA1', 'BA2', 'BA3', 'BA4'], price: 64000 },
+	{ id: 'cert_full', name: 'CIMA Certificate Level', slug: 'cima-certificate-level', level: 'certificate', subjects: ['BA1', 'BA2', 'BA3', 'BA4'], price: 64000, priceGbp: 360 },
 
 	// Operational – singles
 	{ id: 'op_e1', level: 'operational', subjects: ['E1'], price: 29000 },
@@ -445,7 +445,7 @@ const combinations = [
 	{ id: 'op_e1_f1', level: 'operational', subjects: ['E1', 'F1'], price: 58000 },
 	{ id: 'op_p1_f1', level: 'operational', subjects: ['P1', 'F1'], price: 58000 },
 	// Operational – full
-	{ id: 'op_full', level: 'operational', subjects: ['E1', 'P1', 'F1', 'E2'], price: 116000 },
+	{ id: 'op_full', name: 'CIMA Operational Level', slug: 'cima-operational-level', level: 'operational', subjects: ['E1', 'P1', 'F1', 'E2'], price: 116000, priceGbp: 600 },
 
 	// Management – singles
 	{ id: 'mg_p2', level: 'management', subjects: ['P2'], price: 35000 },
@@ -453,7 +453,7 @@ const combinations = [
 	{ id: 'mg_mcs', level: 'management', subjects: ['MCS'], price: 40000 },
 	// Management – pairs / full
 	{ id: 'mg_p2_f2', level: 'management', subjects: ['P2', 'F2'], price: 70000 },
-	{ id: 'mg_full', level: 'management', subjects: ['P2', 'F2', 'MCS'], price: 110000 },
+	{ id: 'mg_full', name: 'CIMA Management Level', slug: 'cima-management-level', level: 'management', subjects: ['P2', 'F2', 'MCS'], price: 110000, priceGbp: 600 },
 
 	// Strategic – singles
 	{ id: 'st_e3', level: 'strategic', subjects: ['E3'], price: 40000 },
@@ -462,7 +462,7 @@ const combinations = [
 	{ id: 'st_scs', level: 'strategic', subjects: ['SCS'], price: 40000 },
 	// Strategic – pairs / full
 	{ id: 'st_e3_p3', level: 'strategic', subjects: ['E3', 'P3'], price: 80000 },
-	{ id: 'st_full', level: 'strategic', subjects: ['E3', 'P3', 'F3', 'SCS'], price: 160000 },
+	{ id: 'st_full', name: 'CIMA Strategic Level', slug: 'cima-strategic-level', level: 'strategic', subjects: ['E3', 'P3', 'F3', 'SCS'], price: 160000, priceGbp: 600 },
 ];
 
 const testimonials = [
@@ -1420,10 +1420,13 @@ async function main() {
 
 	console.log('Seeding combinations …');
 	for (const c of combinations) {
+		const comboName = (c as any).name || '';
+		const comboSlug = (c as any).slug || null;
+		const comboPriceGbp = (c as any).priceGbp || 0;
 		await prisma.courseCombination.upsert({
 			where: { id: c.id },
-			update: { level: c.level, price: c.price },
-			create: { id: c.id, level: c.level, price: c.price },
+			update: { level: c.level, price: c.price, priceGbp: comboPriceGbp, name: comboName, slug: comboSlug },
+			create: { id: c.id, level: c.level, price: c.price, priceGbp: comboPriceGbp, name: comboName, slug: comboSlug },
 		});
 
 		for (const courseId of c.subjects) {

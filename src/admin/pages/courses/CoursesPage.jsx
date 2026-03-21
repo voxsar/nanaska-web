@@ -110,8 +110,8 @@ export default function CoursesPage() {
 	return (
 		<div>
 			<div className="page-title-row">
-				<h1>Courses</h1>
-				<Link to="/admin/courses/new" className="btn btn-primary">+ Add Course</Link>
+				<h1>Subjects (Individual Courses)</h1>
+				<Link to="/admin/courses/new" className="btn btn-primary">+ Add Subject</Link>
 			</div>
 
 			{success && <div className="admin-alert admin-alert-success">{success}</div>}
@@ -140,6 +140,7 @@ export default function CoursesPage() {
 									<th>Name</th>
 									<th>Level</th>
 									<th>Price (LKR)</th>
+									<th>Price (GBP)</th>
 									<th>Duration</th>
 									<th>Lecturers</th>
 									<th>Actions</th>

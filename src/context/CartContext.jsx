@@ -30,15 +30,18 @@ export function CartProvider({ children }) {
 		if (isLevelInCart(level.levelId)) return;
 		if (isInCart(subject.code)) return;
 
-		const prices = getCoursePricesByCode(subject.code, subject.price || 0);
+		// Prefer explicit prices from API (subject.priceGbp / subject.priceLkr),
+		// fall back to the static pricing data map.
+		const staticPrices = getCoursePricesByCode(subject.code, subject.price || 0);
 		const newItem = {
 			type: 'course',
 			courseCode: subject.code,
 			courseName: subject.name,
 			levelId: level.levelId,
 			levelTitle: level.title,
-			priceGbp: prices.gbp,
-			priceLkr: prices.lkr,
+			priceGbp: subject.priceGbp ?? staticPrices.gbp,
+			priceLkr: subject.priceLkr ?? subject.price ?? staticPrices.lkr,
+			combinationId: subject.combinationId || level.courseCombinationIds?.[subject.code] || '',
 			slug: subject.slug,
 		};
 
@@ -53,14 +56,15 @@ export function CartProvider({ children }) {
 
 		if (allInCart) {
 			const merged = newItems.filter(i => !(i.type === 'course' && i.levelId === level.levelId));
-			const levelPrices = getLevelPricesById(level.levelId, level.levelPrice || 0);
+			const staticLevelPrices = getLevelPricesById(level.levelId, level.levelPrice || 0);
 			merged.push({
 				type: 'level',
 				levelId: level.levelId,
 				levelTitle: level.title,
 				levelPath: level.currentPath,
-				priceGbp: levelPrices.gbp,
-				priceLkr: levelPrices.lkr,
+				combinationId: level.combinationId || '',
+				priceGbp: level.priceGbp ?? staticLevelPrices.gbp,
+				priceLkr: level.priceLkr ?? staticLevelPrices.lkr,
 				courseCount: level.subjects.length,
 			});
 			setCartItems(merged);
@@ -74,14 +78,15 @@ export function CartProvider({ children }) {
 	function addLevel(level) {
 		if (isLevelInCart(level.levelId)) return;
 		const filtered = cartItems.filter(i => !(i.type === 'course' && i.levelId === level.levelId));
-		const levelPrices = getLevelPricesById(level.levelId, level.levelPrice || 0);
+		const staticPrices = getLevelPricesById(level.levelId, level.levelPrice || 0);
 		filtered.push({
 			type: 'level',
 			levelId: level.levelId,
 			levelTitle: level.title,
 			levelPath: level.currentPath,
-			priceGbp: levelPrices.gbp,
-			priceLkr: levelPrices.lkr,
+			combinationId: level.combinationId || '',
+			priceGbp: level.priceGbp ?? staticPrices.gbp,
+			priceLkr: level.priceLkr ?? staticPrices.lkr,
 			courseCount: level.subjects.length,
 		});
 		setCartItems(filtered);

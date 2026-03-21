@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -85,5 +85,87 @@ export class CoursesService {
 	async remove(id: string) {
 		await this.prisma.course.delete({ where: { id } });
 		return { message: 'Course deleted' };
+	}
+
+	// ─── Admin: CourseCombination CRUD ─────────────────────────────────────────
+
+	async createCombination(data: {
+		id: string;
+		name: string;
+		slug?: string;
+		level: string;
+		price: number;
+		priceGbp?: number;
+		courseIds: string[];
+	}) {
+		const existing = await this.prisma.courseCombination.findUnique({ where: { id: data.id } });
+		if (existing) throw new BadRequestException(`Combination ID "${data.id}" already exists`);
+
+		return this.prisma.courseCombination.create({
+			data: {
+				id: data.id,
+				name: data.name,
+				slug: data.slug || null,
+				level: data.level,
+				price: data.price,
+				priceGbp: data.priceGbp || 0,
+				items: {
+					create: data.courseIds.map((courseId) => ({ courseId })),
+				},
+			},
+			include: { items: { include: { course: true } } },
+		});
+	}
+
+	async updateCombination(
+		id: string,
+		data: {
+			name?: string;
+			slug?: string;
+			level?: string;
+			price?: number;
+			priceGbp?: number;
+			courseIds?: string[];
+		},
+	) {
+		const combo = await this.prisma.courseCombination.findUnique({ where: { id } });
+		if (!combo) throw new NotFoundException(`Combination ${id} not found`);
+
+		const { courseIds, ...rest } = data;
+
+		// Build the update payload, handling slug null-clearing
+		const updatePayload: any = { ...rest };
+		if ('slug' in data) {
+			updatePayload.slug = data.slug || null;
+		}
+
+		await this.prisma.courseCombination.update({ where: { id }, data: updatePayload });
+
+		if (courseIds !== undefined) {
+			await this.prisma.courseCombinationItem.deleteMany({ where: { combinationId: id } });
+			if (courseIds.length > 0) {
+				await this.prisma.courseCombinationItem.createMany({
+					data: courseIds.map((courseId) => ({ combinationId: id, courseId })),
+				});
+			}
+		}
+
+		return this.prisma.courseCombination.findUnique({
+			where: { id },
+			include: { items: { include: { course: true } } },
+		});
+	}
+
+	async removeCombination(id: string) {
+		const combo = await this.prisma.courseCombination.findUnique({
+			where: { id },
+			include: { orders: { take: 1 } },
+		});
+		if (!combo) throw new NotFoundException(`Combination ${id} not found`);
+		if (combo.orders.length > 0) {
+			throw new BadRequestException('Cannot delete a combination that has existing orders');
+		}
+		await this.prisma.courseCombination.delete({ where: { id } });
+		return { message: 'Combination deleted' };
 	}
 }

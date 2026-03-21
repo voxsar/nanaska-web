@@ -50,4 +50,49 @@ export class CoursesController {
 	remove(@Param('id') id: string) {
 		return this.coursesService.remove(id);
 	}
+
+	// ─── Admin: CourseCombination CRUD ─────────────────────────────────────────
+
+	/** Admin: create a named combination (course program) */
+	@UseGuards(AdminJwtAuthGuard)
+	@Post('combinations')
+	createCombination(
+		@Body()
+		data: {
+			id: string;
+			name: string;
+			slug?: string;
+			level: string;
+			price: number;
+			priceGbp?: number;
+			courseIds: string[];
+		},
+	) {
+		return this.coursesService.createCombination(data);
+	}
+
+	/** Admin: update a combination (name, price, subjects) */
+	@UseGuards(AdminJwtAuthGuard)
+	@Put('combinations/:id')
+	updateCombination(
+		@Param('id') id: string,
+		@Body()
+		data: {
+			name?: string;
+			slug?: string;
+			level?: string;
+			price?: number;
+			priceGbp?: number;
+			courseIds?: string[];
+		},
+	) {
+		return this.coursesService.updateCombination(id, data);
+	}
+
+	/** Admin: delete a combination */
+	@UseGuards(AdminJwtAuthGuard)
+	@Delete('combinations/:id')
+	removeCombination(@Param('id') id: string) {
+		return this.coursesService.removeCombination(id);
+	}
 }

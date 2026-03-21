@@ -8,6 +8,8 @@ import BlogEditorPage from './pages/blog/BlogEditorPage';
 import LecturersPage from './pages/lecturers/LecturersPage';
 import CoursesPage from './pages/courses/CoursesPage';
 import CourseEditorPage from './pages/courses/CourseEditorPage';
+import CourseProgramsPage from './pages/courses/CourseProgramsPage';
+import CourseProgramEditorPage from './pages/courses/CourseProgramEditorPage';
 import StudentsPage from './pages/StudentsPage';
 import NewsletterPage from './pages/NewsletterPage';
 import PaymentsPage from './pages/PaymentsPage';
@@ -33,6 +35,9 @@ export default function AdminApp() {
 					<Route path="courses" element={<CoursesPage />} />
 					<Route path="courses/new" element={<CourseEditorPage />} />
 					<Route path="courses/:id/edit" element={<CourseEditorPage />} />
+					<Route path="course-programs" element={<CourseProgramsPage />} />
+					<Route path="course-programs/new" element={<CourseProgramEditorPage />} />
+					<Route path="course-programs/:id/edit" element={<CourseProgramEditorPage />} />
 					<Route path="students" element={<StudentsPage />} />
 					<Route path="newsletter" element={<NewsletterPage />} />
 					<Route path="payments" element={<PaymentsPage />} />

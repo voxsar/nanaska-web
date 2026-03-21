@@ -129,6 +129,10 @@ export default function EnrollmentPage() {
 	const getCartCombinationId = () => {
 		if (cartItems.length !== 1) return '';
 		const item = cartItems[0];
+
+		// Use combinationId stored directly on the cart item (set by CourseLevelPage via DB)
+		if (item.combinationId) return item.combinationId;
+
 		if (item.type === 'level') return getCombinationIdForLevel(item.levelId);
 		if (item.type === 'course') {
 			// Try static map first

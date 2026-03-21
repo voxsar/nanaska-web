@@ -50,10 +50,12 @@ model Course {
 
 // ─── Course Combinations ────────────────────────────────────────────────────
 model CourseCombination {
-  id    String @id                           // e.g. "cert_ba1_ba2"
-  level String
-  price Int                                  // total price in LKR
-  priceGbp Int @default(0)                  @map("price_gbp") // total price in GBP
+  id       String  @id                          // e.g. "cert_ba1_ba2"
+  name     String  @default("")                 // display name, e.g. "CIMA Certificate Level"
+  slug     String? @unique                      // url slug, e.g. "cima-certificate-level"
+  level    String
+  price    Int                                  // total price in LKR
+  priceGbp Int     @default(0)                 @map("price_gbp") // total price in GBP
 
   items  CourseCombinationItem[]
   orders Order[]

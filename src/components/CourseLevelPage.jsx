@@ -14,13 +14,38 @@ export default function CourseLevelPage({ level }) {
 	const currentSubject = level.subjects.find((s) => s.code === activeSubject);
 	const { addCourse, addLevel, isInCart, isLevelInCart } = useCart();
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
-	const levelPrices = getLevelPricesById(level.levelId);
+
+	// Fetch the full combination for this level from the API to get DB-accurate prices
+	const { data: apiCombination } = useApi(
+		level.defaultCombinationId ? `/courses/combinations/${level.defaultCombinationId}` : null,
+	);
+
+	// Use DB prices from API combination if available, fall back to static pricingData
+	const staticLevelPrices = getLevelPricesById(level.levelId);
+	const levelPrices = {
+		gbp: apiCombination?.priceGbp ?? staticLevelPrices.gbp,
+		lkr: apiCombination?.price ?? staticLevelPrices.lkr,
+	};
 	const levelAmount = getAmountForCountry(levelPrices, selectedCountry);
+
+	// Build a map of course code → API course data (includes DB prices)
+	const apiCourseMap = (apiCombination?.items || []).reduce((acc, item) => {
+		if (item.course?.id) acc[item.course.id] = item.course;
+		return acc;
+	}, {});
 
 	const { data: apiLecturers } = useApi('/lecturers?active=true');
 	const LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
 
 	const levelInCart = isLevelInCart(level.levelId);
+
+	// Build the enriched level object with DB price + combinationId for cart
+	const enrichedLevel = {
+		...level,
+		combinationId: apiCombination?.id || level.defaultCombinationId || '',
+		priceGbp: levelPrices.gbp,
+		priceLkr: levelPrices.lkr,
+	};
 
 	return (
 		<div className="course-page" style={{ '--level-color': level.color, '--level-gradient': level.gradient }}>
@@ -43,7 +68,7 @@ export default function CourseLevelPage({ level }) {
 					<div className="course-page__hero-actions">
 						<button
 							className={`course-page__add-level-btn${levelInCart ? ' course-page__add-level-btn--added' : ''}`}
-							onClick={() => addLevel(level)}
+							onClick={() => addLevel(enrichedLevel)}
 							disabled={levelInCart}
 						>
 							{levelInCart ? '✓ Level Added' : '+ Add Level to Cart'}
@@ -67,8 +92,20 @@ export default function CourseLevelPage({ level }) {
 					<div className="subject-selector">
 						{level.subjects.map((subject) => {
 							const subjectInCart = isInCart(subject.code);
-							const subjectPrices = getCoursePricesByCode(subject.code, 0);
+							// Use DB prices from combination API if available; fall back to static
+							const apiCourse = apiCourseMap[subject.code];
+							const staticPrices = getCoursePricesByCode(subject.code, 0);
+							const subjectPrices = {
+								gbp: apiCourse?.priceGbp ?? staticPrices.gbp,
+								lkr: apiCourse?.price ?? staticPrices.lkr,
+							};
 							const subjectAmount = getAmountForCountry(subjectPrices, selectedCountry);
+							// Enrich subject with DB prices for cart
+							const enrichedSubject = {
+								...subject,
+								priceGbp: subjectPrices.gbp,
+								priceLkr: subjectPrices.lkr,
+							};
 							return (
 								<div key={subject.code} className="subject-selector__item">
 									<button
@@ -81,7 +118,7 @@ export default function CourseLevelPage({ level }) {
 									</button>
 									<button
 										className={`subject-selector__cart-btn${(subjectInCart || levelInCart) ? ' subject-selector__cart-btn--added' : ''}`}
-										onClick={(e) => { e.stopPropagation(); addCourse(subject, level); }}
+										onClick={(e) => { e.stopPropagation(); addCourse(enrichedSubject, enrichedLevel); }}
 										disabled={subjectInCart || levelInCart}
 										title={levelInCart ? 'Level already in cart' : subjectInCart ? 'Already in cart' : 'Add to enrollment cart'}
 									>

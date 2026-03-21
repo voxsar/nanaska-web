@@ -48,6 +48,7 @@ export default function Navbar() {
 	const [cartOpen, setCartOpen] = useState(false);
 	const [scrolled, setScrolled] = useState(false);
 	const { cartCount } = useCart();
+	const { data: apiCombinations } = useApi('/courses/combinations');
 	const { data: apiCourses } = useApi('/courses');
 
 	const LEVEL_META = [
@@ -57,21 +58,34 @@ export default function Navbar() {
 		{ id: 'strategic', label: 'Strategic Level', to: '/cima-strategic-level' },
 	];
 
-	const coursesDropdown = apiCourses?.length
-		? LEVEL_META.map((lvl) => ({
-			label: lvl.label,
-			to: lvl.to,
-			hasSub: true,
-			sub: apiCourses
-				.filter((c) => c.level === lvl.id)
-				.map((c) => ({ label: `${c.id} – ${c.name}`, to: `/${c.slug}` })),
+	// Named combinations (admin-configured programs) drive the Courses dropdown.
+	// Falls back to grouping courses by level if no named combinations exist.
+	const namedCombos = apiCombinations?.filter((c) => c.name);
+	const coursesDropdown = namedCombos?.length
+		? namedCombos.map((combo) => ({
+			label: combo.name,
+			to: combo.slug ? `/${combo.slug}` : '#',
+			hasSub: combo.items?.length > 0,
+			sub: (combo.items || []).map((item) => ({
+				label: `${item.course?.id ?? ''} – ${item.course?.name ?? ''}`,
+				to: item.course?.slug ? `/${item.course.slug}` : '#',
+			})),
 		}))
-		: LEVELS.map((level) => ({
-			label: level.title.replace('CIMA ', ''),
-			to: level.currentPath,
-			hasSub: true,
-			sub: level.subjects.map((s) => ({ label: `${s.code} – ${s.name}`, to: `/${s.slug}` })),
-		}));
+		: apiCourses?.length
+			? LEVEL_META.map((lvl) => ({
+				label: lvl.label,
+				to: lvl.to,
+				hasSub: true,
+				sub: apiCourses
+					.filter((c) => c.level === lvl.id)
+					.map((c) => ({ label: `${c.id} – ${c.name}`, to: `/${c.slug}` })),
+			}))
+			: LEVELS.map((level) => ({
+				label: level.title.replace('CIMA ', ''),
+				to: level.currentPath,
+				hasSub: true,
+				sub: level.subjects.map((s) => ({ label: `${s.code} – ${s.name}`, to: `/${s.slug}` })),
+			}));
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 40);
