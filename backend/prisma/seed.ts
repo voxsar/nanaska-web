@@ -7,7 +7,7 @@ const SALT_ROUNDS = 12;
 
 const adminUsers = [
 	{
-		email: 'miyuru@theredsun.org',
+		email: 'miyuru@nanaska.com',
 		name: 'Miyuru',
 		role: 'superadmin' as const,
 		password: 'password',
