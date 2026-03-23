@@ -84,7 +84,7 @@ export default function Footer() {
 						/>
 
 						<p className="footer__copyright">
-							© Copyright 2026 - The Red Sun - All Rights Reserved
+							© Copyright 2026 - Nanaska - All Rights Reserved
 						</p>
 					</div>
 
