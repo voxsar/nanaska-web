@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useApi } from './hooks/useApi';
+import { useTracking } from './hooks/useTracking';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingWidgets from './components/FloatingWidgets';
@@ -16,6 +17,12 @@ function ScrollToTop() {
 		const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		window.scrollTo({ top: 0, behavior: prefersReduced ? 'instant' : 'instant' });
 	}, [pathname]);
+	return null;
+}
+
+/* Initialises Clarity & fires GA4/Clarity events on every route change */
+function TrackingWrapper() {
+	useTracking();
 	return null;
 }
 
@@ -41,6 +48,7 @@ import CaseStudyPage from './pages/CaseStudyPage';
 import CertificateLevelIntakePage from './pages/CertificateLevelIntakePage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
+import PaymentLinkPage from './pages/PaymentLinkPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 
@@ -121,12 +129,16 @@ function App() {
 			<PricingProvider>
 				<CartProvider>
 					<ScrollToTop />
+					<TrackingWrapper />
 					<Routes>
 
 						{/* Admin panel – completely separate layout */}
 						<Route path="/admin/*" element={<AdminApp />} />
 
-						{/* Funnel landing pages (no navbar/footer) */}
+						{/* Custom payment links – no navbar/footer */}
+					<Route path="/pay/:slug" element={<PaymentLinkPage />} />
+
+					{/* Funnel landing pages (no navbar/footer) */}
 						<Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />
 						<Route path="/case-study" element={<CaseStudyPage />} />
 						<Route path="/certificate-level-intake" element={<CertificateLevelIntakePage />} />

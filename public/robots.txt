@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Disallow admin panel
+Disallow: /admin/
+Disallow: /admin/*
+
+# Disallow payment flow pages (no indexing value)
+Disallow: /payment-success
+Disallow: /payment-cancel
+
+# Sitemap
+Sitemap: https://nanaska.com/sitemap.xml

@@ -11,6 +11,7 @@ import { LecturersModule } from './lecturers/lecturers.module';
 import { SettingsModule } from './settings/settings.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { PaymentLinksModule } from './payment-links/payment-links.module';
 
 @Module({
 	imports: [
@@ -26,6 +27,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 		SettingsModule,
 		TestimonialsModule,
 		SchedulerModule,
+		PaymentLinksModule,
 	],
 })
 export class AppModule { }

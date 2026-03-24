@@ -17,6 +17,7 @@ const dataItems = [
 	{ label: 'Students', icon: '🎓', to: '/admin/students' },
 	{ label: 'Newsletter', icon: '📧', to: '/admin/newsletter' },
 	{ label: 'Payments', icon: '💳', to: '/admin/payments' },
+	{ label: 'Payment Links', icon: '🔗', to: '/admin/payment-links' },
 	{ label: 'Form Submissions', icon: '📋', to: '/admin/form-data' },
 ];
 

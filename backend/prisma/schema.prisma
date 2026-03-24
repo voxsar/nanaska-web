@@ -79,8 +79,9 @@ model CourseCombinationItem {
 model Order {
   id              String      @id @default(uuid())
   userId          String?     @map("user_id")
-  combinationId   String      @map("combination_id")
-  amount          Int                                // in LKR
+  combinationId   String?     @map("combination_id")  // nullable for custom payment links
+  paymentLinkId   String?     @map("payment_link_id") // set when order comes from a payment link
+  amount          Int                                // in currency whole units
   status          OrderStatus @default(PENDING)
   ipgMerchantRef  String?     @map("ipg_merchant_ref")
   ipgRef          String?     @map("ipg_ref")        // returned by IPG after payment
@@ -95,10 +96,36 @@ model Order {
   updatedAt       DateTime    @updatedAt             @map("updated_at")
 
   user        User?              @relation(fields: [userId], references: [id])
-  combination CourseCombination  @relation(fields: [combinationId], references: [id])
+  combination CourseCombination? @relation(fields: [combinationId], references: [id])
+  paymentLink PaymentLink?       @relation(fields: [paymentLinkId], references: [id])
   userCourses UserCourse[]
 
   @@map("orders")
+}
+
+// ─── Custom Payment Links ─────────────────────────────────────────────────────
+model PaymentLink {
+  id               String    @id @default(uuid())
+  slug             String    @unique
+  label            String                      // Admin-facing label/description
+  studentName      String    @map("student_name")
+  studentEmail     String    @map("student_email")
+  amount           Int                         // whole units matching currency (LKR or GBP)
+  currency         String                      // LKR | GBP
+  description      String?   @db.Text          // shown to student on payment page
+  passwordHash     String?   @map("password_hash")   // bcrypt – null means no password needed
+  expiresAt        DateTime? @map("expires_at")      // optional hard expiry
+  expireOnPayment  Boolean   @default(false)   @map("expire_on_payment")
+  isActive         Boolean   @default(true)    @map("is_active")
+  isPaid           Boolean   @default(false)   @map("is_paid")
+  paidAt           DateTime? @map("paid_at")
+  createdByAdminId String    @map("created_by_admin_id")
+  createdAt        DateTime  @default(now())   @map("created_at")
+  updatedAt        DateTime  @updatedAt        @map("updated_at")
+
+  orders Order[]
+
+  @@map("payment_links")
 }
 
 enum OrderStatus {

@@ -7,5 +7,6 @@ import { EmailModule } from '../email/email.module';
   imports: [EmailModule],
   providers: [PaymentsService],
   controllers: [PaymentsController],
+  exports: [PaymentsService],
 })
 export class PaymentsModule {}

@@ -176,6 +176,32 @@ export class EmailService {
 
 	// ── Test emails ──────────────────────────────────────────────────────────────
 
+	// ── Payment link email ────────────────────────────────────────────────────
+
+	async sendPaymentLinkEmail(opts: {
+		studentName: string;
+		studentEmail: string;
+		amount: number;
+		currency: string;
+		description?: string;
+		paymentUrl: string;
+		hasPassword: boolean;
+		expiresAt?: Date;
+	}): Promise<void> {
+		try {
+			const cfg = await this.getConfig();
+			await this.postToWebhook(
+				opts.studentEmail,
+				`Your Nanaska Payment Link – ${opts.currency} ${opts.amount.toLocaleString()}`,
+				this.paymentLinkTemplate(opts),
+				cfg.paymentCc,
+			);
+			this.logger.log(`Payment link email sent to ${opts.studentEmail}`);
+		} catch (err: any) {
+			this.logger.error(`Failed to send payment link email to ${opts.studentEmail}: ${err.message}`);
+		}
+	}
+
 	/**
 	 * Send a typed test email. Type determines which template and CC list is used.
 	 * Valid types: registration | payment-receipt | enrollment-reminder | contact | newsletter
@@ -502,4 +528,70 @@ export class EmailService {
 </div>
 </body></html>`;
 	}
+
+	private paymentLinkTemplate(opts: {
+		studentName: string;
+		amount: number;
+		currency: string;
+		description?: string;
+		paymentUrl: string;
+		hasPassword: boolean;
+		expiresAt?: Date;
+	}): string {
+		const symbol = opts.currency === 'GBP' ? '£' : 'LKR ';
+		const formattedAmount = `${symbol}${opts.amount.toLocaleString()}`;
+		const expiryLine = opts.expiresAt
+			? `<p style="color:#e67e22;font-size:14px;"><strong>⏰ This link expires on ${opts.expiresAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}.</strong></p>`
+			: '';
+		const passwordNote = opts.hasPassword
+			? `<p style="color:#555;font-size:14px;">🔒 This link is password protected. Please use the password provided by your advisor to proceed.</p>`
+			: '';
+		return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:0}
+  .wrap{max-width:600px;margin:40px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .hdr{background:#1B365D;padding:32px;text-align:center}
+  .hdr h1{color:#24ADE3;margin:0;font-size:26px}
+  .hdr p{color:#fff;margin:8px 0 0;font-size:14px}
+  .body{padding:32px}
+  .amount-box{background:#f0f8ff;border:2px solid #24ADE3;border-radius:8px;padding:20px;text-align:center;margin:24px 0}
+  .amount-box .amount{font-size:36px;font-weight:bold;color:#1B365D}
+  .amount-box .currency{font-size:16px;color:#666}
+  .btn{display:inline-block;background:#F5A623;color:#fff!important;text-decoration:none;padding:16px 40px;border-radius:6px;font-size:18px;font-weight:bold;margin:24px 0}
+  .desc{background:#f9f9f9;border-left:4px solid #24ADE3;padding:16px;margin:16px 0;font-size:14px;color:#444}
+  .ftr{background:#f4f4f4;padding:16px 32px;text-align:center;font-size:12px;color:#999}
+  .url-box{word-break:break-all;font-size:13px;color:#666;border:1px solid #ddd;padding:10px;border-radius:4px;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <h1>Nanaska CIMA</h1>
+    <p>Your personalised payment link is ready</p>
+  </div>
+  <div class="body">
+    <p style="font-size:16px;">Dear <strong>${opts.studentName}</strong>,</p>
+    <p style="color:#555;">Your Nanaska advisor has created a secure payment link for you. Please use the button below to complete your payment.</p>
+    <div class="amount-box">
+      <div class="amount">${formattedAmount}</div>
+      <div class="currency">${opts.currency}</div>
+    </div>
+    ${opts.description ? `<div class="desc"><strong>Details:</strong> ${opts.description}</div>` : ''}
+    ${expiryLine}
+    ${passwordNote}
+    <div style="text-align:center">
+      <a href="${opts.paymentUrl}" class="btn">Complete Payment →</a>
+    </div>
+    <p style="color:#888;font-size:13px;">If the button doesn't work, copy and paste this link into your browser:</p>
+    <div class="url-box">${opts.paymentUrl}</div>
+    <p style="color:#888;font-size:13px;margin-top:24px;">For any questions, please contact us at <a href="mailto:info@nanaska.com">info@nanaska.com</a>.</p>
+  </div>
+  <div class="ftr">
+    <p>&copy; ${new Date().getFullYear()} Nanaska. All rights reserved.</p>
+  </div>
+</div>
+</body></html>`;
+	}
 }
+

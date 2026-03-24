@@ -212,34 +212,45 @@ export class PaymentsService {
 				data: { status: 'PAID', ipgRef: body.payment_id ?? null },
 			});
 
-			// Grant access to each subject in the combination (only for registered users)
-			if (order.userId) {
-				const courseIds = order.combination.items.map((i) => i.courseId);
-				for (const courseId of courseIds) {
-					await this.prisma.userCourse.upsert({
-						where: { userId_courseId: { userId: order.userId, courseId } },
-						update: {},
-						create: { userId: order.userId, courseId, orderId: order.id },
-					});
+// Grant access to each subject in the combination (only for registered users with a combo)
+				if (order.userId && order.combination) {
+					const courseIds = order.combination.items.map((i) => i.courseId);
+					for (const courseId of courseIds) {
+						await this.prisma.userCourse.upsert({
+							where: { userId_courseId: { userId: order.userId, courseId } },
+							update: {},
+							create: { userId: order.userId, courseId, orderId: order.id },
+						});
+					}
+					this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted to user ${order.userId}`);
+				} else {
+					this.logger.log(`Order ${order_id} marked PAID (guest/custom order – no course access grants)`);
 				}
-				this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted to user ${order.userId}`);
-			} else {
-				this.logger.log(`Order ${order_id} marked PAID (guest order – no course access grants needed)`);
-			}
 
-			// Send payment receipt email
-			const recipientName = order.userId
-				? (order.user?.name ?? order.guestName ?? 'Student')
-				: (order.guestName ?? 'Student');
-			const recipientEmail = order.userId
-				? (order.user?.email ?? order.guestEmail ?? '')
-				: (order.guestEmail ?? '');
-			if (recipientEmail) {
-				this.email.sendPaymentReceiptEmail({
-					name: recipientName,
-					email: recipientEmail,
-					orderId: order.id,
-					courseName: order.combination.name || order.combination.id,
+				// Mark payment link as paid when expireOnPayment is set
+				if (order.paymentLinkId) {
+					const pl = await this.prisma.paymentLink.findUnique({ where: { id: order.paymentLinkId } });
+					if (pl) {
+						await this.prisma.paymentLink.update({
+							where: { id: order.paymentLinkId },
+							data: { isPaid: true, paidAt: new Date() },
+						});
+					}
+				}
+
+				// Send payment receipt email
+				const recipientName = order.userId
+					? (order.user?.name ?? order.guestName ?? 'Student')
+					: (order.guestName ?? 'Student');
+				const recipientEmail = order.userId
+					? (order.user?.email ?? order.guestEmail ?? '')
+					: (order.guestEmail ?? '');
+				if (recipientEmail) {
+					this.email.sendPaymentReceiptEmail({
+						name: recipientName,
+						email: recipientEmail,
+						orderId: order.id,
+						courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
 					amount: order.amount,
 					currency: order.currency,
 					ipgRef: body.payment_id ?? undefined,
@@ -267,7 +278,7 @@ export class PaymentsService {
 	// Private helpers
 	// ──────────────────────────────────────────────────────────────────────────
 
-	private generateMerchantRef(): string {
+	generateMerchantRef(): string {
 		return `NAN-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 	}
 
@@ -305,7 +316,7 @@ export class PaymentsService {
 	 * The caller redirects the browser to paymentPageUrl.
 	 */
 	/** Returns the first allowed origin from FRONTEND_URL, or validates the provided origin against the whitelist. */
-	private resolveOrigin(requestOrigin?: string): string {
+	resolveOrigin(requestOrigin?: string): string {
 		const allowed = (process.env.FRONTEND_URL || 'https://nanaska.com')
 			.split(',')
 			.map((o) => o.trim())
@@ -314,6 +325,27 @@ export class PaymentsService {
 			return requestOrigin;
 		}
 		return allowed[0];
+	}
+
+	/**
+	 * Expose checkout call for PaymentLinksService without duplicating logic.
+	 */
+	async initiateCustomPayment(opts: {
+		orderId: string;
+		merchantRef: string;
+		amount: number;
+		currency: string;
+		customer: { name: string; email: string; phone?: string };
+		frontendOrigin?: string;
+	}): Promise<string> {
+		return this.callPayCorpCheckout(
+			opts.orderId,
+			opts.merchantRef,
+			opts.amount,
+			opts.currency,
+			opts.customer,
+			opts.frontendOrigin,
+		);
 	}
 
 	private async callPayCorpCheckout(
@@ -463,7 +495,7 @@ export class PaymentsService {
 				data: { status: success ? 'PAID' : 'FAILED' },
 			});
 
-			if (success && order.userId) {
+			if (success && order.userId && order.combination) {
 				const courseIds = order.combination.items.map((i) => i.courseId);
 				for (const courseId of courseIds) {
 					await this.prisma.userCourse.upsert({
@@ -475,6 +507,14 @@ export class PaymentsService {
 				this.logger.log(`Order ${order.id} PAID – ${courseIds.length} course(s) granted to user ${order.userId}`);
 			}
 
+			// Mark payment link paid
+			if (success && order.paymentLinkId) {
+				await this.prisma.paymentLink.update({
+					where: { id: order.paymentLinkId },
+					data: { isPaid: true, paidAt: new Date() },
+				});
+			}
+
 			// Send payment receipt email on success
 			if (success) {
 				const recipientName = order.user?.name ?? order.guestName ?? 'Student';
@@ -484,7 +524,7 @@ export class PaymentsService {
 						name: recipientName,
 						email: recipientEmail,
 						orderId: order.id,
-						courseName: order.combination.name || order.combination.id,
+						courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
 						amount: order.amount,
 						currency: order.currency,
 						ipgRef: txnRef || undefined,
