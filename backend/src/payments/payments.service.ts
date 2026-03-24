@@ -212,45 +212,45 @@ export class PaymentsService {
 				data: { status: 'PAID', ipgRef: body.payment_id ?? null },
 			});
 
-// Grant access to each subject in the combination (only for registered users with a combo)
-				if (order.userId && order.combination) {
-					const courseIds = order.combination.items.map((i) => i.courseId);
-					for (const courseId of courseIds) {
-						await this.prisma.userCourse.upsert({
-							where: { userId_courseId: { userId: order.userId, courseId } },
-							update: {},
-							create: { userId: order.userId, courseId, orderId: order.id },
-						});
-					}
-					this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted to user ${order.userId}`);
-				} else {
-					this.logger.log(`Order ${order_id} marked PAID (guest/custom order – no course access grants)`);
+			// Grant access to each subject in the combination (only for registered users with a combo)
+			if (order.userId && order.combination) {
+				const courseIds = order.combination.items.map((i) => i.courseId);
+				for (const courseId of courseIds) {
+					await this.prisma.userCourse.upsert({
+						where: { userId_courseId: { userId: order.userId, courseId } },
+						update: {},
+						create: { userId: order.userId, courseId, orderId: order.id },
+					});
 				}
+				this.logger.log(`Order ${order_id} marked PAID, ${courseIds.length} course(s) granted to user ${order.userId}`);
+			} else {
+				this.logger.log(`Order ${order_id} marked PAID (guest/custom order – no course access grants)`);
+			}
 
-				// Mark payment link as paid when expireOnPayment is set
-				if (order.paymentLinkId) {
-					const pl = await this.prisma.paymentLink.findUnique({ where: { id: order.paymentLinkId } });
-					if (pl) {
-						await this.prisma.paymentLink.update({
-							where: { id: order.paymentLinkId },
-							data: { isPaid: true, paidAt: new Date() },
-						});
-					}
+			// Mark payment link as paid when expireOnPayment is set
+			if (order.paymentLinkId) {
+				const pl = await this.prisma.paymentLink.findUnique({ where: { id: order.paymentLinkId } });
+				if (pl) {
+					await this.prisma.paymentLink.update({
+						where: { id: order.paymentLinkId },
+						data: { isPaid: true, paidAt: new Date() },
+					});
 				}
+			}
 
-				// Send payment receipt email
-				const recipientName = order.userId
-					? (order.user?.name ?? order.guestName ?? 'Student')
-					: (order.guestName ?? 'Student');
-				const recipientEmail = order.userId
-					? (order.user?.email ?? order.guestEmail ?? '')
-					: (order.guestEmail ?? '');
-				if (recipientEmail) {
-					this.email.sendPaymentReceiptEmail({
-						name: recipientName,
-						email: recipientEmail,
-						orderId: order.id,
-						courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
+			// Send payment receipt email
+			const recipientName = order.userId
+				? (order.user?.name ?? order.guestName ?? 'Student')
+				: (order.guestName ?? 'Student');
+			const recipientEmail = order.userId
+				? (order.user?.email ?? order.guestEmail ?? '')
+				: (order.guestEmail ?? '');
+			if (recipientEmail) {
+				this.email.sendPaymentReceiptEmail({
+					name: recipientName,
+					email: recipientEmail,
+					orderId: order.id,
+					courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
 					amount: order.amount,
 					currency: order.currency,
 					ipgRef: body.payment_id ?? undefined,

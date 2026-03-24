@@ -136,9 +136,9 @@ function App() {
 						<Route path="/admin/*" element={<AdminApp />} />
 
 						{/* Custom payment links – no navbar/footer */}
-					<Route path="/pay/:slug" element={<PaymentLinkPage />} />
+						<Route path="/pay/:slug" element={<PaymentLinkPage />} />
 
-					{/* Funnel landing pages (no navbar/footer) */}
+						{/* Funnel landing pages (no navbar/footer) */}
 						<Route path="/financial-leadership-program" element={<FinancialLeadershipPage />} />
 						<Route path="/case-study" element={<CaseStudyPage />} />
 						<Route path="/certificate-level-intake" element={<CertificateLevelIntakePage />} />

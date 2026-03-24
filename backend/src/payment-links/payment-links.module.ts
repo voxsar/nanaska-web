@@ -5,8 +5,8 @@ import { PaymentsModule } from '../payments/payments.module';
 import { EmailModule } from '../email/email.module';
 
 @Module({
-  imports: [PaymentsModule, EmailModule],
-  providers: [PaymentLinksService],
-  controllers: [PaymentLinksController],
+	imports: [PaymentsModule, EmailModule],
+	providers: [PaymentLinksService],
+	controllers: [PaymentLinksController],
 })
-export class PaymentLinksModule {}
+export class PaymentLinksModule { }
