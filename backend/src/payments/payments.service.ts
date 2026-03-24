@@ -10,6 +10,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
+import { EmailService } from '../email/email.service';
 
 /**
  * PaymentsService
@@ -24,7 +25,10 @@ import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 export class PaymentsService {
 	private readonly logger = new Logger(PaymentsService.name);
 
-	constructor(private readonly prisma: PrismaService) { }
+	constructor(
+		private readonly prisma: PrismaService,
+		private readonly email: EmailService,
+	) { }
 
 	/** HMAC-SHA256 of envelopeJson signed with IPG_HMAC_SECRET (hex-encoded, as required by PayCorp). */
 	private sign(envelopeJson: string): string {
@@ -177,7 +181,10 @@ export class PaymentsService {
 		// 3. Fetch and validate the order
 		const order = await this.prisma.order.findUnique({
 			where: { id: order_id },
-			include: { combination: { include: { items: { include: { course: true } } } } },
+			include: {
+				user: true,
+				combination: { include: { items: { include: { course: true } } } },
+			},
 		});
 		if (!order) {
 			this.logger.warn(`Webhook: order ${order_id} not found`);
@@ -219,6 +226,27 @@ export class PaymentsService {
 			} else {
 				this.logger.log(`Order ${order_id} marked PAID (guest order – no course access grants needed)`);
 			}
+
+			// Send payment receipt email
+			const recipientName = order.userId
+				? (order.user?.name ?? order.guestName ?? 'Student')
+				: (order.guestName ?? 'Student');
+			const recipientEmail = order.userId
+				? (order.user?.email ?? order.guestEmail ?? '')
+				: (order.guestEmail ?? '');
+			if (recipientEmail) {
+				this.email.sendPaymentReceiptEmail({
+					name: recipientName,
+					email: recipientEmail,
+					orderId: order.id,
+					courseName: order.combination.name || order.combination.id,
+					amount: order.amount,
+					currency: order.currency,
+					ipgRef: body.payment_id ?? undefined,
+					paidAt: new Date(),
+				});
+			}
+
 			return { message: 'Payment successful' };
 		}
 
@@ -423,7 +451,10 @@ export class PaymentsService {
 		// Find and update the order
 		const order = await this.prisma.order.findFirst({
 			where: { ipgRef: reqid },
-			include: { combination: { include: { items: { include: { course: true } } } } },
+			include: {
+				user: true,
+				combination: { include: { items: { include: { course: true } } } },
+			},
 		});
 
 		if (order) {
@@ -442,6 +473,24 @@ export class PaymentsService {
 					});
 				}
 				this.logger.log(`Order ${order.id} PAID – ${courseIds.length} course(s) granted to user ${order.userId}`);
+			}
+
+			// Send payment receipt email on success
+			if (success) {
+				const recipientName = order.user?.name ?? order.guestName ?? 'Student';
+				const recipientEmail = order.user?.email ?? order.guestEmail ?? '';
+				if (recipientEmail) {
+					this.email.sendPaymentReceiptEmail({
+						name: recipientName,
+						email: recipientEmail,
+						orderId: order.id,
+						courseName: order.combination.name || order.combination.id,
+						amount: order.amount,
+						currency: order.currency,
+						ipgRef: txnRef || undefined,
+						paidAt: new Date(),
+					});
+				}
 			}
 		} else {
 			this.logger.warn(`PAYMENT_COMPLETE: no order found for reqid=${reqid}`);

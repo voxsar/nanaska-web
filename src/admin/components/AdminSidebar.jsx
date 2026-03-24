@@ -25,6 +25,7 @@ const settingItems = [
 	{ label: 'Analytics & Pixels', icon: '📈', to: '/admin/analytics' },
 	{ label: 'Payment Settings', icon: '⚙️', to: '/admin/payment-settings' },
 	{ label: 'Contact Settings', icon: '📞', to: '/admin/contact-settings' },
+	{ label: 'Email Settings', icon: '✉️', to: '/admin/email-settings' },
 ];
 
 const superadminItems = [

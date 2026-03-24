@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
@@ -12,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly email: EmailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -22,6 +24,9 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: { email: dto.email, passwordHash, name: dto.name },
     });
+
+    // Send registration confirmation email (non-blocking)
+    this.email.sendRegistrationEmail({ name: user.name, email: user.email });
 
     return this.signToken(user.id, user.email);
   }

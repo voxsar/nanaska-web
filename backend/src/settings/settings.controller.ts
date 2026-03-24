@@ -7,10 +7,20 @@ import { UpsertPageMetaDto } from './dto/upsert-page-meta.dto';
 import { NewsletterSignupDto } from './dto/newsletter-signup.dto';
 import { ContactSubmissionDto } from './dto/contact-submission.dto';
 import { AdminJwtAuthGuard } from '../admin/admin-jwt-auth.guard';
+import { EmailService } from '../email/email.service';
+import { IsEmail } from 'class-validator';
+
+class TestEmailDto {
+  @IsEmail()
+  to: string;
+}
 
 @Controller('settings')
 export class SettingsController {
-  constructor(private readonly settingsService: SettingsService) {}
+  constructor(
+    private readonly settingsService: SettingsService,
+    private readonly email: EmailService,
+  ) {}
 
   // Public: newsletter signup
   @Post('newsletter/signup')
@@ -57,6 +67,15 @@ export class SettingsController {
   @Post('bulk')
   upsertMany(@Body() settings: UpsertSettingDto[]) {
     return this.settingsService.upsertMany(settings);
+  }
+
+  // Admin: test email
+  @UseGuards(AdminJwtAuthGuard)
+  @Post('test-email')
+  async testEmail(@Body() body: TestEmailDto) {
+    if (!body.to) throw new BadRequestException('to is required');
+    await this.email.sendTestEmail(body.to);
+    return { message: `Test email sent to ${body.to}` };
   }
 
   // Admin: list all page meta
