@@ -1,0 +1,1075 @@
+{
+	"exportFormatVersion": 2,
+	"exportTime": "2026-03-24 00:00:00",
+	"containerVersion": {
+		"path": "accounts/0/containers/0/versions/0",
+		"accountId": "0",
+		"containerId": "0",
+		"containerVersionId": "0",
+		"name": "Nanaska – Full Tracking Setup",
+		"description": "GA4 + Clarity events: page views, scroll depth, form interactions, enrollment conversions, CTA clicks",
+		"container": {
+			"path": "accounts/0/containers/0",
+			"accountId": "0",
+			"containerId": "0",
+			"name": "nanaska.com",
+			"publicId": "GTM-KPS5PQ4T",
+			"usageContext": [
+				"WEB"
+			]
+		},
+		"variable": [
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "1",
+				"name": "GA4 Measurement ID",
+				"type": "c",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "value",
+						"value": "G-J8HXJMBSRW"
+					}
+				],
+				"fingerprint": "1"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "2",
+				"name": "DLV – event_name",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "event_name"
+					}
+				],
+				"fingerprint": "2"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "3",
+				"name": "DLV – form_name",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "form_name"
+					}
+				],
+				"fingerprint": "3"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "4",
+				"name": "DLV – form_field",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "form_field"
+					}
+				],
+				"fingerprint": "4"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "5",
+				"name": "DLV – event_category",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "event_category"
+					}
+				],
+				"fingerprint": "5"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "6",
+				"name": "DLV – event_label",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "event_label"
+					}
+				],
+				"fingerprint": "6"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "7",
+				"name": "DLV – value",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "true"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "defaultValue",
+						"value": "0"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "value"
+					}
+				],
+				"fingerprint": "7"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "8",
+				"name": "DLV – currency",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "true"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "defaultValue",
+						"value": "LKR"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "currency"
+					}
+				],
+				"fingerprint": "8"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "9",
+				"name": "DLV – items",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "items"
+					}
+				],
+				"fingerprint": "9"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "10",
+				"name": "DLV – percent_scrolled",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "percent_scrolled"
+					}
+				],
+				"fingerprint": "10"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "11",
+				"name": "DLV – page_path",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "page_path"
+					}
+				],
+				"fingerprint": "11"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"variableId": "12",
+				"name": "DLV – enrolled_course",
+				"type": "v",
+				"parameter": [
+					{
+						"type": "INTEGER",
+						"key": "dataLayerVersion",
+						"value": "2"
+					},
+					{
+						"type": "BOOLEAN",
+						"key": "setDefaultValue",
+						"value": "false"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "name",
+						"value": "enrolled_course"
+					}
+				],
+				"fingerprint": "12"
+			}
+		],
+		"trigger": [
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "10",
+				"name": "Custom Event – page_view",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "page_view"
+							}
+						]
+					}
+				],
+				"fingerprint": "10"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "20",
+				"name": "Custom Event – scroll (depth milestones)",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "scroll"
+							}
+						]
+					}
+				],
+				"fingerprint": "20"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "30",
+				"name": "Custom Event – form_start",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "form_start"
+							}
+						]
+					}
+				],
+				"fingerprint": "30"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "40",
+				"name": "Custom Event – form_submit (CONVERSION)",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "form_submit"
+							}
+						]
+					}
+				],
+				"fingerprint": "40"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "50",
+				"name": "Custom Event – form_error",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "form_error"
+							}
+						]
+					}
+				],
+				"fingerprint": "50"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "60",
+				"name": "Custom Event – click (CTA)",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "click"
+							}
+						]
+					}
+				],
+				"fingerprint": "60"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "70",
+				"name": "Custom Event – begin_checkout (CONVERSION)",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "begin_checkout"
+							}
+						]
+					}
+				],
+				"fingerprint": "70"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"triggerId": "80",
+				"name": "Custom Event – enrollment_started (CONVERSION)",
+				"type": "CUSTOM_EVENT",
+				"customEventFilter": [
+					{
+						"type": "EQUALS",
+						"parameter": [
+							{
+								"type": "TEMPLATE",
+								"key": "arg0",
+								"value": "{{_event}}"
+							},
+							{
+								"type": "TEMPLATE",
+								"key": "arg1",
+								"value": "enrollment_started"
+							}
+						]
+					}
+				],
+				"fingerprint": "80"
+			}
+		],
+		"tag": [
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "1",
+				"name": "GA4 – Configuration",
+				"type": "googtag",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "tagId",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "LIST",
+						"key": "configSettingsTable",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "parameter",
+										"value": "send_page_view"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "parameterValue",
+										"value": "false"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "parameter",
+										"value": "cookie_flags"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "parameterValue",
+										"value": "SameSite=None;Secure"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"2147479553"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "1"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "2",
+				"name": "GA4 Event – page_view (SPA)",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "page_view"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "page_path"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – page_path}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "page_location"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{Page URL}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"10"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "2"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "3",
+				"name": "GA4 Event – scroll_depth",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "scroll"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "percent_scrolled"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – percent_scrolled}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "event_category"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "engagement"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "event_label"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – event_label}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"20"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "3"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "4",
+				"name": "GA4 Event – form_start",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "form_start"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "form_name"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – form_name}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"30"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "4"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "5",
+				"name": "GA4 Event – form_submit [CONVERSION]",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "form_submit"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "form_name"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – form_name}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"40"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "5"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "6",
+				"name": "GA4 Event – form_error",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "form_error"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "form_name"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – form_name}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "form_field"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – form_field}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"50"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "6"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "7",
+				"name": "GA4 Event – click (CTA)",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "click"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "event_category"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – event_category}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "event_label"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – event_label}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"60"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "7"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "8",
+				"name": "GA4 Event – begin_checkout [CONVERSION]",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "begin_checkout"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "currency"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – currency}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "value"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – value}}"
+									}
+								]
+							},
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "items"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – items}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"70"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "8"
+			},
+			{
+				"accountId": "0",
+				"containerId": "0",
+				"tagId": "9",
+				"name": "GA4 Event – enrollment_started [CONVERSION]",
+				"type": "gaawe",
+				"parameter": [
+					{
+						"type": "TEMPLATE",
+						"key": "measurementIdOverride",
+						"value": "{{GA4 Measurement ID}}"
+					},
+					{
+						"type": "TEMPLATE",
+						"key": "eventName",
+						"value": "enrollment_started"
+					},
+					{
+						"type": "LIST",
+						"key": "eventParameters",
+						"list": [
+							{
+								"type": "MAP",
+								"map": [
+									{
+										"type": "TEMPLATE",
+										"key": "name",
+										"value": "enrolled_course"
+									},
+									{
+										"type": "TEMPLATE",
+										"key": "value",
+										"value": "{{DLV – enrolled_course}}"
+									}
+								]
+							}
+						]
+					}
+				],
+				"firingTriggerId": [
+					"80"
+				],
+				"tagFiringOption": "ONCE_PER_EVENT",
+				"monitoringMetadata": {
+					"type": "MAP"
+				},
+				"fingerprint": "9"
+			}
+		]
+	}
+}
