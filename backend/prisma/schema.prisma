@@ -90,6 +90,7 @@ model Order {
   guestEmail      String?     @map("guest_email")
   guestPhone      String?     @map("guest_phone")
   frontendOrigin  String?     @map("frontend_origin") // origin that initiated the payment
+  archivedAt      DateTime?   @map("archived_at")     // set when auto-archived after 2 months pending
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt             @map("updated_at")
 
@@ -105,6 +106,7 @@ enum OrderStatus {
   PAID
   FAILED
   REFUNDED
+  ARCHIVED
 }
 
 // ─── UserCourses (access grants) ────────────────────────────────────────────
@@ -145,7 +147,22 @@ model EnrollmentSubmission {
   orderId   String?  @map("order_id")
   createdAt DateTime @default(now()) @map("created_at")
 
+  reminders EnrollmentReminder[]
+
   @@map("enrollment_submissions")
+}
+
+// ─── Enrollment Payment Reminders ─────────────────────────────────────────────
+model EnrollmentReminder {
+  id             String               @id @default(uuid())
+  enrollmentId   String               @map("enrollment_id")
+  reminderNumber Int                  @map("reminder_number") // 1-based index of this reminder
+  sentAt         DateTime             @default(now()) @map("sent_at")
+
+  enrollment EnrollmentSubmission @relation(fields: [enrollmentId], references: [id])
+
+  @@unique([enrollmentId, reminderNumber])
+  @@map("enrollment_reminders")
 }
 
 // ─── Admin Users ─────────────────────────────────────────────────────────────
