@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './PaymentLinkPage.css';
 
-const API = import.meta.env.VITE_API_URL || 'https://api.nanaska.com';
+const API = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
 
 function formatCurrency(amount, currency) {
 	if (currency === 'GBP') return `£${amount.toLocaleString()}`;
