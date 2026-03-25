@@ -16,12 +16,14 @@ export class CreatePaymentLinkDto {
 	@MinLength(1)
 	label: string;
 
+	@IsOptional()
 	@IsString()
 	@MinLength(1)
-	studentName: string;
+	studentName?: string;
 
+	@IsOptional()
 	@IsEmail()
-	studentEmail: string;
+	studentEmail?: string;
 
 	/** Amount in whole currency units (e.g. 16000 LKR or 105 GBP) */
 	@IsInt()

@@ -47,13 +47,13 @@ export class PaymentLinksService {
 			},
 		});
 
-		if (dto.sendEmail !== false) {
+		if (dto.sendEmail !== false && link.studentEmail) {
 			const frontendBase = (process.env.FRONTEND_URL || 'https://nanaska.com')
 				.split(',')[0]
 				.trim();
 			const paymentUrl = `${frontendBase}/pay/${link.slug}`;
 			this.email.sendPaymentLinkEmail({
-				studentName: link.studentName,
+				studentName: link.studentName ?? 'Student',
 				studentEmail: link.studentEmail,
 				amount: link.amount,
 				currency: link.currency,
@@ -90,6 +90,7 @@ export class PaymentLinksService {
 	async resendEmail(id: string) {
 		const link = await this.prisma.paymentLink.findUnique({ where: { id } });
 		if (!link) throw new NotFoundException('Payment link not found');
+		if (!link.studentEmail) throw new BadRequestException('No student email on this link — cannot resend');
 
 		const frontendBase = (process.env.FRONTEND_URL || 'https://nanaska.com')
 			.split(',')[0]
@@ -97,7 +98,7 @@ export class PaymentLinksService {
 		const paymentUrl = `${frontendBase}/pay/${link.slug}`;
 
 		await this.email.sendPaymentLinkEmail({
-			studentName: link.studentName,
+			studentName: link.studentName ?? 'Student',
 			studentEmail: link.studentEmail,
 			amount: link.amount,
 			currency: link.currency,

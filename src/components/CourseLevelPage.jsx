@@ -23,8 +23,8 @@ export default function CourseLevelPage({ level }) {
 	// Use DB prices from API combination if available, fall back to static pricingData
 	const staticLevelPrices = getLevelPricesById(level.levelId);
 	const levelPrices = {
-		gbp: apiCombination?.priceGbp ?? staticLevelPrices.gbp,
-		lkr: apiCombination?.price ?? staticLevelPrices.lkr,
+		gbp: (apiCombination?.priceGbp > 0 ? apiCombination.priceGbp : null) ?? staticLevelPrices.gbp,
+		lkr: (apiCombination?.price > 0 ? apiCombination.price : null) ?? staticLevelPrices.lkr,
 	};
 	const levelAmount = getAmountForCountry(levelPrices, selectedCountry);
 
@@ -96,8 +96,8 @@ export default function CourseLevelPage({ level }) {
 							const apiCourse = apiCourseMap[subject.code];
 							const staticPrices = getCoursePricesByCode(subject.code, 0);
 							const subjectPrices = {
-								gbp: apiCourse?.priceGbp ?? staticPrices.gbp,
-								lkr: apiCourse?.price ?? staticPrices.lkr,
+								gbp: (apiCourse?.priceGbp > 0 ? apiCourse.priceGbp : null) ?? staticPrices.gbp,
+								lkr: (apiCourse?.price > 0 ? apiCourse.price : null) ?? staticPrices.lkr,
 							};
 							const subjectAmount = getAmountForCountry(subjectPrices, selectedCountry);
 							// Enrich subject with DB prices for cart

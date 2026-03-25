@@ -54,6 +54,49 @@ export default function EnrollmentPage() {
 
 	const [payError, setPayError] = useState('');
 	const [paying, setPaying] = useState(false);
+	const [fieldErrors, setFieldErrors] = useState({});
+
+	const REQUIRED_FIELDS = [
+		{ name: 'firstName', label: 'First Name' },
+		{ name: 'lastName', label: 'Last Name' },
+		{ name: 'email', label: 'Email Address' },
+		{ name: 'phone', label: 'Phone Number' },
+		{ name: 'country', label: 'Country' },
+		{ name: 'street', label: 'Street Address' },
+		{ name: 'city', label: 'City' },
+		{ name: 'postcode', label: 'Postcode' },
+	];
+
+	const validateForm = () => {
+		const errors = {};
+		for (const field of REQUIRED_FIELDS) {
+			if (!form[field.name] || !String(form[field.name]).trim()) {
+				errors[field.name] = `${field.label} is required.`;
+			}
+		}
+		if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+			errors.email = 'Please enter a valid email address.';
+		}
+		if (!form.terms) {
+			errors.terms = 'You must agree to the terms and conditions.';
+		}
+		setFieldErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
+
+	const handleBlur = (e) => {
+		const { name } = e.target;
+		const requiredNames = REQUIRED_FIELDS.map(f => f.name);
+		if (!requiredNames.includes(name)) return;
+		if (!form[name] || !String(form[name]).trim()) {
+			const field = REQUIRED_FIELDS.find(f => f.name === name);
+			setFieldErrors(prev => ({ ...prev, [name]: `${field.label} is required.` }));
+		} else if (name === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+			setFieldErrors(prev => ({ ...prev, email: 'Please enter a valid email address.' }));
+		} else {
+			setFieldErrors(prev => { const e = { ...prev }; delete e[name]; return e; });
+		}
+	};
 
 	/**
 	 * Attempt to pay online via the backend API.
@@ -151,6 +194,11 @@ export default function EnrollmentPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		if (!validateForm()) {
+			const firstErrorField = document.querySelector('.enrollment-page__input--error, .enrollment-page__select--error');
+			if (firstErrorField) firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			return;
+		}
 		// Save enrollment form data to backend before redirecting to payment
 		if (API_URL && form.firstName && form.email) {
 			try {
@@ -257,35 +305,39 @@ export default function EnrollmentPage() {
 										<label className="enrollment-page__label" htmlFor="firstName">First Name *</label>
 										<input
 											id="firstName" name="firstName" type="text"
-											className="enrollment-page__input"
-											value={form.firstName} onChange={handleChange} required
+											className={`enrollment-page__input${fieldErrors.firstName ? ' enrollment-page__input--error' : ''}`}
+											value={form.firstName} onChange={handleChange} onBlur={handleBlur} required
 										/>
+										{fieldErrors.firstName && <span className="enrollment-page__field-error">{fieldErrors.firstName}</span>}
 									</div>
 									<div className="enrollment-page__field">
 										<label className="enrollment-page__label" htmlFor="lastName">Last Name *</label>
 										<input
 											id="lastName" name="lastName" type="text"
-											className="enrollment-page__input"
-											value={form.lastName} onChange={handleChange} required
+											className={`enrollment-page__input${fieldErrors.lastName ? ' enrollment-page__input--error' : ''}`}
+											value={form.lastName} onChange={handleChange} onBlur={handleBlur} required
 										/>
+										{fieldErrors.lastName && <span className="enrollment-page__field-error">{fieldErrors.lastName}</span>}
 									</div>
 								</div>
 								<div className="enrollment-page__field">
 									<label className="enrollment-page__label" htmlFor="email">Email Address *</label>
 									<input
 										id="email" name="email" type="email"
-										className="enrollment-page__input"
-										value={form.email} onChange={handleChange} required
+										className={`enrollment-page__input${fieldErrors.email ? ' enrollment-page__input--error' : ''}`}
+										value={form.email} onChange={handleChange} onBlur={handleBlur} required
 									/>
+									{fieldErrors.email && <span className="enrollment-page__field-error">{fieldErrors.email}</span>}
 								</div>
 								<div className="enrollment-page__row">
 									<div className="enrollment-page__field">
 										<label className="enrollment-page__label" htmlFor="phone">Phone Number *</label>
 										<input
 											id="phone" name="phone" type="tel"
-											className="enrollment-page__input"
-											value={form.phone} onChange={handleChange} required
+											className={`enrollment-page__input${fieldErrors.phone ? ' enrollment-page__input--error' : ''}`}
+											value={form.phone} onChange={handleChange} onBlur={handleBlur} required
 										/>
+										{fieldErrors.phone && <span className="enrollment-page__field-error">{fieldErrors.phone}</span>}
 									</div>
 									<div className="enrollment-page__field">
 										<label className="enrollment-page__label" htmlFor="whatsapp">WhatsApp Number</label>
@@ -367,37 +419,41 @@ export default function EnrollmentPage() {
 									<label className="enrollment-page__label" htmlFor="country">Country *</label>
 									<select
 										id="country" name="country"
-										className="enrollment-page__select"
-										value={form.country} onChange={handleChange} required
+										className={`enrollment-page__select${fieldErrors.country ? ' enrollment-page__select--error' : ''}`}
+										value={form.country} onChange={handleChange} onBlur={handleBlur} required
 									>
 										<option value="">Select country...</option>
 										{availableCountries.map(c => <option key={c} value={c}>{c}</option>)}
 									</select>
+									{fieldErrors.country && <span className="enrollment-page__field-error">{fieldErrors.country}</span>}
 								</div>
 								<div className="enrollment-page__field">
 									<label className="enrollment-page__label" htmlFor="street">Street Address *</label>
 									<input
 										id="street" name="street" type="text"
-										className="enrollment-page__input"
-										value={form.street} onChange={handleChange} required
+										className={`enrollment-page__input${fieldErrors.street ? ' enrollment-page__input--error' : ''}`}
+										value={form.street} onChange={handleChange} onBlur={handleBlur} required
 									/>
+									{fieldErrors.street && <span className="enrollment-page__field-error">{fieldErrors.street}</span>}
 								</div>
 								<div className="enrollment-page__row">
 									<div className="enrollment-page__field">
 										<label className="enrollment-page__label" htmlFor="city">City *</label>
 										<input
 											id="city" name="city" type="text"
-											className="enrollment-page__input"
-											value={form.city} onChange={handleChange} required
+											className={`enrollment-page__input${fieldErrors.city ? ' enrollment-page__input--error' : ''}`}
+											value={form.city} onChange={handleChange} onBlur={handleBlur} required
 										/>
+										{fieldErrors.city && <span className="enrollment-page__field-error">{fieldErrors.city}</span>}
 									</div>
 									<div className="enrollment-page__field">
 										<label className="enrollment-page__label" htmlFor="postcode">Postcode *</label>
 										<input
 											id="postcode" name="postcode" type="text"
-											className="enrollment-page__input"
-											value={form.postcode} onChange={handleChange} required
+											className={`enrollment-page__input${fieldErrors.postcode ? ' enrollment-page__input--error' : ''}`}
+											value={form.postcode} onChange={handleChange} onBlur={handleBlur} required
 										/>
+										{fieldErrors.postcode && <span className="enrollment-page__field-error">{fieldErrors.postcode}</span>}
 									</div>
 								</div>
 							</fieldset>
@@ -429,6 +485,7 @@ export default function EnrollmentPage() {
 											. *
 										</span>
 									</label>
+									{fieldErrors.terms && <span className="enrollment-page__field-error">{fieldErrors.terms}</span>}
 								</div>
 							</fieldset>
 

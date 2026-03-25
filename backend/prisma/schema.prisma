@@ -108,8 +108,8 @@ model PaymentLink {
   id               String    @id @default(uuid())
   slug             String    @unique
   label            String                      // Admin-facing label/description
-  studentName      String    @map("student_name")
-  studentEmail     String    @map("student_email")
+  studentName      String?   @map("student_name")
+  studentEmail     String?   @map("student_email")
   amount           Int                         // whole units matching currency (LKR or GBP)
   currency         String                      // LKR | GBP
   description      String?   @db.Text          // shown to student on payment page

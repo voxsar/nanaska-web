@@ -65,7 +65,7 @@ export default function PaymentLinksPage() {
 		e.preventDefault();
 		setError('');
 		setSuccess('');
-		if (!form.label || !form.studentName || !form.studentEmail || !form.amount) {
+		if (!form.label || !form.amount) {
 			setError('Please fill in all required fields.');
 			return;
 		}
@@ -73,8 +73,8 @@ export default function PaymentLinksPage() {
 			setSubmitting(true);
 			const payload = {
 				label: form.label,
-				studentName: form.studentName,
-				studentEmail: form.studentEmail,
+				studentName: form.studentName || undefined,
+				studentEmail: form.studentEmail || undefined,
 				amount: parseInt(form.amount, 10),
 				currency: form.currency,
 				description: form.description || undefined,
@@ -84,7 +84,7 @@ export default function PaymentLinksPage() {
 				sendEmail: form.sendEmail,
 			};
 			await api.post('/payment-links', payload);
-			setSuccess('Payment link created' + (form.sendEmail ? ' and email sent to student.' : '.'));
+			setSuccess('Payment link created' + (form.sendEmail && form.studentEmail ? ' and email sent to student.' : '.'));
 			setForm(emptyForm);
 			setShowForm(false);
 			load();
@@ -153,12 +153,12 @@ export default function PaymentLinksPage() {
 
 						<div className="pl-form-row pl-form-row-2">
 							<div className="pl-field">
-								<label>Student Name <span className="pl-req">*</span></label>
-								<input name="studentName" value={form.studentName} onChange={handleChange} placeholder="Full name" required />
+								<label>Student Name <small>(optional)</small></label>
+								<input name="studentName" value={form.studentName} onChange={handleChange} placeholder="Full name — leave blank for a generic link" />
 							</div>
 							<div className="pl-field">
-								<label>Student Email <span className="pl-req">*</span></label>
-								<input name="studentEmail" type="email" value={form.studentEmail} onChange={handleChange} placeholder="student@email.com" required />
+								<label>Student Email <small>(optional)</small></label>
+								<input name="studentEmail" type="email" value={form.studentEmail} onChange={handleChange} placeholder="student@email.com — required to send email" />
 							</div>
 						</div>
 
@@ -200,9 +200,9 @@ export default function PaymentLinksPage() {
 								<input type="checkbox" name="expireOnPayment" checked={form.expireOnPayment} onChange={handleChange} />
 								Deactivate link after successful payment
 							</label>
-							<label className="pl-checkbox-label">
-								<input type="checkbox" name="sendEmail" checked={form.sendEmail} onChange={handleChange} />
-								Send payment link email to student now
+							<label className={`pl-checkbox-label${!form.studentEmail ? ' pl-checkbox-disabled' : ''}`}>
+								<input type="checkbox" name="sendEmail" checked={form.sendEmail && !!form.studentEmail} onChange={handleChange} disabled={!form.studentEmail} />
+								Send payment link email to student now {!form.studentEmail && <small>(enter student email above)</small>}
 							</label>
 						</div>
 
@@ -240,8 +240,8 @@ export default function PaymentLinksPage() {
 							{links.map((link) => (
 								<tr key={link.id} className={link.isPaid ? 'pl-row-paid' : !link.isActive ? 'pl-row-inactive' : ''}>
 									<td>
-										<div className="pl-student-name">{link.studentName}</div>
-										<div className="pl-student-email">{link.studentEmail}</div>
+										<div className="pl-student-name">{link.studentName || <span className="pl-none">Generic link</span>}</div>
+										<div className="pl-student-email">{link.studentEmail || <span className="pl-none">—</span>}</div>
 										<div className="pl-slug-label">{link.label}</div>
 									</td>
 									<td className="pl-amount">
@@ -291,8 +291,7 @@ export default function PaymentLinksPage() {
 											<button
 												className="pl-btn-action pl-btn-resend"
 												onClick={() => handleResend(link.id)}
-												title="Resend email"
-											>
+												title="Resend email" disabled={!link.studentEmail}											>
 												✉ Email
 											</button>
 											<button

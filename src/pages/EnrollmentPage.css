@@ -404,3 +404,16 @@
   font-size: 0.875rem;
   margin: 0 0 0.75rem;
 }
+
+.enrollment-page__input--error,
+.enrollment-page__select--error {
+  border-color: #dc2626 !important;
+  outline-color: #dc2626;
+}
+
+.enrollment-page__field-error {
+  display: block;
+  color: #dc2626;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
