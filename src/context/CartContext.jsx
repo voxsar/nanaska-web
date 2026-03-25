@@ -32,15 +32,16 @@ export function CartProvider({ children }) {
 
 		// Prefer explicit prices from API (subject.priceGbp / subject.priceLkr),
 		// fall back to the static pricing data map.
-		const staticPrices = getCoursePricesByCode(subject.code, subject.price || 0);
+		// Note: subject.price is NOT used as LKR fallback — it holds stale/GBP values in coursesData.
+		const staticPrices = getCoursePricesByCode(subject.code, 0);
 		const newItem = {
 			type: 'course',
 			courseCode: subject.code,
 			courseName: subject.name,
 			levelId: level.levelId,
 			levelTitle: level.title,
-			priceGbp: subject.priceGbp ?? staticPrices.gbp,
-			priceLkr: subject.priceLkr ?? subject.price ?? staticPrices.lkr,
+			priceGbp: (subject.priceGbp > 0 ? subject.priceGbp : null) ?? staticPrices.gbp,
+			priceLkr: (subject.priceLkr > 0 ? subject.priceLkr : null) ?? staticPrices.lkr,
 			combinationId: subject.combinationId || level.courseCombinationIds?.[subject.code] || '',
 			slug: subject.slug,
 		};

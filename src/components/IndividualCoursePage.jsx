@@ -39,7 +39,7 @@ export default function IndividualCoursePage({ course, level }) {
 	const coursePrice = getAmountForCountry(getCoursePricesByCode(course.code, course.price || 0), selectedCountry);
 
 	const handleAddToCart = () => {
-		addCourse(course, level);
+		addCourse(mergedCourse, level);
 	};
 
 	return (
