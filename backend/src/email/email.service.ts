@@ -487,25 +487,25 @@ export class EmailService {
 			opts.currency === 'GBP'
 				? `&pound;${opts.amount.toLocaleString()}`
 				: `LKR ${opts.amount.toLocaleString()}`;
-
+		
 		// Format cart items as a visually appealing list based on item type
 		const cartList = Array.isArray(opts.cartItems) && opts.cartItems.length
 			? opts.cartItems.map((i: any) => {
-				if (i.type === 'level') {
-					return `<li style="margin-bottom:12px;padding:10px;background:#f0f8ff;border-left:3px solid #24ADE3;border-radius:4px;">
+					if (i.type === 'level') {
+						return `<li style="margin-bottom:12px;padding:10px;background:#f0f8ff;border-left:3px solid #24ADE3;border-radius:4px;">
 								<div style="color:#1B365D;font-weight:bold;font-size:15px;margin-bottom:4px;">${i.levelTitle || 'CIMA Level Package'}</div>
 								<div style="color:#666;font-size:13px;">📚 Full Level Programme · ${i.courseCount || 'Multiple'} courses</div>
 							</li>`;
-				} else if (i.type === 'course') {
-					return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #1B365D;border-radius:4px;">
+					} else if (i.type === 'course') {
+						return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #1B365D;border-radius:4px;">
 								<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.courseCode ? `${i.courseCode} — ` : ''}${i.courseName || 'CIMA Course'}</div>
 							</li>`;
-				}
-				// Fallback for legacy or unexpected formats
-				return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #24ADE3;border-radius:4px;">
+					}
+					// Fallback for legacy or unexpected formats
+					return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #24ADE3;border-radius:4px;">
 							<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.name || i.title || i.courseName || i.levelTitle || 'Selected programme'}</div>
 						</li>`;
-			}).join('')
+			  }).join('')
 			: '<li style="padding:10px;">Your selected programme</li>';
 		return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
