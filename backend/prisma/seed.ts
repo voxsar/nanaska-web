@@ -485,8 +485,8 @@ const COMBINATION_PRICE_OVERRIDES: Record<string, { price?: number; priceGbp?: n
 	// Two-subject combinations at operational/management/strategic levels
 	op_e1_f1: { price: 58000, priceGbp: 0 },
 	op_e1_p1: { price: 58000, priceGbp: 0 },
-	op_p1_f1: { price: 58000, priceGbp: 0 },
-	mg_p2_f2: { price: 70000, priceGbp: 0 },
+	op_f1_p1: { price: 58000, priceGbp: 0 },
+	mg_f2_p2: { price: 70000, priceGbp: 0 },
 	st_e3_p3: { price: 80000, priceGbp: 0 },
 };
 
