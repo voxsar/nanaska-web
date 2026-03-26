@@ -170,25 +170,48 @@ export default function EnrollmentPage() {
 	const cartTotal = getCartTotal(form.country || selectedCountry);
 
 	const getCartCombinationId = () => {
-		if (cartItems.length !== 1) return '';
-		const item = cartItems[0];
+		if (cartItems.length === 0) return '';
 
-		// Use combinationId stored directly on the cart item (set by CourseLevelPage via DB)
-		if (item.combinationId) return item.combinationId;
+		// Single item — fast path
+		if (cartItems.length === 1) {
+			const item = cartItems[0];
+			// Use combinationId stored directly on the cart item (set by CourseLevelPage via DB)
+			if (item.combinationId) return item.combinationId;
 
-		if (item.type === 'level') return getCombinationIdForLevel(item.levelId);
-		if (item.type === 'course') {
-			// Try static map first
-			const staticId = getCombinationIdForCourse(item.courseCode);
-			if (staticId) return staticId;
-			// Fall back to API combinations — find one that contains this course and has exactly 1 item
-			if (apiCombinations) {
-				const found = apiCombinations.find(
-					(combo) => combo.items?.length === 1 && combo.items[0]?.course?.id === item.courseCode
-				);
-				if (found) return found.id;
+			if (item.type === 'level') return getCombinationIdForLevel(item.levelId);
+			if (item.type === 'course') {
+				// Try static map first
+				const staticId = getCombinationIdForCourse(item.courseCode);
+				if (staticId) return staticId;
+				// Fall back to API combinations — find one that contains this course and has exactly 1 item
+				if (apiCombinations) {
+					const found = apiCombinations.find(
+						(combo) => combo.items?.length === 1 && combo.items[0]?.course?.id === item.courseCode
+					);
+					if (found) return found.id;
+				}
 			}
+			return '';
 		}
+
+		// Multiple items — extract all course codes, sort, and look up in API
+		const courseCodes = cartItems
+			.filter(item => item.type === 'course')
+			.map(item => item.courseCode)
+			.sort();
+
+		if (courseCodes.length === 0) return '';
+
+		// Look up the combination in API that matches this exact set of courses
+		if (apiCombinations) {
+			const found = apiCombinations.find((combo) => {
+				const comboCourses = (combo.items || []).map(i => i.course?.id).filter(Boolean).sort();
+				return comboCourses.length === courseCodes.length &&
+					   comboCourses.every((code, idx) => code === courseCodes[idx]);
+			});
+			if (found) return found.id;
+		}
+
 		return '';
 	};
 

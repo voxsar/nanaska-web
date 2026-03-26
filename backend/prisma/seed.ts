@@ -264,7 +264,7 @@ const subjects = [
 	{
 		id: `E1`,
 		name: `Managing Finance in a Digital World`,
-		price: 29000,
+		price: 25000,
 		level: `operational`,
 		slug: `e1-managing-finance-in-a-digital-world`,
 		description: `E1 examines the evolving role of the finance function in a digital business environment. Students explore digital technologies, data analytics, automation and the changing skills required of finance professionals.`,
@@ -277,7 +277,7 @@ const subjects = [
 	{
 		id: `F1`,
 		name: `Financial Reporting`,
-		price: 29000,
+		price: 25000,
 		level: `operational`,
 		slug: `f1-financial-reporting`,
 		description: `F1 develops students' ability to prepare and interpret financial statements for individual companies and groups in accordance with IFRS. Topics include consolidation, financial instruments and reporting frameworks.`,
@@ -290,7 +290,7 @@ const subjects = [
 	{
 		id: `P1`,
 		name: `Management Accounting`,
-		price: 29000,
+		price: 25000,
 		level: `operational`,
 		slug: `p1-management-accounting`,
 		description: `P1 advances students' management accounting skills, covering advanced costing techniques, pricing strategies, performance measurement, and risk in the context of planning and control within organisations.`,
@@ -303,7 +303,7 @@ const subjects = [
 	{
 		id: `OCS`,
 		name: `Operational Case Study`,
-		price: 40000,
+		price: 26650,
 		level: `operational`,
 		slug: `operational-case-study`,
 		description: `The Operational Case Study (OCS) is a three-hour integrated assessment that tests students' ability to apply knowledge from E1, F1 and P1 in a realistic business scenario. It assesses professional skills including communication, analysis and judgement.`,
@@ -316,7 +316,7 @@ const subjects = [
 	{
 		id: `E2`,
 		name: `Managing Performance`,
-		price: 29000,
+		price: 25000,
 		level: `management`,
 		slug: `e2-managing-performance`,
 		description: `E2 examines how organisations manage performance and relationships in modern dynamic environments. Students explore project management, people management, digital innovation and the management of change across complex organisations.`,
@@ -329,7 +329,7 @@ const subjects = [
 	{
 		id: `P2`,
 		name: `Advanced Management Accounting`,
-		price: 35000,
+		price: 25000,
 		level: `management`,
 		slug: `p2-advanced-management-accounting`,
 		description: `P2 extends management accounting into advanced territory — covering advanced variance analysis, decision theory under uncertainty, capital investment appraisal, and strategic performance measurement systems.`,
@@ -342,7 +342,7 @@ const subjects = [
 	{
 		id: `F2`,
 		name: `Advanced Financial Reporting`,
-		price: 35000,
+		price: 25000,
 		level: `management`,
 		slug: `f2-advanced-financial-reporting`,
 		description: `F2 advances financial reporting into complex territory — covering complex group structures, financial instruments, share-based payments, impairment, and a critical evaluation of financial reporting standards.`,
@@ -355,7 +355,7 @@ const subjects = [
 	{
 		id: `MCS`,
 		name: `Management Case Study`,
-		price: 40000,
+		price: 27675,
 		level: `management`,
 		slug: `management-case-study`,
 		description: `The Management Case Study (MCS) is a three-hour integrated exam set within a realistic management-level business scenario. It tests the application of E2, P2 and F2 knowledge with particular emphasis on financial analysis, management control and strategic decision support.`,
@@ -368,7 +368,7 @@ const subjects = [
 	{
 		id: `E3`,
 		name: `Strategic Management`,
-		price: 40000,
+		price: 25000,
 		level: `strategic`,
 		slug: `e3-strategic-management`,
 		description: `E3 covers the formulation, evaluation and implementation of strategy at the enterprise level. Students analyse the competitive environment, develop strategic options, manage strategic risk and lead organisational change to deliver the strategy.`,
@@ -381,7 +381,7 @@ const subjects = [
 	{
 		id: `P3`,
 		name: `Risk Management`,
-		price: 40000,
+		price: 25000,
 		level: `strategic`,
 		slug: `p3-risk-management`,
 		description: `P3 equips students with the tools and frameworks to identify, assess, quantify and manage risks facing complex organisations. Topics include enterprise risk management, treasury management, financial risk instruments and cybersecurity.`,
@@ -394,7 +394,7 @@ const subjects = [
 	{
 		id: `F3`,
 		name: `Financial Strategy`,
-		price: 40000,
+		price: 25000,
 		level: `strategic`,
 		slug: `f3-financial-strategy`,
 		description: `F3 covers the advanced corporate finance topics required for financial leadership. Students evaluate financing, dividend and investment decisions; value businesses; and advise on mergers, acquisitions and complex financial strategy questions.`,
@@ -407,7 +407,7 @@ const subjects = [
 	{
 		id: `SCS`,
 		name: `Strategic Case Study`,
-		price: 40000,
+		price: 30750,
 		level: `strategic`,
 		slug: `strategic-case-study`,
 		description: `The Strategic Case Study (SCS) is CIMA's most demanding integrated exam, testing mastery of E3, P3 and F3 within a complex, board-level business scenario. Success in the SCS, combined with the CIMA experience requirement, awards the CGMA designation.`,
@@ -419,51 +419,122 @@ const subjects = [
 	},
 ];
 
-const combinations = [
-	// Certificate – singles
-	{ id: 'cert_ba1', level: 'certificate', subjects: ['BA1'], price: 16000 },
-	{ id: 'cert_ba2', level: 'certificate', subjects: ['BA2'], price: 16000 },
-	{ id: 'cert_ba3', level: 'certificate', subjects: ['BA3'], price: 16000 },
-	{ id: 'cert_ba4', level: 'certificate', subjects: ['BA4'], price: 16000 },
-	// Certificate – pairs
-	{ id: 'cert_ba1_ba2', level: 'certificate', subjects: ['BA1', 'BA2'], price: 32000 },
-	{ id: 'cert_ba1_ba3', level: 'certificate', subjects: ['BA1', 'BA3'], price: 32000 },
-	{ id: 'cert_ba1_ba4', level: 'certificate', subjects: ['BA1', 'BA4'], price: 32000 },
-	{ id: 'cert_ba2_ba3', level: 'certificate', subjects: ['BA2', 'BA3'], price: 32000 },
-	{ id: 'cert_ba2_ba4', level: 'certificate', subjects: ['BA2', 'BA4'], price: 32000 },
-	{ id: 'cert_ba3_ba4', level: 'certificate', subjects: ['BA3', 'BA4'], price: 32000 },
-	// Certificate – full
-	{ id: 'cert_full', name: 'CIMA Certificate Level', slug: 'cima-certificate-level', level: 'certificate', subjects: ['BA1', 'BA2', 'BA3', 'BA4'], price: 64000, priceGbp: 360 },
+// Helper to generate all non-empty subsets (power set) of an array
+function generatePowerSet<T>(arr: T[]): T[][] {
+	const result: T[][] = [];
+	const n = arr.length;
+	// Iterate through all possible binary combinations (2^n - 1, excluding empty set)
+	for (let i = 1; i < (1 << n); i++) {
+		const subset: T[] = [];
+		for (let j = 0; j < n; j++) {
+			if (i & (1 << j)) {
+				subset.push(arr[j]);
+			}
+		}
+		result.push(subset);
+	}
+	return result;
+}
 
-	// Operational – singles
-	{ id: 'op_e1', level: 'operational', subjects: ['E1'], price: 29000 },
-	{ id: 'op_p1', level: 'operational', subjects: ['P1'], price: 29000 },
-	{ id: 'op_f1', level: 'operational', subjects: ['F1'], price: 29000 },
-	{ id: 'op_e2', level: 'operational', subjects: ['E2'], price: 29000 },
-	// Operational – pairs
-	{ id: 'op_e1_p1', level: 'operational', subjects: ['E1', 'P1'], price: 58000 },
-	{ id: 'op_e1_f1', level: 'operational', subjects: ['E1', 'F1'], price: 58000 },
-	{ id: 'op_p1_f1', level: 'operational', subjects: ['P1', 'F1'], price: 58000 },
-	// Operational – full
-	{ id: 'op_full', name: 'CIMA Operational Level', slug: 'cima-operational-level', level: 'operational', subjects: ['E1', 'P1', 'F1', 'E2'], price: 116000, priceGbp: 600 },
+// Course price lookup map (LKR)
+const COURSE_PRICES: Record<string, number> = {
+	BA1: 16000, BA2: 16000, BA3: 16000, BA4: 16000,
+	E1: 25000, P1: 25000, F1: 25000, OCS: 26650,
+	E2: 25000, P2: 25000, F2: 25000, MCS: 27675,
+	E3: 25000, P3: 25000, F3: 25000, SCS: 30750,
+};
 
-	// Management – singles
-	{ id: 'mg_p2', level: 'management', subjects: ['P2'], price: 35000 },
-	{ id: 'mg_f2', level: 'management', subjects: ['F2'], price: 35000 },
-	{ id: 'mg_mcs', level: 'management', subjects: ['MCS'], price: 40000 },
-	// Management – pairs / full
-	{ id: 'mg_p2_f2', level: 'management', subjects: ['P2', 'F2'], price: 70000 },
-	{ id: 'mg_full', name: 'CIMA Management Level', slug: 'cima-management-level', level: 'management', subjects: ['P2', 'F2', 'MCS'], price: 110000, priceGbp: 600 },
+// Course price lookup map (GBP) — fallback to proportional conversion if not set
+const COURSE_PRICES_GBP: Record<string, number> = {
+	BA1: 105, BA2: 105, BA3: 105, BA4: 105,
+	E1: 175, P1: 175, F1: 175, OCS: 399,
+	E2: 175, P2: 175, F2: 175, MCS: 499,
+	E3: 175, P3: 175, F3: 175, SCS: 599,
+};
 
-	// Strategic – singles
-	{ id: 'st_e3', level: 'strategic', subjects: ['E3'], price: 40000 },
-	{ id: 'st_p3', level: 'strategic', subjects: ['P3'], price: 40000 },
-	{ id: 'st_f3', level: 'strategic', subjects: ['F3'], price: 40000 },
-	{ id: 'st_scs', level: 'strategic', subjects: ['SCS'], price: 40000 },
-	// Strategic – pairs / full
-	{ id: 'st_e3_p3', level: 'strategic', subjects: ['E3', 'P3'], price: 80000 },
-	{ id: 'st_full', name: 'CIMA Strategic Level', slug: 'cima-strategic-level', level: 'strategic', subjects: ['E3', 'P3', 'F3', 'SCS'], price: 160000, priceGbp: 600 },
-];
+// Level definitions — which courses belong to which level
+const LEVEL_COURSE_GROUPS = {
+	certificate: ['BA1', 'BA2', 'BA3', 'BA4'],
+	operational: ['E1', 'P1', 'F1', 'OCS'],
+	management: ['E2', 'P2', 'F2', 'MCS'],
+	strategic: ['E3', 'P3', 'F3', 'SCS'],
+};
+
+// Explicit price overrides for both full-level packages and single-subject combinations
+const COMBINATION_PRICE_OVERRIDES: Record<string, { price?: number; priceGbp?: number; name?: string; slug?: string }> = {
+	// Full-level packages
+	cert_full: { name: 'CIMA Certificate Level', slug: 'cima-certificate-level', price: 55000, priceGbp: 360 },
+	op_full: { name: 'CIMA Operational Level', slug: 'cima-operational-level', price: 75000, priceGbp: 600 },
+	mg_full: { name: 'CIMA Management Level', slug: 'cima-management-level', price: 77775, priceGbp: 600 },
+	st_full: { name: 'CIMA Strategic Level', slug: 'cima-strategic-level', price: 105750, priceGbp: 600 },
+	// Single-subject operational premium pricing
+	op_e1: { price: 29000, priceGbp: 0 },
+	op_e2: { price: 29000, priceGbp: 0 },
+	op_f1: { price: 29000, priceGbp: 0 },
+	op_p1: { price: 29000, priceGbp: 0 },
+	// Single-subject management premium pricing
+	mg_e2: { price: 35000, priceGbp: 0 },
+	mg_f2: { price: 35000, priceGbp: 0 },
+	mg_p2: { price: 35000, priceGbp: 0 },
+	mg_mcs: { price: 40000, priceGbp: 0 },
+	// Single-subject strategic premium pricing
+	st_e3: { price: 40000, priceGbp: 0 },
+	st_f3: { price: 40000, priceGbp: 0 },
+	st_p3: { price: 40000, priceGbp: 0 },
+	st_scs: { price: 40000, priceGbp: 0 },
+	// Two-subject combinations at operational/management/strategic levels
+	op_e1_f1: { price: 58000, priceGbp: 0 },
+	op_e1_p1: { price: 58000, priceGbp: 0 },
+	op_p1_f1: { price: 58000, priceGbp: 0 },
+	mg_p2_f2: { price: 70000, priceGbp: 0 },
+	st_e3_p3: { price: 80000, priceGbp: 0 },
+};
+
+// Generate all possible combinations for all levels
+function generateCombinations() {
+	const result: any[] = [];
+
+	// Level key to prefix map
+	const levelPrefixes: Record<string, string> = {
+		certificate: 'cert',
+		operational: 'op',
+		management: 'mg',
+		strategic: 'st',
+	};
+
+	for (const [levelKey, courseCodes] of Object.entries(LEVEL_COURSE_GROUPS)) {
+		const prefix = levelPrefixes[levelKey] || levelKey.slice(0, 2);
+		const allSubsets = generatePowerSet(courseCodes);
+
+		for (const subset of allSubsets) {
+			// Sort for consistent ID generation
+			const sorted = [...subset].sort();
+			const idSuffix = sorted.map(c => c.toLowerCase()).join('_');
+			const comboId = `${prefix}_${idSuffix}`;
+
+			// Calculate default price as sum of individual course prices
+			const priceLkr = sorted.reduce((sum, code) => sum + (COURSE_PRICES[code] || 0), 0);
+			const priceGbp = sorted.reduce((sum, code) => sum + (COURSE_PRICES_GBP[code] || 0), 0);
+
+			// Check if there's a specific override for this combination
+			const override = COMBINATION_PRICE_OVERRIDES[comboId];
+
+			result.push({
+				id: comboId,
+				level: levelKey,
+				subjects: sorted,
+				price: override?.price ?? priceLkr,
+				priceGbp: override?.priceGbp ?? priceGbp,
+				name: override?.name ?? '',
+				slug: override?.slug ?? null,
+			});
+		}
+	}
+
+	return result;
+}
+
+const combinations = generateCombinations();
 
 const testimonials = [
 	{
@@ -1421,12 +1492,33 @@ async function main() {
 	console.log('Seeding combinations …');
 	for (const c of combinations) {
 		const comboName = (c as any).name || '';
-		const comboSlug = (c as any).slug || null;
+		const comboSlug = (c as any).slug || undefined;
 		const comboPriceGbp = (c as any).priceGbp || 0;
+
+		// Build update data (no slug to avoid unique constraint issues)
+		const updateData: any = {
+			level: c.level,
+			price: c.price,
+			priceGbp: comboPriceGbp,
+			name: comboName,
+		};
+
+		// Build create data (include slug only if defined)
+		const createData: any = {
+			id: c.id,
+			level: c.level,
+			price: c.price,
+			priceGbp: comboPriceGbp,
+			name: comboName,
+		};
+		if (comboSlug) {
+			createData.slug = comboSlug;
+		}
+
 		await prisma.courseCombination.upsert({
 			where: { id: c.id },
-			update: { level: c.level, price: c.price, priceGbp: comboPriceGbp, name: comboName, slug: comboSlug },
-			create: { id: c.id, level: c.level, price: c.price, priceGbp: comboPriceGbp, name: comboName, slug: comboSlug },
+			update: updateData,
+			create: createData,
 		});
 
 		for (const courseId of c.subjects) {

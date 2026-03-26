@@ -247,7 +247,10 @@ export class EmailService {
 						email: to,
 						enrollmentId: 'test-enrollment-id',
 						reminderNumber: 1,
-						cartItems: [{ id: 'cert_ba1_ba2', name: 'CIMA Certificate Level' }],
+						cartItems: [
+							{ type: 'level', levelTitle: 'CIMA Certificate Level', courseCount: 4 },
+							{ type: 'course', courseCode: 'P1', courseName: 'Management Accounting' }
+						],
 						currency: 'LKR',
 						amount: 25000,
 					}),
@@ -484,9 +487,26 @@ export class EmailService {
 			opts.currency === 'GBP'
 				? `&pound;${opts.amount.toLocaleString()}`
 				: `LKR ${opts.amount.toLocaleString()}`;
+
+		// Format cart items as a visually appealing list based on item type
 		const cartList = Array.isArray(opts.cartItems) && opts.cartItems.length
-			? opts.cartItems.map((i: any) => `<li>${i.name || i.id || JSON.stringify(i)}</li>`).join('')
-			: '<li>Your selected programme</li>';
+			? opts.cartItems.map((i: any) => {
+				if (i.type === 'level') {
+					return `<li style="margin-bottom:12px;padding:10px;background:#f0f8ff;border-left:3px solid #24ADE3;border-radius:4px;">
+								<div style="color:#1B365D;font-weight:bold;font-size:15px;margin-bottom:4px;">${i.levelTitle || 'CIMA Level Package'}</div>
+								<div style="color:#666;font-size:13px;">📚 Full Level Programme · ${i.courseCount || 'Multiple'} courses</div>
+							</li>`;
+				} else if (i.type === 'course') {
+					return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #1B365D;border-radius:4px;">
+								<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.courseCode ? `${i.courseCode} — ` : ''}${i.courseName || 'CIMA Course'}</div>
+							</li>`;
+				}
+				// Fallback for legacy or unexpected formats
+				return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #24ADE3;border-radius:4px;">
+							<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.name || i.title || i.courseName || i.levelTitle || 'Selected programme'}</div>
+						</li>`;
+			}).join('')
+			: '<li style="padding:10px;">Your selected programme</li>';
 		return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <style>
@@ -499,7 +519,7 @@ export class EmailService {
   .body h2{color:#1B365D;margin-top:0}
   .box{background:#fff8e6;border-left:4px solid #F5A623;padding:16px;border-radius:4px;margin:20px 0;font-size:15px}
   .btn{display:inline-block;background:#F5A623;color:#fff;padding:14px 32px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px;margin-top:8px}
-  ul{padding-left:20px;margin:8px 0}
+  ul{list-style:none;padding:0;margin:12px 0}
   li{margin-bottom:4px}
   .ftr{background:#f9f9f9;padding:24px;text-align:center;color:#999;font-size:12px;border-top:1px solid #eee}
 </style>
