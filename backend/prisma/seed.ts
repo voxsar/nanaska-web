@@ -467,21 +467,20 @@ const COMBINATION_PRICE_OVERRIDES: Record<string, { price?: number; priceGbp?: n
 	op_full: { name: 'CIMA Operational Level', slug: 'cima-operational-level', price: 75000, priceGbp: 600 },
 	mg_full: { name: 'CIMA Management Level', slug: 'cima-management-level', price: 77775, priceGbp: 600 },
 	st_full: { name: 'CIMA Strategic Level', slug: 'cima-strategic-level', price: 105750, priceGbp: 600 },
-	// Single-subject operational premium pricing
-	op_e1: { price: 29000, priceGbp: 0 },
-	op_e2: { price: 29000, priceGbp: 0 },
-	op_f1: { price: 29000, priceGbp: 0 },
-	op_p1: { price: 29000, priceGbp: 0 },
-	// Single-subject management premium pricing
-	mg_e2: { price: 35000, priceGbp: 0 },
-	mg_f2: { price: 35000, priceGbp: 0 },
-	mg_p2: { price: 35000, priceGbp: 0 },
-	mg_mcs: { price: 40000, priceGbp: 0 },
-	// Single-subject strategic premium pricing
-	st_e3: { price: 40000, priceGbp: 0 },
-	st_f3: { price: 40000, priceGbp: 0 },
-	st_p3: { price: 40000, priceGbp: 0 },
-	st_scs: { price: 40000, priceGbp: 0 },
+	// Single-subject operational pricing (matches frontend display prices)
+	op_e1: { price: 25000, priceGbp: 200 },
+	op_f1: { price: 25000, priceGbp: 200 },
+	op_p1: { price: 25000, priceGbp: 200 },
+	// Single-subject management pricing (matches frontend display prices)
+	mg_e2: { price: 25000, priceGbp: 200 },
+	mg_f2: { price: 25000, priceGbp: 200 },
+	mg_p2: { price: 25000, priceGbp: 200 },
+	mg_mcs: { price: 27675, priceGbp: 499 },
+	// Single-subject strategic pricing (matches frontend display prices)
+	st_e3: { price: 25000, priceGbp: 200 },
+	st_f3: { price: 25000, priceGbp: 200 },
+	st_p3: { price: 25000, priceGbp: 200 },
+	st_scs: { price: 30750, priceGbp: 599 },
 	// Two-subject combinations at operational/management/strategic levels
 	op_e1_f1: { price: 58000, priceGbp: 0 },
 	op_e1_p1: { price: 58000, priceGbp: 0 },

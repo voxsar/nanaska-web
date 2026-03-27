@@ -49,7 +49,7 @@ export class SchedulerService {
 
 	// ── Cron: Send enrollment payment reminders (every hour) ──────────────────
 
-	@Cron(CronExpression.EVERY_HOUR)
+	// @Cron(CronExpression.EVERY_HOUR) // DISABLED
 	async sendEnrollmentReminders(): Promise<void> {
 		this.logger.log('Running enrollment reminder check...');
 
