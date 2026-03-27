@@ -54,9 +54,8 @@ export default function PaymentLinkPage() {
 			const data = res.data;
 			setLinkInfo(data);
 
-			if (data.isPaid) {
-				setStatus('paid');
-			} else if (data.hasPassword) {
+			// Payment links are now reusable - skip isPaid check
+			if (data.hasPassword) {
 				setStatus('password');
 			} else {
 				setStatus('form');
@@ -229,12 +228,6 @@ export default function PaymentLinkPage() {
 					<div className="plp-desc-box">
 						<strong>Payment details:</strong><br />
 						{linkInfo.description}
-					</div>
-				)}
-
-				{linkInfo?.expiresAt && (
-					<div className="plp-expiry-note">
-						⏰ This link expires on {new Date(linkInfo.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
 					</div>
 				)}
 

@@ -117,12 +117,8 @@ export class PaymentLinksService {
 		const link = await this.prisma.paymentLink.findUnique({ where: { slug } });
 		if (!link) throw new NotFoundException('Payment link not found');
 
-		const now = new Date();
+		// Only check if admin manually deactivated the link
 		if (!link.isActive) throw new ForbiddenException('This payment link is no longer active');
-		if (link.isPaid && link.expireOnPayment)
-			throw new ForbiddenException('This payment link has already been used');
-		if (link.expiresAt && link.expiresAt < now)
-			throw new ForbiddenException('This payment link has expired');
 
 		return {
 			id: link.id,
@@ -155,13 +151,8 @@ export class PaymentLinksService {
 		const link = await this.prisma.paymentLink.findUnique({ where: { slug } });
 		if (!link) throw new NotFoundException('Payment link not found');
 
-		// Validate link state
-		const now = new Date();
+		// Only check if admin manually deactivated the link
 		if (!link.isActive) throw new ForbiddenException('This payment link is no longer active');
-		if (link.isPaid && link.expireOnPayment)
-			throw new ForbiddenException('This payment link has already been used');
-		if (link.expiresAt && link.expiresAt < now)
-			throw new ForbiddenException('This payment link has expired');
 
 		// Verify password if protected
 		if (link.passwordHash) {

@@ -27,8 +27,6 @@ const emptyForm = {
 	currency: 'LKR',
 	description: '',
 	password: '',
-	expiresAt: '',
-	expireOnPayment: false,
 	sendEmail: true,
 };
 
@@ -79,8 +77,7 @@ export default function PaymentLinksPage() {
 				currency: form.currency,
 				description: form.description || undefined,
 				password: form.password || undefined,
-				expiresAt: form.expiresAt || undefined,
-				expireOnPayment: form.expireOnPayment,
+
 				sendEmail: form.sendEmail,
 			};
 			await api.post('/payment-links', payload);
@@ -129,7 +126,7 @@ export default function PaymentLinksPage() {
 			<div className="pl-header">
 				<div>
 					<h1>Payment Links</h1>
-					<p>Create personalised payment links for students — no login required.</p>
+					<p>Create reusable payment links for students — no login required, no expiry.</p>
 				</div>
 				<button className="pl-btn-primary" onClick={() => { setShowForm(!showForm); setError(''); setSuccess(''); }}>
 					{showForm ? '✕ Cancel' : '+ New Payment Link'}
@@ -183,23 +180,15 @@ export default function PaymentLinksPage() {
 							</div>
 						</div>
 
-						<div className="pl-form-row pl-form-row-2">
+						<div className="pl-form-row">
 							<div className="pl-field">
 								<label>Password Protection <small>(optional)</small></label>
 								<input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Leave blank for no password" autoComplete="new-password" />
 								<small>Student must enter this to access the payment page</small>
 							</div>
-							<div className="pl-field">
-								<label>Expiry Date <small>(optional)</small></label>
-								<input name="expiresAt" type="datetime-local" value={form.expiresAt} onChange={handleChange} />
-							</div>
 						</div>
 
 						<div className="pl-form-row pl-checkboxes">
-							<label className="pl-checkbox-label">
-								<input type="checkbox" name="expireOnPayment" checked={form.expireOnPayment} onChange={handleChange} />
-								Deactivate link after successful payment
-							</label>
 							<label className={`pl-checkbox-label${!form.studentEmail ? ' pl-checkbox-disabled' : ''}`}>
 								<input type="checkbox" name="sendEmail" checked={form.sendEmail && !!form.studentEmail} onChange={handleChange} disabled={!form.studentEmail} />
 								Send payment link email to student now {!form.studentEmail && <small>(enter student email above)</small>}
@@ -249,24 +238,21 @@ export default function PaymentLinksPage() {
 									</td>
 									<td className="pl-desc">{link.description ? link.description.slice(0, 60) + (link.description.length > 60 ? '…' : '') : <span className="pl-none">—</span>}</td>
 									<td>
-										{link.isPaid ? (
-											<span className="pl-badge pl-badge-paid">✓ Paid</span>
-										) : !link.isActive ? (
+										{!link.isActive ? (
 											<span className="pl-badge pl-badge-inactive">Inactive</span>
-										) : link.expiresAt && new Date(link.expiresAt) < new Date() ? (
-											<span className="pl-badge pl-badge-expired">Expired</span>
+										) : link.isPaid ? (
+											<span className="pl-badge pl-badge-paid">✓ Used</span>
 										) : (
 											<span className="pl-badge pl-badge-active">Active</span>
 										)}
 										{link.paidAt && (
-											<div className="pl-paid-at">{new Date(link.paidAt).toLocaleDateString()}</div>
+											<div className="pl-paid-at">Last: {new Date(link.paidAt).toLocaleDateString()}</div>
 										)}
 									</td>
 									<td>
 										<div className="pl-features">
 											{link.hasPassword && <span className="pl-tag">🔒 Password</span>}
-											{link.expireOnPayment && <span className="pl-tag">⏱ Expires on pay</span>}
-											{link.expiresAt && <span className="pl-tag">📅 {new Date(link.expiresAt).toLocaleDateString()}</span>}
+											<span className="pl-tag">♻️ Reusable</span>
 										</div>
 									</td>
 									<td className="pl-date">{new Date(link.createdAt).toLocaleDateString()}</td>
