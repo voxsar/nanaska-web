@@ -127,34 +127,86 @@ export class PaymentsService {
 	// POST /payments/create
 	// ──────────────────────────────────────────────────────────────────────────
 	async createPayment(userId: string, dto: CreatePaymentDto, origin?: string) {
-		// Resolve combination from either combinationId or courseIds
-		let combo;
-		if (dto.combinationId) {
-			combo = await this.prisma.courseCombination.findUnique({
-				where: { id: dto.combinationId },
-				include: { items: { include: { course: true } } },
-			});
-			if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
-		} else if (dto.courseIds && dto.courseIds.length > 0) {
-			combo = await this.findOrCreateCombination(dto.courseIds);
-		} else {
-			throw new BadRequestException('Either combinationId or courseIds must be provided');
-		}
-
 		const user = await this.prisma.user.findUnique({ where: { id: userId } });
 		if (!user) throw new NotFoundException('User not found');
 
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
-		const amount = currency === 'GBP'
-			? (combo.priceGbp && combo.priceGbp > 0 ? combo.priceGbp : (dto.amount || combo.priceGbp || 0))
-			: combo.price;
+
+		// Calculate total from all combinations and courses in cart
+		let totalPriceLkr = 0;
+		let totalPriceGbp = 0;
+		const allCombinationIds: string[] = [];
+
+		// Add single combinationId if provided
+		if (dto.combinationId) {
+			allCombinationIds.push(dto.combinationId);
+		}
+
+		// Add multiple combinationIds if provided
+		if (dto.combinationIds && dto.combinationIds.length > 0) {
+			allCombinationIds.push(...dto.combinationIds);
+		}
+
+		// Fetch all combinations and sum their prices
+		for (const comboId of allCombinationIds) {
+			const combo = await this.prisma.courseCombination.findUnique({
+				where: { id: comboId },
+				include: { items: { include: { course: true } } },
+			});
+			if (!combo) throw new NotFoundException(`Combination ${comboId} not found`);
+			totalPriceLkr += combo.price;
+			totalPriceGbp += combo.priceGbp || 0;
+		}
+
+		// Add individual course prices
+		if (dto.courseIds && dto.courseIds.length > 0) {
+			const courses = await this.prisma.course.findMany({
+				where: { id: { in: dto.courseIds } },
+			});
+			if (courses.length !== dto.courseIds.length) {
+				throw new NotFoundException(`One or more course IDs not found`);
+			}
+			for (const course of courses) {
+				totalPriceLkr += course.price;
+				totalPriceGbp += course.priceGbp || 0;
+			}
+		}
+
+		// Use currency-specific total
+		const amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+
+		if (amount <= 0) {
+			throw new BadRequestException('Cart total must be greater than zero');
+		}
+
+		// Create or find combination for this cart
+		let finalComboId = dto.combinationId;
+		if (!finalComboId) {
+			// If multiple items, create a dynamic combination
+			const allCourseIds = [...dto.courseIds || []];
+			// Extract course IDs from combinations
+			for (const comboId of allCombinationIds) {
+				const combo = await this.prisma.courseCombination.findUnique({
+					where: { id: comboId },
+					include: { items: { include: { course: true } } },
+				});
+				if (combo?.items) {
+					allCourseIds.push(...combo.items.map(item => item.course.id));
+				}
+			}
+			if (allCourseIds.length > 0) {
+				const combo = await this.findOrCreateCombination(allCourseIds);
+				finalComboId = combo.id;
+			}
+		}
+
 		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order
 		const order = await this.prisma.order.create({
 			data: {
 				userId,
-				combinationId: combo.id,
+				combinationId: finalComboId,
 				amount,
 				currency,
 				status: 'PENDING',
@@ -176,32 +228,84 @@ export class PaymentsService {
 	// POST /payments/guest-create
 	// ──────────────────────────────────────────────────────────────────────────
 	async createGuestPayment(dto: GuestPaymentDto, origin?: string) {
-		// Resolve combination from either combinationId or courseIds
-		let combo;
-		if (dto.combinationId) {
-			combo = await this.prisma.courseCombination.findUnique({
-				where: { id: dto.combinationId },
-				include: { items: { include: { course: true } } },
-			});
-			if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
-		} else if (dto.courseIds && dto.courseIds.length > 0) {
-			combo = await this.findOrCreateCombination(dto.courseIds);
-		} else {
-			throw new BadRequestException('Either combinationId or courseIds must be provided');
-		}
-
 		const fullName = [dto.firstName, dto.lastName].filter(Boolean).join(' ');
 		const phone = dto.phone || '';
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
-		const amount = currency === 'GBP'
-			? (combo.priceGbp && combo.priceGbp > 0 ? combo.priceGbp : (dto.amount || combo.priceGbp || 0))
-			: combo.price;
+
+		// Calculate total from all combinations and courses in cart
+		let totalPriceLkr = 0;
+		let totalPriceGbp = 0;
+		const allCombinationIds: string[] = [];
+
+		// Add single combinationId if provided
+		if (dto.combinationId) {
+			allCombinationIds.push(dto.combinationId);
+		}
+
+		// Add multiple combinationIds if provided
+		if (dto.combinationIds && dto.combinationIds.length > 0) {
+			allCombinationIds.push(...dto.combinationIds);
+		}
+
+		// Fetch all combinations and sum their prices
+		for (const comboId of allCombinationIds) {
+			const combo = await this.prisma.courseCombination.findUnique({
+				where: { id: comboId },
+				include: { items: { include: { course: true } } },
+			});
+			if (!combo) throw new NotFoundException(`Combination ${comboId} not found`);
+			totalPriceLkr += combo.price;
+			totalPriceGbp += combo.priceGbp || 0;
+		}
+
+		// Add individual course prices
+		if (dto.courseIds && dto.courseIds.length > 0) {
+			const courses = await this.prisma.course.findMany({
+				where: { id: { in: dto.courseIds } },
+			});
+			if (courses.length !== dto.courseIds.length) {
+				throw new NotFoundException(`One or more course IDs not found`);
+			}
+			for (const course of courses) {
+				totalPriceLkr += course.price;
+				totalPriceGbp += course.priceGbp || 0;
+			}
+		}
+
+		// Use currency-specific total
+		const amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+
+		if (amount <= 0) {
+			throw new BadRequestException('Cart total must be greater than zero');
+		}
+
+		// Create or find combination for this cart
+		let finalComboId = dto.combinationId;
+		if (!finalComboId) {
+			// If multiple items, create a dynamic combination
+			const allCourseIds = [...dto.courseIds || []];
+			// Extract course IDs from combinations
+			for (const comboId of allCombinationIds) {
+				const combo = await this.prisma.courseCombination.findUnique({
+					where: { id: comboId },
+					include: { items: { include: { course: true } } },
+				});
+				if (combo?.items) {
+					allCourseIds.push(...combo.items.map(item => item.course.id));
+				}
+			}
+			if (allCourseIds.length > 0) {
+				const combo = await this.findOrCreateCombination(allCourseIds);
+				finalComboId = combo.id;
+			}
+		}
+
 		const frontendOrigin = this.resolveOrigin(origin);
 
 		// Create a PENDING order (no user account required)
 		const order = await this.prisma.order.create({
 			data: {
-				combinationId: combo.id,
+				combinationId: finalComboId,
 				amount,
 				currency,
 				status: 'PENDING',

@@ -104,49 +104,35 @@ export default function EnrollmentPage() {
 	 * For guest users: uses /payments/guest-create with the form details already entered.
 	 * Both paths redirect to the PayHere IPG checkout page.
 	 */
-	const handlePayOnline = async (combinationId) => {
+	const handlePayOnline = async () => {
 		if (!API_URL) return;
 
-		// Extract all course IDs from cart (both individual courses and level packages)
-		const courseIds = [];
+		// Build cart payload: send combination IDs for level packages, course IDs for individual courses
+		const combinationIds = cartItems
+			.filter(item => item.type === 'level' && item.combinationId)
+			.map(item => item.combinationId);
 
-		// Collect individual course items
-		cartItems
+		const courseIds = cartItems
 			.filter(item => item.type === 'course')
-			.forEach(item => courseIds.push(item.courseCode));
+			.map(item => item.courseCode);
 
-		// For level items, fetch their course IDs from the combination
-		const levelItems = cartItems.filter(item => item.type === 'level');
-		if (levelItems.length > 0) {
-			try {
-				// Fetch all combinations to look up course IDs
-				const combosRes = await fetch(`${API_URL}/courses/combinations`);
-				if (combosRes.ok) {
-					const allCombos = await combosRes.json();
-					for (const levelItem of levelItems) {
-						const combo = allCombos.find(c => c.id === levelItem.combinationId);
-						if (combo?.items) {
-							combo.items.forEach(item => {
-								if (item.course?.id) courseIds.push(item.course.id);
-							});
-						}
-					}
-				}
-			} catch (err) {
-				console.error('Failed to fetch combination courses:', err);
-			}
+		// Single combination optimization
+		if (combinationIds.length === 1 && courseIds.length === 0) {
+			const singleComboId = combinationIds[0];
+			await submitPayment({ combinationId: singleComboId });
+			return;
 		}
 
-		// For single-combination carts, use the combinationId directly (optimization)
-		const effectiveCombinationId = (cartItems.length === 1 && cartItems[0].type === 'level')
-			? cartItems[0].combinationId
-			: null;
-
-		if (!effectiveCombinationId && courseIds.length === 0) {
+		// Multiple items: send all combination IDs and course IDs
+		if (combinationIds.length === 0 && courseIds.length === 0) {
 			setPayError('No courses selected for payment.');
 			return;
 		}
 
+		await submitPayment({ combinationIds, courseIds });
+	};
+
+	const submitPayment = async (cartData) => {
 		// Guests must have filled in at least their name and email first
 		const token = localStorage.getItem('nanaska_token');
 		if (!token) {
@@ -160,19 +146,13 @@ export default function EnrollmentPage() {
 		setPaying(true);
 		try {
 			const effectiveCurrency = currency || 'GBP';
-			const cartAmount = getCartTotal(form.country || selectedCountry);
 			let res;
 			if (token) {
 				// Authenticated user path
 				const payload = {
 					currency: effectiveCurrency,
-					amount: cartAmount,
+					...cartData,
 				};
-				if (effectiveCombinationId) {
-					payload.combinationId = effectiveCombinationId;
-				} else {
-					payload.courseIds = courseIds;
-				}
 				res = await fetch(`${API_URL}/payments/create`, {
 					method: 'POST',
 					headers: {
@@ -189,13 +169,8 @@ export default function EnrollmentPage() {
 					email: form.email,
 					phone: form.phone || undefined,
 					currency: effectiveCurrency,
-					amount: cartAmount,
+					...cartData,
 				};
-				if (effectiveCombinationId) {
-					payload.combinationId = effectiveCombinationId;
-				} else {
-					payload.courseIds = courseIds;
-				}
 				res = await fetch(`${API_URL}/payments/guest-create`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },

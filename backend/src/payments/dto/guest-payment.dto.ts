@@ -1,12 +1,18 @@
-import { IsString, IsEmail, IsOptional, IsIn, IsInt, Min, IsArray } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsIn, IsArray } from 'class-validator';
 
 export class GuestPaymentDto {
-	/** The course combination ID the guest wants to pay for */
+	/** Single course combination ID (for single package checkout) */
 	@IsOptional()
 	@IsString()
 	combinationId?: string;
 
-	/** Array of course IDs to create a dynamic combination (alternative to combinationId) */
+	/** Multiple combination IDs (for multiple packages in cart) */
+	@IsOptional()
+	@IsArray()
+	@IsString({ each: true })
+	combinationIds?: string[];
+
+	/** Array of course IDs for individual courses in cart */
 	@IsOptional()
 	@IsArray()
 	@IsString({ each: true })
@@ -29,10 +35,4 @@ export class GuestPaymentDto {
 	@IsOptional()
 	@IsIn(['GBP', 'LKR'])
 	currency?: string;
-
-	/** Amount in the selected currency (required when currency is GBP) */
-	@IsOptional()
-	@IsInt()
-	@Min(1)
-	amount?: number;
 }
