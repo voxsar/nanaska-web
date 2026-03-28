@@ -10,13 +10,13 @@ const SPECIALISTS = [
 	{
 		name: 'Channa Gunawardena',
 		quals: 'MBA, FCA, FCMA, BSC First Class, CIMA Case Study Specialist',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Group-274.png',
+		img: '/images/2023-09-Group-274.png',
 		bio: 'Mr. Channa is the founder and lead lecturer at Nanaska with more than two decades of experience in teaching and currently serving as the CEO of a public listed company in Sri Lanka. His hands-on expertise makes him one of the best case study experts when it comes to CIMA, with over 95% of CIMA Sri Lankan prize winners including global prize winners during the last decade along with overseas prize winners in Ghana, UAE, Malaysia and UK. He is also a member of the CIMA Global Council.',
 	},
 	{
 		name: 'Mark Gunathilake',
 		quals: 'BSc Hons., USJ, ACMA, CGMA, CIMA SCS Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Group-303.png',
+		img: '/images/2023-09-Group-303.png',
 		bio: 'Meet our renowned lecturer Mark Gunathilake, a Sri Lankan Prize Winner for the Strategic Case Study Examination of CIMA (UK). He has over 5 years of valuable experience in the business sectors of Manufacturing, Transportation, and Retail. Starting his career at one of the Big 4 audit firms, he has gained extensive knowledge and expertise in finance, risk, project management and operations.',
 	},
 ];
@@ -62,51 +62,51 @@ const COURSE_OUTLINE = [
 ];
 
 const PRIZE_WINNERS = [
-	{ name: 'Shamini Devee Saygaran', award: "SCS CIMA Southeast Asia's 21 Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14.png' },
-	{ name: 'Sashika Wijesiri', award: "Gateway Nov'21 Sri Lanka Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-1.png' },
-	{ name: 'Sanara Manamperi', award: "SCS Nov'21 Sri Lanka Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-1-1.png' },
-	{ name: 'Randi Vithanagamage', award: "CIMA SCS Aug'22 Sri Lanka Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-2.png' },
-	{ name: 'Lakshika Kalubowila', award: "MCS Nov'20 Gateway Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-3.png' },
-	{ name: 'Marco Arletti', award: "MCS Feb'20 Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-4.png' },
-	{ name: 'Luong Thi Thuy Linh', award: "SCS Nov'20 Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-5.png' },
-	{ name: 'Saman Edirimannage', award: "CIMA Gateway Exam Aug'20 Joint Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-6.png' },
-	{ name: 'Tharanga Ileperuma', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-7.png' },
-	{ name: 'Thilan Darmarathne', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-8.png' },
-	{ name: 'Nimesh Jayawardana', award: "SCS Nov'20 Joint Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-9.png' },
-	{ name: 'Hassan Ariff', award: "SCS Aug'20 Joint Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-10.png' },
-	{ name: 'Hasitha Wanniarachchi', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-11.png' },
-	{ name: 'Chinthaka Abeydeera', award: "SCS Nov'20 Joint Prize Winner", img: 'https://images.nanaska.com/wp-content/uploads/2023/08/Ellipse-14-12.png' },
+	{ name: 'Shamini Devee Saygaran', award: "SCS CIMA Southeast Asia's 21 Prize Winner", img: '/images/2023-08-Ellipse-14.png' },
+	{ name: 'Sashika Wijesiri', award: "Gateway Nov'21 Sri Lanka Prize Winner", img: '/images/2023-08-Ellipse-14-1.png' },
+	{ name: 'Sanara Manamperi', award: "SCS Nov'21 Sri Lanka Prize Winner", img: '/images/2023-08-Ellipse-14-1-1.png' },
+	{ name: 'Randi Vithanagamage', award: "CIMA SCS Aug'22 Sri Lanka Prize Winner", img: '/images/2023-08-Ellipse-14-2.png' },
+	{ name: 'Lakshika Kalubowila', award: "MCS Nov'20 Gateway Prize Winner", img: '/images/2023-08-Ellipse-14-3.png' },
+	{ name: 'Marco Arletti', award: "MCS Feb'20 Prize Winner", img: '/images/2023-08-Ellipse-14-4.png' },
+	{ name: 'Luong Thi Thuy Linh', award: "SCS Nov'20 Prize Winner", img: '/images/2023-08-Ellipse-14-5.png' },
+	{ name: 'Saman Edirimannage', award: "CIMA Gateway Exam Aug'20 Joint Prize Winner", img: '/images/2023-08-Ellipse-14-6.png' },
+	{ name: 'Tharanga Ileperuma', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: '/images/2023-08-Ellipse-14-7.png' },
+	{ name: 'Thilan Darmarathne', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: '/images/2023-08-Ellipse-14-8.png' },
+	{ name: 'Nimesh Jayawardana', award: "SCS Nov'20 Joint Prize Winner", img: '/images/2023-08-Ellipse-14-9.png' },
+	{ name: 'Hassan Ariff', award: "SCS Aug'20 Joint Prize Winner", img: '/images/2023-08-Ellipse-14-10.png' },
+	{ name: 'Hasitha Wanniarachchi', award: "MCS MAY'21 GATEWAY PRIZE WINNER", img: '/images/2023-08-Ellipse-14-11.png' },
+	{ name: 'Chinthaka Abeydeera', award: "SCS Nov'20 Joint Prize Winner", img: '/images/2023-08-Ellipse-14-12.png' },
 ];
 
 const TESTIMONIALS = [
 	{
 		name: 'Luong Thi Thuy Linh',
 		role: 'Strategic Case Study (Prize Winner)',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Rectangle-8.png',
+		img: '/images/2023-09-Rectangle-8.png',
 		quote: 'I am very grateful for what Nanaska had prepared for my Strategic Case Study exam. Thank you, Mr. Channa and Nanaska team for the inspiring lectures, the comprehensive and unique learning materials as well as the one-to-one coaching sessions after each mock exam.',
 	},
 	{
 		name: 'Thisal Liyanage',
 		role: 'SCS – May 23 · 106 Marks',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Rectangle-8-2.png',
+		img: '/images/2023-09-Rectangle-8-2.png',
 		quote: 'CIMA finance leadership program allowed me to step into the prestigious CIMA qualification with fewer exams. Most importantly FLP helps us to face exams while continuing our professional work. Furthermore, flexibility from Nanaska team on tutoring and pre-preparations for the exams helped me a lot to get through the final case study easily.',
 	},
 	{
 		name: 'Piyumi Divyanjali',
 		role: 'SCS – May 23 · 103 Marks',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Rectangle-8-3.png',
+		img: '/images/2023-09-Rectangle-8-3.png',
 		quote: 'I appreciate the enormous support offered by Nanaska team for me to pass the Strategic Level Case Study with a good score. The holistic approach followed by Channa Sir and staff while giving personal attention to each student was very helpful and one of the fundamental reasons behind my success.',
 	},
 	{
 		name: 'Fathima Shifara',
 		role: 'OCS – May 23 · 97 Marks',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Rectangle-8-5.png',
+		img: '/images/2023-09-Rectangle-8-5.png',
 		quote: 'Thank you for all the support and extra efforts given to pass the exam.',
 	},
 	{
 		name: 'Eugene Akorli',
 		role: 'OCS – May 23 · 93 Marks',
-		img: 'https://images.nanaska.com/wp-content/uploads/2023/09/Rectangle-8-4.png',
+		img: '/images/2023-09-Rectangle-8-4.png',
 		quote: 'The teaching methods used by Nanaska helped me believe that if I put in the required effort I could achieve the result I wanted. The responsiveness and dedication of the team at Nanaska proved really valuable and made me feel that I had all the support I needed to pass the exam.',
 	},
 ];
@@ -125,7 +125,7 @@ export default function CaseStudyPage() {
 		description:
 			"Kickstart your CIMA Case Study journey at Nanaska. Expert lecturers, live sessions, personalised support for OCS, MCS and SCS. Sri Lanka's leading CIMA case study provider with 95%+ prize winner success rate.",
 		keywords: 'CIMA Case Study, OCS, MCS, SCS, Nanaska, CIMA Sri Lanka, case study specialist, prize winners',
-		ogImage: 'https://images.nanaska.com/wp-content/uploads/2023/09/Akka-1.png',
+		ogImage: '/images/2023-09-Akka-1.png',
 		canonical: 'https://www.nanaska.com/case-study/',
 	});
 
@@ -157,7 +157,7 @@ export default function CaseStudyPage() {
 				</div>
 				<div className="cs-hero__img-col" data-reveal>
 					<img
-						src="https://images.nanaska.com/wp-content/uploads/2023/09/Akka-1.png"
+						src="/images/2023-09-Akka-1.png"
 						alt="Professional woman representing Nanaska lecturers"
 						loading="eager"
 					/>
@@ -177,19 +177,19 @@ export default function CaseStudyPage() {
 					<div className="cs-why__grid">
 						{[
 							{
-								icon: 'https://images.nanaska.com/wp-content/uploads/2023/09/user-time-1.png',
+								icon: '/images/2023-09-user-time-1.png',
 								alt: 'Time icon',
 								title: '24/7 Service',
 								desc: 'Round-the-clock support and resources so you can study at your own pace, any time.',
 							},
 							{
-								icon: 'https://images.nanaska.com/wp-content/uploads/2023/09/address-book-1.png',
+								icon: '/images/2023-09-address-book-1.png',
 								alt: 'Address book icon',
 								title: 'Live Sessions',
 								desc: 'Free live classes covering both competencies and case studies, with recordings for missed sessions.',
 							},
 							{
-								icon: 'https://images.nanaska.com/wp-content/uploads/2023/09/calendar-clock-1.png',
+								icon: '/images/2023-09-calendar-clock-1.png',
 								alt: 'Calendar icon',
 								title: 'Flexible Timetable',
 								desc: 'Adapt your learning schedule to your lifestyle with our flexible, student-friendly timetable.',
@@ -223,7 +223,7 @@ export default function CaseStudyPage() {
 							</p>
 						</div>
 						<div className="cs-why__action">
-							<img src="https://images.nanaska.com/wp-content/uploads/2023/09/Group-301-1.png" alt="Students attending Nanaska CIMA classes" loading="lazy" />
+							<img src="/images/2023-09-Group-301-1.png" alt="Students attending Nanaska CIMA classes" loading="lazy" />
 							<a href={REGISTER_URL} className="cs-btn cs-btn--primary" target="_blank" rel="noopener noreferrer">Register Now</a>
 						</div>
 					</div>
@@ -316,7 +316,7 @@ export default function CaseStudyPage() {
 						</div>
 						<div className="cs-outline__img" data-reveal>
 							<img
-								src="https://images.nanaska.com/wp-content/uploads/2023/09/Ayiyaa.png"
+								src="/images/2023-09-Ayiyaa.png"
 								alt="Professional man representing Nanaska lecturers"
 								loading="lazy"
 							/>

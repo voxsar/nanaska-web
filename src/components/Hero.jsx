@@ -2,15 +2,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import './Hero.css';
 
 const SLIDES = [
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2026/03/HomePage-Dekstop.png', alt: 'Nanaska – Leading CIMA Course Provider' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/11/Desktop.webp', alt: 'Nanaska CIMA Courses' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/10/resize-web.webp', alt: 'Nanaska Students' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/10/Prize-Winner-yanik-web-1.webp', alt: 'Prize Winner' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/10/Nanaska_September_lecture_panel_Slider.webp', alt: 'September Lecture Panel' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/10/Nanska_Prize_winner_Template-v2_Banner.webp', alt: 'Prize Winner Template' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2025/10/Nanaska_CIMA-Prize-Winner-Slider-1916x792-1.webp', alt: 'CIMA Prize Winner' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2026/01/100-Club-MCS-02-Web-banner.webp', alt: '100 Club MCS' },
-	{ src: 'https://images.nanaska.com/wp-content/uploads/2026/01/Prize-Winner-Kaneshamoorthy-Anochkaran-wb-1.png', alt: 'Prize Winner Kaneshamoorthy' },
+	{ src: '/images/2026-03-HomePage-Dekstop.png', alt: 'Nanaska – Leading CIMA Course Provider' },
+	{ src: '/images/2025-11-Desktop.webp', alt: 'Nanaska CIMA Courses' },
+	{ src: '/images/2025-10-resize-web.webp', alt: 'Nanaska Students' },
+	{ src: '/images/2025-10-Prize-Winner-yanik-web-1.webp', alt: 'Prize Winner' },
+	{ src: '/images/2025-10-Nanaska_September_lecture_panel_Slider.webp', alt: 'September Lecture Panel' },
+	{ src: '/images/2025-10-Nanska_Prize_winner_Template-v2_Banner.webp', alt: 'Prize Winner Template' },
+	{ src: '/images/2025-10-Nanaska_CIMA-Prize-Winner-Slider-1916x792-1.webp', alt: 'CIMA Prize Winner' },
+	{ src: '/images/2026-01-100-Club-MCS-02-Web-banner.webp', alt: '100 Club MCS' },
+	{ src: '/images/2026-01-Prize-Winner-Kaneshamoorthy-Anochkaran-wb-1.png', alt: 'Prize Winner Kaneshamoorthy' },
 ];
 
 const INTERVAL = 5000;

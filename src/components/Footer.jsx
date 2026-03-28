@@ -77,7 +77,7 @@ export default function Footer() {
 						</div>
 
 						<img
-							src="https://images.nanaska.com/wp-content/uploads/2023/02/secure-payments-logos-v2-1-2048x826.png"
+							src="/images/2023-02-secure-payments-logos-v2-1-2048x826.png"
 							alt="Secure payment logos"
 							className="footer__payments-img"
 							loading="lazy"

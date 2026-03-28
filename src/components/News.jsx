@@ -10,7 +10,7 @@ const STATIC_NEWS = [
 		title: 'Nanaska Student Wins Global CIMA Prize',
 		excerpt:
 			'Congratulations to our latest global prize winner who achieved top marks in the CIMA Strategic Level case study examination, representing Nanaska on the world stage.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2026/03/HomePage-Dekstop.png',
+		img: '/images/2026-03-HomePage-Dekstop.png',
 	},
 	{
 		id: 2,
@@ -19,7 +19,7 @@ const STATIC_NEWS = [
 		title: 'Prize Winner: Kaneshamoorthy Anochkaran',
 		excerpt:
 			'Kaneshamoorthy Anochkaran joins our ever-growing list of CIMA prize winners, achieving an outstanding result in the latest examination sitting.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2026/01/Prize-Winner-Kaneshamoorthy-Anochkaran-wb-1.png',
+		img: '/images/2026-01-Prize-Winner-Kaneshamoorthy-Anochkaran-wb-1.png',
 	},
 	{
 		id: 3,
@@ -28,7 +28,7 @@ const STATIC_NEWS = [
 		title: '100 Club MCS — Another Record-Breaking Result',
 		excerpt:
 			'Our exclusive 100 Club management case study programme continues to deliver exceptional results, with multiple students scoring over 90 marks.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2026/01/100-Club-MCS-02-Web-banner.webp',
+		img: '/images/2026-01-100-Club-MCS-02-Web-banner.webp',
 	},
 	{
 		id: 4,
@@ -37,7 +37,7 @@ const STATIC_NEWS = [
 		title: 'Nanaska Launches New Desktop Learning Platform',
 		excerpt:
 			'We are excited to unveil our brand-new desktop learning environment, giving students a richer, more interactive online study experience.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2025/11/Desktop.webp',
+		img: '/images/2025-11-Desktop.webp',
 	},
 	{
 		id: 5,
@@ -46,7 +46,7 @@ const STATIC_NEWS = [
 		title: 'September Lecture Panel Highlights',
 		excerpt:
 			'Our September lecture panel brought together leading industry professionals to discuss emerging trends in management accounting and finance.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2025/10/Nanaska_September_lecture_panel_Slider.webp',
+		img: '/images/2025-10-Nanaska_September_lecture_panel_Slider.webp',
 	},
 	{
 		id: 6,
@@ -55,7 +55,7 @@ const STATIC_NEWS = [
 		title: 'CIMA Prize Winner Spotlight: Yanik',
 		excerpt:
 			'Yanik&apos;s outstanding performance in the CIMA examinations has earned him a well-deserved place in Nanaska&apos;s prestigious prize winners hall of fame.',
-		img: 'https://images.nanaska.com/wp-content/uploads/2025/10/Prize-Winner-yanik-web-1.webp',
+		img: '/images/2025-10-Prize-Winner-yanik-web-1.webp',
 	},
 ];
 

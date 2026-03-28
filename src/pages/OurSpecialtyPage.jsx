@@ -47,7 +47,7 @@ const PRIZE_WINNERS = [
 		country: 'Malaysia',
 		achievement: 'Strategic Case Study, November 2020',
 		award: 'Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Luong.png',
+		img: '/images/2021-06-Luong.png',
 	},
 	{
 		name: 'Marco Arletti',
@@ -55,7 +55,7 @@ const PRIZE_WINNERS = [
 		country: 'UAE (GCC)',
 		achievement: 'Management Case Study, February 2020',
 		award: 'Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Marco.png',
+		img: '/images/2021-06-Marco.png',
 	},
 	{
 		name: 'Saman Edirimannage',
@@ -63,7 +63,7 @@ const PRIZE_WINNERS = [
 		country: 'Oman (GCC)',
 		achievement: 'CIMA Gateway Exam, August 2020',
 		award: 'Joint Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Saman.png',
+		img: '/images/2021-06-Saman.png',
 	},
 	{
 		name: 'Nimesh Jayawardana',
@@ -71,7 +71,7 @@ const PRIZE_WINNERS = [
 		country: 'Sri Lanka',
 		achievement: 'Strategic Case Study',
 		award: 'Joint Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Nimesh.png',
+		img: '/images/2021-06-Nimesh.png',
 	},
 	{
 		name: 'Chinthaka Abeydeera',
@@ -79,7 +79,7 @@ const PRIZE_WINNERS = [
 		country: 'Sri Lanka',
 		achievement: 'Strategic Case Study',
 		award: 'Joint Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Chinthaka.png',
+		img: '/images/2021-06-Chinthaka.png',
 	},
 	{
 		name: 'Lakshika Kalubowila',
@@ -87,7 +87,7 @@ const PRIZE_WINNERS = [
 		country: 'Sri Lanka',
 		achievement: 'Management Case Study, November 2020 Gateway',
 		award: 'Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Lakshika.png',
+		img: '/images/2021-06-Lakshika.png',
 	},
 	{
 		name: 'Hassan Ariff',
@@ -95,7 +95,7 @@ const PRIZE_WINNERS = [
 		country: 'Sri Lanka',
 		achievement: 'Strategic Case Study, August 2020',
 		award: 'Prize Winner',
-		img: 'https://images.nanaska.com/wp-content/uploads/2021/06/Hassan.png',
+		img: '/images/2021-06-Hassan.png',
 	},
 ];
 
