@@ -109,12 +109,12 @@ export default function EnrollmentPage() {
 
 		// Extract all course IDs from cart (both individual courses and level packages)
 		const courseIds = [];
-		
+
 		// Collect individual course items
 		cartItems
 			.filter(item => item.type === 'course')
 			.forEach(item => courseIds.push(item.courseCode));
-		
+
 		// For level items, fetch their course IDs from the combination
 		const levelItems = cartItems.filter(item => item.type === 'level');
 		if (levelItems.length > 0) {
@@ -138,8 +138,8 @@ export default function EnrollmentPage() {
 		}
 
 		// For single-combination carts, use the combinationId directly (optimization)
-		const effectiveCombinationId = (cartItems.length === 1 && cartItems[0].type === 'level') 
-			? cartItems[0].combinationId 
+		const effectiveCombinationId = (cartItems.length === 1 && cartItems[0].type === 'level')
+			? cartItems[0].combinationId
 			: null;
 
 		if (!effectiveCombinationId && courseIds.length === 0) {
