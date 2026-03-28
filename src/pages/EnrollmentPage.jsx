@@ -107,12 +107,42 @@ export default function EnrollmentPage() {
 	const handlePayOnline = async (combinationId) => {
 		if (!API_URL) return;
 
-		// If no combinationId found, extract courseIds from cart 
-		const courseIds = cartItems
+		// Extract all course IDs from cart (both individual courses and level packages)
+		const courseIds = [];
+		
+		// Collect individual course items
+		cartItems
 			.filter(item => item.type === 'course')
-			.map(item => item.courseCode);
+			.forEach(item => courseIds.push(item.courseCode));
+		
+		// For level items, fetch their course IDs from the combination
+		const levelItems = cartItems.filter(item => item.type === 'level');
+		if (levelItems.length > 0) {
+			try {
+				// Fetch all combinations to look up course IDs
+				const combosRes = await fetch(`${API_URL}/courses/combinations`);
+				if (combosRes.ok) {
+					const allCombos = await combosRes.json();
+					for (const levelItem of levelItems) {
+						const combo = allCombos.find(c => c.id === levelItem.combinationId);
+						if (combo?.items) {
+							combo.items.forEach(item => {
+								if (item.course?.id) courseIds.push(item.course.id);
+							});
+						}
+					}
+				}
+			} catch (err) {
+				console.error('Failed to fetch combination courses:', err);
+			}
+		}
 
-		if (!combinationId && courseIds.length === 0) {
+		// For single-combination carts, use the combinationId directly (optimization)
+		const effectiveCombinationId = (cartItems.length === 1 && cartItems[0].type === 'level') 
+			? cartItems[0].combinationId 
+			: null;
+
+		if (!effectiveCombinationId && courseIds.length === 0) {
 			setPayError('No courses selected for payment.');
 			return;
 		}
@@ -138,8 +168,8 @@ export default function EnrollmentPage() {
 					currency: effectiveCurrency,
 					amount: cartAmount,
 				};
-				if (combinationId) {
-					payload.combinationId = combinationId;
+				if (effectiveCombinationId) {
+					payload.combinationId = effectiveCombinationId;
 				} else {
 					payload.courseIds = courseIds;
 				}
@@ -161,8 +191,8 @@ export default function EnrollmentPage() {
 					currency: effectiveCurrency,
 					amount: cartAmount,
 				};
-				if (combinationId) {
-					payload.combinationId = combinationId;
+				if (effectiveCombinationId) {
+					payload.combinationId = effectiveCombinationId;
 				} else {
 					payload.courseIds = courseIds;
 				}
@@ -271,7 +301,7 @@ export default function EnrollmentPage() {
 				// Non-blocking – proceed to payment even if save fails
 			}
 		}
-		await handlePayOnline(getCartCombinationId());
+		await handlePayOnline();
 	};
 
 	if (submitted) {
