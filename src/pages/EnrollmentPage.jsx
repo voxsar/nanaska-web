@@ -106,8 +106,14 @@ export default function EnrollmentPage() {
 	 */
 	const handlePayOnline = async (combinationId) => {
 		if (!API_URL) return;
-		if (!combinationId) {
-			setPayError('No payment package is configured for this selection yet.');
+
+		// If no combinationId found, extract courseIds from cart 
+		const courseIds = cartItems
+			.filter(item => item.type === 'course')
+			.map(item => item.courseCode);
+
+		if (!combinationId && courseIds.length === 0) {
+			setPayError('No courses selected for payment.');
 			return;
 		}
 
@@ -128,28 +134,42 @@ export default function EnrollmentPage() {
 			let res;
 			if (token) {
 				// Authenticated user path
+				const payload = {
+					currency: effectiveCurrency,
+					amount: cartAmount,
+				};
+				if (combinationId) {
+					payload.combinationId = combinationId;
+				} else {
+					payload.courseIds = courseIds;
+				}
 				res = await fetch(`${API_URL}/payments/create`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
 						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify({ combinationId, currency: effectiveCurrency, amount: cartAmount }),
+					body: JSON.stringify(payload),
 				});
 			} else {
 				// Guest user path – send form details with the request
+				const payload = {
+					firstName: form.firstName,
+					lastName: form.lastName,
+					email: form.email,
+					phone: form.phone || undefined,
+					currency: effectiveCurrency,
+					amount: cartAmount,
+				};
+				if (combinationId) {
+					payload.combinationId = combinationId;
+				} else {
+					payload.courseIds = courseIds;
+				}
 				res = await fetch(`${API_URL}/payments/guest-create`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						combinationId,
-						firstName: form.firstName,
-						lastName: form.lastName,
-						email: form.email,
-						phone: form.phone || undefined,
-						currency: effectiveCurrency,
-						amount: cartAmount,
-					}),
+					body: JSON.stringify(payload),
 				});
 			}
 
@@ -207,7 +227,7 @@ export default function EnrollmentPage() {
 			const found = apiCombinations.find((combo) => {
 				const comboCourses = (combo.items || []).map(i => i.course?.id).filter(Boolean).sort();
 				return comboCourses.length === courseCodes.length &&
-					   comboCourses.every((code, idx) => code === courseCodes[idx]);
+					comboCourses.every((code, idx) => code === courseCodes[idx]);
 			});
 			if (found) return found.id;
 		}

@@ -1,9 +1,16 @@
-import { IsString, IsOptional, IsIn, IsInt, Min } from 'class-validator';
+import { IsString, IsOptional, IsIn, IsInt, Min, IsArray } from 'class-validator';
 
 export class CreatePaymentDto {
 	/** The course combination ID the user wants to pay for */
+	@IsOptional()
 	@IsString()
-	combinationId: string;
+	combinationId?: string;
+
+	/** Array of course IDs to create a dynamic combination (alternative to combinationId) */
+	@IsOptional()
+	@IsArray()
+	@IsString({ each: true })
+	courseIds?: string[];
 
 	/** Payment currency – GBP for international, LKR for Sri Lanka */
 	@IsOptional()

@@ -30,6 +30,67 @@ export class PaymentsService {
 		private readonly email: EmailService,
 	) { }
 
+	/**
+	 * Find or create a course combination dynamically based on course IDs.
+	 * Returns the combination with all necessary pricing information.
+	 */
+	private async findOrCreateCombination(courseIds: string[]) {
+		//Sort course IDs for consistent lookup
+		const sortedIds = [...courseIds].sort();
+
+		// Try to find existing combination
+		const allCombos = await this.prisma.courseCombination.findMany({
+			include: { items: { include: { course: true } } },
+		});
+
+		const existing = allCombos.find((combo) => {
+			const comboCourses = combo.items.map(i => i.course.id).sort();
+			return comboCourses.length === sortedIds.length &&
+				comboCourses.every((code, idx) => code === sortedIds[idx]);
+		});
+
+		if (existing) return existing;
+
+		// Combination doesn't exist - create it dynamically
+		const courses = await this.prisma.course.findMany({
+			where: { id: { in: sortedIds } },
+		});
+
+		if (courses.length !== sortedIds.length) {
+			throw new NotFoundException(`One or more course IDs not found: ${sortedIds.join(', ')}`);
+		}
+
+		// Calculate pricing as sum of individual courses
+		const priceLkr = courses.reduce((sum, c) => sum + c.price, 0);
+		const priceGbp = courses.reduce((sum, c) => sum + (c.priceGbp || 0), 0);
+
+		// Determine the level (use the first course's level, or 'mixed' if different levels)
+		const levels = [...new Set(courses.map(c => c.level))];
+		const level = levels.length === 1 ? levels[0] : 'mixed';
+
+		// Generate combination ID
+		const levelPrefix = level === 'mixed' ? 'mix' : level.slice(0, 4).toLowerCase();
+		const comboId = `${levelPrefix}_${sortedIds.map(id => id.toLowerCase()).join('_')}`;
+
+		// Create the combination
+		const newCombo = await this.prisma.courseCombination.create({
+			data: {
+				id: comboId,
+				level,
+				price: priceLkr,
+				priceGbp,
+				name: courses.map(c => c.name).join(' + '),
+				items: {
+					create: sortedIds.map(courseId => ({ courseId })),
+				},
+			},
+			include: { items: { include: { course: true } } },
+		});
+
+		this.logger.log(`Created dynamic combination: ${comboId} for courses [${sortedIds.join(', ')}]`);
+		return newCombo;
+	}
+
 	/** HMAC-SHA256 of envelopeJson signed with IPG_HMAC_SECRET (hex-encoded, as required by PayCorp). */
 	private sign(envelopeJson: string): string {
 		return crypto
@@ -66,15 +127,21 @@ export class PaymentsService {
 	// POST /payments/create
 	// ──────────────────────────────────────────────────────────────────────────
 	async createPayment(userId: string, dto: CreatePaymentDto, origin?: string) {
-		const [combo, user] = await Promise.all([
-			this.prisma.courseCombination.findUnique({
+		// Resolve combination from either combinationId or courseIds
+		let combo;
+		if (dto.combinationId) {
+			combo = await this.prisma.courseCombination.findUnique({
 				where: { id: dto.combinationId },
 				include: { items: { include: { course: true } } },
-			}),
-			this.prisma.user.findUnique({ where: { id: userId } }),
-		]);
+			});
+			if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
+		} else if (dto.courseIds && dto.courseIds.length > 0) {
+			combo = await this.findOrCreateCombination(dto.courseIds);
+		} else {
+			throw new BadRequestException('Either combinationId or courseIds must be provided');
+		}
 
-		if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
+		const user = await this.prisma.user.findUnique({ where: { id: userId } });
 		if (!user) throw new NotFoundException('User not found');
 
 		const currency = dto.currency || process.env.IPG_CURRENCY || 'LKR';
@@ -109,12 +176,19 @@ export class PaymentsService {
 	// POST /payments/guest-create
 	// ──────────────────────────────────────────────────────────────────────────
 	async createGuestPayment(dto: GuestPaymentDto, origin?: string) {
-		const combo = await this.prisma.courseCombination.findUnique({
-			where: { id: dto.combinationId },
-			include: { items: { include: { course: true } } },
-		});
-
-		if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
+		// Resolve combination from either combinationId or courseIds
+		let combo;
+		if (dto.combinationId) {
+			combo = await this.prisma.courseCombination.findUnique({
+				where: { id: dto.combinationId },
+				include: { items: { include: { course: true } } },
+			});
+			if (!combo) throw new NotFoundException(`Combination ${dto.combinationId} not found`);
+		} else if (dto.courseIds && dto.courseIds.length > 0) {
+			combo = await this.findOrCreateCombination(dto.courseIds);
+		} else {
+			throw new BadRequestException('Either combinationId or courseIds must be provided');
+		}
 
 		const fullName = [dto.firstName, dto.lastName].filter(Boolean).join(' ');
 		const phone = dto.phone || '';
