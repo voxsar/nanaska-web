@@ -159,12 +159,12 @@ export class BackupsService {
 			};
 		} catch (error: any) {
 			this.logger.error(`Failed to restore database: ${error.message}`);
-			
+
 			// Cleanup on error
 			try {
 				const extractedDir = path.join(this.backupDir, 'temp');
 				await fs.rm(extractedDir, { recursive: true, force: true });
-			} catch {}
+			} catch { }
 
 			return {
 				success: false,

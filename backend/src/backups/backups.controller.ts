@@ -15,7 +15,7 @@ import { SuperadminGuard } from '../admin/superadmin.guard';
 @Controller('admin/backups')
 @UseGuards(AdminJwtAuthGuard, SuperadminGuard)
 export class BackupsController {
-	constructor(private readonly backupsService: BackupsService) {}
+	constructor(private readonly backupsService: BackupsService) { }
 
 	/**
 	 * GET /admin/backups
