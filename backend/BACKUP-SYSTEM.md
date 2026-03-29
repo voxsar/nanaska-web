@@ -131,6 +131,13 @@ Currently, backups are kept indefinitely. To enable automatic cleanup:
 - Format: `postgresql://user:password@host:port/database`
 - Handles URL-encoded passwords (e.g., `%23` → `#`)
 
+### Path Resolution
+
+- Uses `process.cwd()` to locate scripts and backup directory
+- Works correctly when code is compiled to `dist/` folder
+- PM2 config sets `cwd: '/var/www/nanaska-web/backend'`
+- Ensures backup script is found at `{cwd}/scripts/backup-db.sh`
+
 ### Backup Process
 
 1. Parse `DATABASE_URL` to extract credentials

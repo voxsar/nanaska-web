@@ -20,8 +20,8 @@ export class BackupsService {
 	private readonly backupDir: string;
 
 	constructor() {
-		// Path to backups directory relative to the backend root
-		this.backupDir = path.join(__dirname, '..', '..', 'backups');
+		// Path to backups directory - use process.cwd() for compiled dist/ compatibility
+		this.backupDir = path.join(process.cwd(), 'backups');
 	}
 
 	/**
@@ -69,11 +69,13 @@ export class BackupsService {
 	async createBackup(): Promise<{ success: boolean; message: string; filename?: string }> {
 		this.logger.log('Starting manual database backup...');
 
-		const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'backup-db.sh');
+		// Use process.cwd() to get the backend root directory (works in compiled dist/ folder)
+		const backendRoot = process.cwd();
+		const scriptPath = path.join(backendRoot, 'scripts', 'backup-db.sh');
 
 		try {
 			const { stdout, stderr } = await execAsync(`bash ${scriptPath}`, {
-				cwd: path.join(__dirname, '..', '..'),
+				cwd: backendRoot,
 			});
 
 			// Extract filename from output

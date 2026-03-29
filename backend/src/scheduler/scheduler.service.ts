@@ -167,11 +167,13 @@ export class SchedulerService {
 	async performDatabaseBackup(): Promise<void> {
 		this.logger.log('Starting scheduled database backup...');
 
-		const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'backup-db.sh');
+		// Use process.cwd() to get the backend root directory (works in compiled dist/ folder)
+		const backendRoot = process.cwd();
+		const scriptPath = path.join(backendRoot, 'scripts', 'backup-db.sh');
 
 		try {
 			const { stdout, stderr } = await execAsync(`bash ${scriptPath}`, {
-				cwd: path.join(__dirname, '..', '..'),
+				cwd: backendRoot,
 			});
 
 			if (stdout) {
