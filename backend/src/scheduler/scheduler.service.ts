@@ -2,6 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as path from 'path';
+
+const execAsync = promisify(exec);
 
 @Injectable()
 export class SchedulerService {
@@ -153,6 +158,38 @@ export class SchedulerService {
 
 		if (result.count > 0) {
 			this.logger.log(`Archived ${result.count} pending order(s) older than 2 months`);
+		}
+	}
+
+	// ── Cron: Database backup every 4 hours ────────────────────────────────────
+
+	@Cron('0 */4 * * *')
+	async performDatabaseBackup(): Promise<void> {
+		this.logger.log('Starting scheduled database backup...');
+
+		const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'backup-db.sh');
+
+		try {
+			const { stdout, stderr } = await execAsync(`bash ${scriptPath}`, {
+				cwd: path.join(__dirname, '..', '..'),
+			});
+
+			if (stdout) {
+				this.logger.log(`Backup output: ${stdout}`);
+			}
+			if (stderr) {
+				this.logger.warn(`Backup warnings: ${stderr}`);
+			}
+
+			this.logger.log('✓ Database backup completed successfully');
+		} catch (error: any) {
+			this.logger.error(`Database backup failed: ${error.message}`);
+			if (error.stdout) {
+				this.logger.error(`STDOUT: ${error.stdout}`);
+			}
+			if (error.stderr) {
+				this.logger.error(`STDERR: ${error.stderr}`);
+			}
 		}
 	}
 }

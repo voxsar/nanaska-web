@@ -6,7 +6,7 @@ set -e
 
 # Load environment variables from .env file
 if [ -f .env ]; then
-    export $(cat .env | grep -v '^#' | xargs)
+    export $(cat .env | grep -v '^#' | grep -v '^$' | xargs -d '\n')
 fi
 
 # Check if DATABASE_URL is set
@@ -15,13 +15,22 @@ if [ -z "$DATABASE_URL" ]; then
     exit 1
 fi
 
+# Function to URL decode a string
+urldecode() {
+    local url_encoded="${1//+/ }"
+    printf '%b' "${url_encoded//%/\\x}"
+}
+
 # Extract database connection details from DATABASE_URL
 # Format: postgresql://user:password@host:port/database
 DB_USER=$(echo $DATABASE_URL | sed -n 's/.*:\/\/\([^:]*\):.*/\1/p')
-DB_PASS=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
+DB_PASS_ENCODED=$(echo $DATABASE_URL | sed -n 's/.*:\/\/[^:]*:\([^@]*\)@.*/\1/p')
 DB_HOST=$(echo $DATABASE_URL | sed -n 's/.*@\([^:]*\):.*/\1/p')
 DB_PORT=$(echo $DATABASE_URL | sed -n 's/.*:\([0-9]*\)\/.*/\1/p')
 DB_NAME=$(echo $DATABASE_URL | sed -n 's/.*\/\([^?]*\).*/\1/p')
+
+# URL decode the password
+DB_PASS=$(urldecode "$DB_PASS_ENCODED")
 
 # Create backups directory if it doesn't exist
 BACKUP_DIR="./backups"
@@ -47,16 +56,21 @@ pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
 
 # Check if backup was successful
 if [ $? -eq 0 ]; then
-    # Compress the backup file
-    gzip "$BACKUP_FILE"
+    # Create a tar.gz archive of the backup file
+    TAR_FILE="${BACKUP_FILE}.tar.gz"
+    tar -czf "$TAR_FILE" -C "$BACKUP_DIR" "$(basename $BACKUP_FILE)"
+    
+    # Remove the uncompressed SQL file
+    rm "$BACKUP_FILE"
+    
     echo ""
     echo "✓ Backup completed successfully!"
-    echo "✓ File: ${BACKUP_FILE}.gz"
-    echo "✓ Size: $(du -h ${BACKUP_FILE}.gz | cut -f1)"
+    echo "✓ File: ${TAR_FILE}"
+    echo "✓ Size: $(du -h ${TAR_FILE} | cut -f1)"
     echo ""
     echo "To restore this backup, run:"
-    echo "  gunzip ${BACKUP_FILE}.gz"
-    echo "  psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f $BACKUP_FILE"
+    echo "  tar -xzf ${TAR_FILE} -C $BACKUP_DIR"
+    echo "  psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f ${BACKUP_FILE}"
 else
     echo ""
     echo "✗ Backup failed!"
@@ -68,6 +82,6 @@ echo "Recent backups:"
 ls -lht "$BACKUP_DIR" | head -6
 
 # Clean up backups older than 30 days (optional)
-# find "$BACKUP_DIR" -name "*.sql.gz" -type f -mtime +30 -delete
+# find "$BACKUP_DIR" -name "*.tar.gz" -type f -mtime +30 -delete
 
 unset PGPASSWORD

@@ -12,6 +12,7 @@ import { SettingsModule } from './settings/settings.module';
 import { TestimonialsModule } from './testimonials/testimonials.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { PaymentLinksModule } from './payment-links/payment-links.module';
+import { BackupsModule } from './backups/backups.module';
 
 @Module({
 	imports: [
@@ -28,6 +29,7 @@ import { PaymentLinksModule } from './payment-links/payment-links.module';
 		TestimonialsModule,
 		SchedulerModule,
 		PaymentLinksModule,
+		BackupsModule,
 	],
 })
 export class AppModule { }

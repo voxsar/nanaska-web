@@ -31,6 +31,7 @@ const settingItems = [
 
 const superadminItems = [
 	{ label: 'Database Viewer', icon: '🗄️', to: '/admin/database' },
+	{ label: 'Database Backups', icon: '💾', to: '/admin/backups' },
 ];
 
 export default function AdminSidebar() {
