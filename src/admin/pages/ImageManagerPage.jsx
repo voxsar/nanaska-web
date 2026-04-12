@@ -140,7 +140,7 @@ export default function ImageManagerPage() {
 
 	const allGroups = [...new Set(images.map((img) => img.group))].sort();
 	const visibleImages = images
-		.filter((img) => !filterGroup || img.filterGroup === filterGroup || img.group === filterGroup)
+		.filter((img) => !filterGroup || img.group === filterGroup)
 		.filter((img) => !search || img.label.toLowerCase().includes(search.toLowerCase()) || img.key.toLowerCase().includes(search.toLowerCase()));
 	const groups = [...new Set(visibleImages.map((img) => img.group))].sort((a, b) => {
 		const order = Object.keys(GROUP_LABELS);
