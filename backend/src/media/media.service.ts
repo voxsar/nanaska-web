@@ -1,12 +1,26 @@
 import {
-	Injectable, NotFoundException, BadRequestException,
+	Injectable, NotFoundException, BadRequestException, ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateSiteImageDto } from './dto/create-site-image.dto';
 import { UpdateSiteImageDto } from './dto/update-site-image.dto';
 
 @Injectable()
 export class MediaService {
 	constructor(private readonly prisma: PrismaService) { }
+
+	async createImage(dto: CreateSiteImageDto) {
+		const existing = await this.prisma.siteImage.findUnique({ where: { key: dto.key } });
+		if (existing) throw new ConflictException(`Site image key "${dto.key}" already exists`);
+		return this.prisma.siteImage.create({ data: dto });
+	}
+
+	async deleteImage(key: string) {
+		const exists = await this.prisma.siteImage.findUnique({ where: { key } });
+		if (!exists) throw new NotFoundException(`Site image "${key}" not found`);
+		await this.prisma.siteImage.delete({ where: { key } });
+		return { deleted: key };
+	}
 
 	async findAll(group?: string) {
 		return this.prisma.siteImage.findMany({

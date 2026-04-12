@@ -1,5 +1,5 @@
 import {
-	Controller, Get, Post, Put, Query, Param, Body,
+	Controller, Get, Post, Put, Delete, Query, Param, Body,
 	UseGuards, UseInterceptors, UploadedFile, BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -8,6 +8,7 @@ import { extname, join } from 'path';
 import { randomBytes } from 'crypto';
 import { AdminJwtAuthGuard } from '../admin/admin-jwt-auth.guard';
 import { MediaService } from './media.service';
+import { CreateSiteImageDto } from './dto/create-site-image.dto';
 import { UpdateSiteImageDto } from './dto/update-site-image.dto';
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
@@ -35,6 +36,20 @@ export class MediaController {
 	@Get()
 	findAll(@Query('group') group?: string) {
 		return this.mediaService.findAll(group);
+	}
+
+	// Admin: create a new image slot
+	@UseGuards(AdminJwtAuthGuard)
+	@Post()
+	create(@Body() dto: CreateSiteImageDto) {
+		return this.mediaService.createImage(dto);
+	}
+
+	// Admin: delete an image slot
+	@UseGuards(AdminJwtAuthGuard)
+	@Delete(':key')
+	remove(@Param('key') key: string) {
+		return this.mediaService.deleteImage(key);
 	}
 
 	// Admin: upload a new image file and assign it to a key
