@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api';
 import './ImageManagerPage.css';
 
@@ -16,7 +16,6 @@ export default function ImageManagerPage() {
 	const [uploading, setUploading] = useState({});
 	const [editing, setEditing] = useState(null);
 	const [editAlt, setEditAlt] = useState('');
-	const fileInputRefs = useRef({});
 
 	const load = () => {
 		setLoading(true);
@@ -28,7 +27,7 @@ export default function ImageManagerPage() {
 
 	useEffect(() => { load(); }, []);
 
-	const handleUpload = async (key, file) => {
+	const handleUpload = async (key, file, inputEl) => {
 		if (!file) return;
 		setUploading((prev) => ({ ...prev, [key]: true }));
 		setError('');
@@ -45,7 +44,7 @@ export default function ImageManagerPage() {
 			setError(err.response?.data?.message || `Failed to upload image for "${key}"`);
 		} finally {
 			setUploading((prev) => ({ ...prev, [key]: false }));
-			if (fileInputRefs.current[key]) fileInputRefs.current[key].value = '';
+			if (inputEl) inputEl.value = '';
 		}
 	};
 
@@ -133,8 +132,7 @@ export default function ImageManagerPage() {
 												<input
 													type="file"
 													accept="image/*"
-													ref={(el) => { fileInputRefs.current[img.key] = el; }}
-													onChange={(e) => handleUpload(img.key, e.target.files?.[0])}
+													onChange={(e) => handleUpload(img.key, e.target.files?.[0], e.target)}
 													className="img-mgr__file-input"
 													disabled={uploading[img.key]}
 												/>

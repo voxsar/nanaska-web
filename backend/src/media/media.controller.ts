@@ -1,18 +1,24 @@
 import {
 	Controller, Get, Post, Put, Query, Param, Body,
 	UseGuards, UseInterceptors, UploadedFile, BadRequestException,
-	Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { Request } from 'express';
+import { randomBytes } from 'crypto';
 import { AdminJwtAuthGuard } from '../admin/admin-jwt-auth.guard';
 import { MediaService } from './media.service';
 import { UpdateSiteImageDto } from './dto/update-site-image.dto';
 
 const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
+function getApiBaseUrl(): string {
+	const configured = process.env.API_BASE_URL;
+	if (configured) return configured.replace(/\/$/, '');
+	const port = process.env.PORT || '3001';
+	return `http://localhost:${port}`;
+}
 
 @Controller('media')
 export class MediaController {
@@ -39,7 +45,7 @@ export class MediaController {
 			storage: diskStorage({
 				destination: join(process.cwd(), 'uploads'),
 				filename: (_req, file, cb) => {
-					const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+					const uniqueSuffix = randomBytes(16).toString('hex');
 					cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
 				},
 			}),
@@ -56,11 +62,9 @@ export class MediaController {
 	async uploadImage(
 		@Param('key') key: string,
 		@UploadedFile() file: Express.Multer.File,
-		@Req() req: Request,
 	) {
 		if (!file) throw new BadRequestException('No file uploaded');
-		const baseUrl = `${req.protocol}://${req.get('host')}`;
-		const fileUrl = `${baseUrl}/uploads/${file.filename}`;
+		const fileUrl = `${getApiBaseUrl()}/uploads/${file.filename}`;
 		return this.mediaService.uploadAndSetImage(key, fileUrl);
 	}
 
