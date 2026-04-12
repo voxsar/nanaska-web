@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import api from '../api';
 import './ImageManagerPage.css';
 
@@ -108,22 +108,37 @@ export default function ImageManagerPage() {
 		}
 	};
 
-	// Build page image list — unknown groups fall under misc
-	const knownGroups = PAGES.flatMap((p) => p.groups);
-	const unknownGroups = [...new Set(images.map((img) => img.group))].filter((g) => !knownGroups.includes(g));
+	const pageCounts = useMemo(
+		() => Object.fromEntries(PAGES.map((p) => [p.id, images.filter((img) => p.groups.includes(img.group)).length])),
+		[images],
+	);
+	const knownGroups = useMemo(() => PAGES.flatMap((p) => p.groups), []);
+	const unknownGroups = useMemo(
+		() => [...new Set(images.map((img) => img.group))].filter((g) => !knownGroups.includes(g)),
+		[images, knownGroups],
+	);
 	const currentPage = PAGES.find((p) => p.id === selectedPage);
-	const effectiveGroups = selectedPage === 'misc'
-		? [...(currentPage?.groups ?? []), ...unknownGroups]
-		: (currentPage?.groups ?? []);
+	const effectiveGroups = useMemo(
+		() => (selectedPage === 'misc'
+			? [...(currentPage?.groups ?? []), ...unknownGroups]
+			: (currentPage?.groups ?? [])),
+		[selectedPage, currentPage, unknownGroups],
+	);
 
-	const pageImages = images
-		.filter((img) => effectiveGroups.includes(img.group))
-		.sort((a, b) => {
-			const gi = effectiveGroups.indexOf(a.group) - effectiveGroups.indexOf(b.group);
-			return gi !== 0 ? gi : a.sortOrder - b.sortOrder;
-		});
+	const pageImages = useMemo(
+		() => images
+			.filter((img) => effectiveGroups.includes(img.group))
+			.sort((a, b) => {
+				const gi = effectiveGroups.indexOf(a.group) - effectiveGroups.indexOf(b.group);
+				return gi !== 0 ? gi : a.sortOrder - b.sortOrder;
+			}),
+		[images, effectiveGroups],
+	);
 
-	const groupsInPage = [...new Set(pageImages.map((img) => img.group))];
+	const groupsInPage = useMemo(
+		() => [...new Set(pageImages.map((img) => img.group))],
+		[pageImages],
+	);
 
 	return (
 		<div className="img-mgr">
@@ -139,19 +154,16 @@ export default function ImageManagerPage() {
 
 			{/* Page navigation */}
 			<nav className="img-mgr__pages">
-				{PAGES.map((page) => {
-					const count = images.filter((img) => page.groups.includes(img.group)).length;
-					return (
-						<button
-							key={page.id}
-							className={`img-mgr__page-tab${selectedPage === page.id ? ' img-mgr__page-tab--active' : ''}`}
-							onClick={() => { setSelectedPage(page.id); setExpandedCard(null); setError(''); }}
-						>
-							{page.label}
-							{count > 0 && <span className="img-mgr__page-count">{count}</span>}
-						</button>
-					);
-				})}
+				{PAGES.map((page) => (
+					<button
+						key={page.id}
+						className={`img-mgr__page-tab${selectedPage === page.id ? ' img-mgr__page-tab--active' : ''}`}
+						onClick={() => { setSelectedPage(page.id); setExpandedCard(null); setError(''); }}
+					>
+						{page.label}
+						{pageCounts[page.id] > 0 && <span className="img-mgr__page-count">{pageCounts[page.id]}</span>}
+					</button>
+				))}
 			</nav>
 
 			{loading ? (
