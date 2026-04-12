@@ -8,52 +8,72 @@
 	margin-top: 0.25rem;
 }
 
-.img-mgr__toolbar {
+/* ── Page navigation tabs ── */
+.img-mgr__pages {
 	display: flex;
-	gap: 0.75rem;
 	flex-wrap: wrap;
-	margin: 1.25rem 0;
+	gap: 0.5rem;
+	margin: 1.5rem 0 2rem;
+}
+
+.img-mgr__page-tab {
+	display: flex;
 	align-items: center;
+	gap: 0.4rem;
+	padding: 0.5rem 1rem;
+	border: 2px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	color: #374151;
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+	white-space: nowrap;
 }
 
-.img-mgr__search {
-	flex: 1;
-	min-width: 160px;
-}
-
-.img-mgr__filter {
-	min-width: 180px;
-}
-
-/* Create new slot form */
-.img-mgr__create-form {
-	background: #f9fafb;
-	border: 1px solid #e5e7eb;
-	border-radius: 10px;
-	padding: 1.25rem;
-	margin-bottom: 1.5rem;
-}
-
-.img-mgr__create-title {
-	font-size: 1rem;
-	font-weight: 700;
+.img-mgr__page-tab:hover {
+	border-color: #24ade3;
 	color: #1b365d;
-	margin-bottom: 1rem;
 }
 
-.img-mgr__create-fields {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-	gap: 0.6rem;
-	margin-bottom: 0.75rem;
+.img-mgr__page-tab--active {
+	border-color: #1b365d;
+	background: #1b365d;
+	color: #fff;
 }
 
+.img-mgr__page-tab--active:hover {
+	border-color: #1b365d;
+	color: #fff;
+}
+
+.img-mgr__page-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.25);
+	color: inherit;
+	border-radius: 20px;
+	min-width: 1.4rem;
+	height: 1.4rem;
+	padding: 0 0.35rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+
+.img-mgr__page-tab:not(.img-mgr__page-tab--active) .img-mgr__page-count {
+	background: #f3f4f6;
+	color: #6b7280;
+}
+
+/* ── Groups ── */
 .img-mgr__group {
-	margin-top: 2.5rem;
+	margin-bottom: 2.5rem;
 }
 
 .img-mgr__group-title {
-	font-size: 1.15rem;
+	font-size: 1rem;
 	font-weight: 700;
 	color: #1b365d;
 	border-bottom: 2px solid #e5e7eb;
@@ -61,34 +81,49 @@
 	margin-bottom: 1.25rem;
 }
 
+.img-mgr__empty {
+	text-align: center;
+	color: #9ca3af;
+	padding: 3rem 1rem;
+	font-size: 1rem;
+}
+
+/* ── Image grid ── */
 .img-mgr__grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
 	gap: 1.25rem;
 }
 
+/* ── Image card ── */
 .img-mgr__card {
 	background: #fff;
-	border: 1px solid #e5e7eb;
-	border-radius: 10px;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-	transition: box-shadow 0.2s;
+	transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .img-mgr__card:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+	border-color: #24ade3;
 }
 
+.img-mgr__card--uploading {
+	opacity: 0.7;
+	pointer-events: none;
+}
+
+/* ── Preview area ── */
 .img-mgr__preview {
+	position: relative;
 	background: #f3f4f6;
-	aspect-ratio: 16 / 7;
+	aspect-ratio: 16 / 9;
 	overflow: hidden;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	cursor: pointer;
 }
 
 .img-mgr__img {
@@ -96,111 +131,133 @@
 	height: 100%;
 	object-fit: cover;
 	display: block;
+	transition: transform 0.2s;
 }
 
-.img-mgr__info {
-	padding: 0.75rem 1rem 0;
+.img-mgr__preview:hover .img-mgr__img {
+	transform: scale(1.03);
+}
+
+.img-mgr__no-image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: #9ca3af;
+	font-size: 0.85rem;
+}
+
+/* Hover overlay */
+.img-mgr__preview-overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(27, 54, 93, 0.65);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.2s;
+}
+
+.img-mgr__preview:hover .img-mgr__preview-overlay {
+	opacity: 1;
+}
+
+.img-mgr__overlay-text {
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-align: center;
+	padding: 0.5rem 1rem;
+	border: 2px solid rgba(255, 255, 255, 0.6);
+	border-radius: 8px;
+	letter-spacing: 0.02em;
+}
+
+/* ── Card body ── */
+.img-mgr__body {
+	padding: 0.9rem 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
 }
 
 .img-mgr__label {
 	font-weight: 600;
 	font-size: 0.9rem;
 	color: #111827;
-	margin-bottom: 0.2rem;
-}
-
-.img-mgr__key {
-	font-size: 0.78rem;
-	color: #6b7280;
-	margin-bottom: 0.3rem;
-}
-
-.img-mgr__key code {
-	background: #f3f4f6;
-	padding: 1px 5px;
-	border-radius: 4px;
-	font-size: 0.75rem;
+	margin: 0;
 }
 
 .img-mgr__dims {
-	font-size: 0.8rem;
-	color: #374151;
+	font-size: 0.78rem;
+	color: #1e40af;
 	background: #eff6ff;
 	border: 1px solid #bfdbfe;
 	border-radius: 5px;
 	padding: 3px 8px;
 	display: inline-block;
-	margin-bottom: 0.35rem;
+	margin: 0;
 }
 
-.img-mgr__alt {
-	font-size: 0.8rem;
-	color: #6b7280;
-	margin-bottom: 0.5rem;
+/* ── Replace button ── */
+.img-mgr__replace-btn {
+	width: 100%;
+	padding: 0.6rem 1rem;
+	font-size: 0.9rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
 }
 
-.img-mgr__edit-alt-btn {
+/* ── Options toggle ── */
+.img-mgr__options-toggle {
 	background: none;
 	border: none;
-	color: #24ade3;
-	font-size: 0.75rem;
+	color: #6b7280;
+	font-size: 0.78rem;
 	cursor: pointer;
-	margin-left: 0.4rem;
 	padding: 0;
+	text-align: left;
 	text-decoration: underline;
+	align-self: flex-start;
 }
 
-.img-mgr__alt-edit {
-	display: flex;
-	flex-direction: column;
-	gap: 0.4rem;
-	margin-bottom: 0.5rem;
+.img-mgr__options-toggle:hover {
+	color: #374151;
 }
 
-.img-mgr__alt-actions {
-	display: flex;
-	gap: 0.4rem;
-}
-
-.img-mgr__upload {
-	padding: 0.75rem 1rem;
-	border-top: 1px solid #f3f4f6;
-	margin-top: auto;
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.img-mgr__upload-label {
-	display: block;
-	cursor: pointer;
-}
-
+/* ── Hidden file input ── */
 .img-mgr__file-input {
 	display: none;
 }
 
-/* URL paste */
-.img-mgr__url-edit {
+/* ── Advanced panel ── */
+.img-mgr__advanced {
+	border-top: 1px solid #f3f4f6;
+	padding: 0.9rem 1rem;
 	display: flex;
 	flex-direction: column;
-	gap: 0.4rem;
+	gap: 0.6rem;
+	background: #f9fafb;
 }
 
-.img-mgr__url-input {
-	font-size: 0.8rem !important;
-	padding: 0.3rem 0.5rem !important;
+.img-mgr__adv-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #374151;
 }
 
-.img-mgr__url-btn {
-	align-self: flex-start;
+.img-mgr__alt-input {
+	font-size: 0.85rem !important;
 }
 
-/* Delete button */
-.img-mgr__delete-btn {
-	align-self: flex-start;
+.img-mgr__adv-actions {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
 }
 
+/* ── Utility ── */
 .btn-danger {
 	background: #fee2e2;
 	color: #b91c1c;
