@@ -1,10 +1,20 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
+import { mkdirSync } from 'fs';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	// Ensure uploads directory exists
+	const uploadsDir = join(process.cwd(), 'uploads');
+	mkdirSync(uploadsDir, { recursive: true });
+
+	const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+	// Serve uploaded images as static files under /uploads
+	app.useStaticAssets(uploadsDir, { prefix: '/uploads' });
 
 	// CORS – allow all origins listed in FRONTEND_URL (comma-separated) or localhost for dev
 	const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')

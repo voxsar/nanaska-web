@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import './Hero.css';
 
-const SLIDES = [
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const DEFAULT_SLIDES = [
 	{ src: '/images/2026-03-HomePage-Dekstop.png', alt: 'Nanaska – Leading CIMA Course Provider' },
 	{ src: '/images/2025-11-Desktop.webp', alt: 'Nanaska CIMA Courses' },
 	{ src: '/images/2025-10-resize-web.webp', alt: 'Nanaska Students' },
@@ -16,10 +18,25 @@ const SLIDES = [
 const INTERVAL = 5000;
 
 export default function Hero() {
+	const [slides, setSlides] = useState(DEFAULT_SLIDES);
 	const [current, setCurrent] = useState(0);
 	const [animating, setAnimating] = useState(false);
 	const timerRef = useRef(null);
-	const count = SLIDES.length;
+
+	useEffect(() => {
+		fetch(`${API_BASE}/media/public?group=hero`)
+			.then((r) => r.ok ? r.json() : null)
+			.then((data) => {
+				if (Array.isArray(data) && data.length > 0) {
+					const sorted = [...data].sort((a, b) => a.sortOrder - b.sortOrder);
+					setSlides(sorted.map((img) => ({ src: img.url, alt: img.altText || img.label })));
+					setCurrent(0);
+				}
+			})
+			.catch(() => { /* keep default slides */ });
+	}, []);
+
+	const count = slides.length;
 
 	const goTo = useCallback((index) => {
 		if (animating) return;
@@ -51,7 +68,7 @@ export default function Hero() {
 	return (
 		<section className="hero" id="home" aria-label="Hero image slider">
 			<div className="hero__track">
-				{SLIDES.map((slide, i) => (
+				{slides.map((slide, i) => (
 					<div
 						key={i}
 						className={`hero__slide${i === current ? ' hero__slide--active' : ''}`}
@@ -85,7 +102,7 @@ export default function Hero() {
 			<button className="hero__arrow hero__arrow--next" onClick={handleNext} aria-label="Next slide">&#8250;</button>
 
 			<div className="hero__dots" role="tablist" aria-label="Slide indicators">
-				{SLIDES.map((_, i) => (
+				{slides.map((_, i) => (
 					<button
 						key={i}
 						role="tab"

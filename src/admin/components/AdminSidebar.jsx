@@ -11,6 +11,7 @@ const contentItems = [
 	{ label: 'Subjects', icon: '📖', to: '/admin/courses' },
 	{ label: 'Course Programs', icon: '📚', to: '/admin/course-programs' },
 	{ label: 'Testimonials', icon: '💬', to: '/admin/testimonials' },
+	{ label: 'Site Images', icon: '🖼️', to: '/admin/images' },
 ];
 
 const dataItems = [
