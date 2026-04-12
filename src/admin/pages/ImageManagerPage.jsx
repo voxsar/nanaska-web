@@ -41,7 +41,7 @@ export default function ImageManagerPage() {
 			setImages((prev) => prev.map((img) => img.key === key ? res.data : img));
 			setSuccess(`Image "${key}" updated successfully.`);
 		} catch (err) {
-			setError(err.response?.data?.message || `Failed to upload image for "${key}"`);
+			setError(err.response?.data?.message || `Failed to upload image for ${key}`);
 		} finally {
 			setUploading((prev) => ({ ...prev, [key]: false }));
 			if (inputEl) inputEl.value = '';
