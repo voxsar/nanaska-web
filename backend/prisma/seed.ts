@@ -1538,6 +1538,39 @@ async function main() {
 			await prisma.testimonial.create({ data: t as any });
 		}
 	}
+
+	console.log('Seeding site images …');
+	const siteImages = [
+		// Hero slider (1916×792 approx banner dimensions)
+		{ key: 'hero_slide_1', group: 'hero', label: 'Hero Slide 1', url: '/images/2026-03-HomePage-Dekstop.png', altText: 'Nanaska – Leading CIMA Course Provider', widthHint: 1916, heightHint: 792, sortOrder: 1 },
+		{ key: 'hero_slide_2', group: 'hero', label: 'Hero Slide 2', url: '/images/2025-11-Desktop.webp', altText: 'Nanaska CIMA Courses', widthHint: 1916, heightHint: 792, sortOrder: 2 },
+		{ key: 'hero_slide_3', group: 'hero', label: 'Hero Slide 3', url: '/images/2025-10-resize-web.webp', altText: 'Nanaska Students', widthHint: 1916, heightHint: 792, sortOrder: 3 },
+		{ key: 'hero_slide_4', group: 'hero', label: 'Hero Slide 4', url: '/images/2025-10-Prize-Winner-yanik-web-1.webp', altText: 'Prize Winner', widthHint: 1916, heightHint: 792, sortOrder: 4 },
+		{ key: 'hero_slide_5', group: 'hero', label: 'Hero Slide 5', url: '/images/2025-10-Nanaska_September_lecture_panel_Slider.webp', altText: 'September Lecture Panel', widthHint: 1916, heightHint: 792, sortOrder: 5 },
+		{ key: 'hero_slide_6', group: 'hero', label: 'Hero Slide 6', url: '/images/2025-10-Nanska_Prize_winner_Template-v2_Banner.webp', altText: 'Prize Winner Template', widthHint: 1916, heightHint: 792, sortOrder: 6 },
+		{ key: 'hero_slide_7', group: 'hero', label: 'Hero Slide 7', url: '/images/2025-10-Nanaska_CIMA-Prize-Winner-Slider-1916x792-1.webp', altText: 'CIMA Prize Winner', widthHint: 1916, heightHint: 792, sortOrder: 7 },
+		{ key: 'hero_slide_8', group: 'hero', label: 'Hero Slide 8', url: '/images/2026-01-100-Club-MCS-02-Web-banner.webp', altText: '100 Club MCS', widthHint: 1916, heightHint: 792, sortOrder: 8 },
+		{ key: 'hero_slide_9', group: 'hero', label: 'Hero Slide 9', url: '/images/2026-01-Prize-Winner-Kaneshamoorthy-Anochkaran-wb-1.png', altText: 'Prize Winner Kaneshamoorthy', widthHint: 1916, heightHint: 792, sortOrder: 9 },
+		// Course level images (roughly 600×400)
+		{ key: 'course_certificate', group: 'courses', label: 'Certificate Level', url: '/images/2021-03-cert-level.jpg', altText: 'CIMA Certificate Level', widthHint: 600, heightHint: 400, sortOrder: 1 },
+		{ key: 'course_operational', group: 'courses', label: 'Operational Level', url: '/images/2021-03-opera-level.jpg', altText: 'CIMA Operational Level', widthHint: 600, heightHint: 400, sortOrder: 2 },
+		{ key: 'course_management', group: 'courses', label: 'Management Level', url: '/images/2021-03-manage-level.jpg', altText: 'CIMA Management Level', widthHint: 600, heightHint: 400, sortOrder: 3 },
+		{ key: 'course_strategic', group: 'courses', label: 'Strategic Level', url: '/images/2021-03-strat-level.jpg', altText: 'CIMA Strategic Level', widthHint: 600, heightHint: 400, sortOrder: 4 },
+		// Features section images (480×320 approx)
+		{ key: 'feature_tutoring', group: 'features', label: 'Feature: Personalised Tutoring', url: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=480&q=80', altText: 'Personalised tutoring session', widthHint: 480, heightHint: 320, sortOrder: 1 },
+		{ key: 'feature_online', group: 'features', label: 'Feature: Online & On-site Classes', url: 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=480&q=80', altText: 'Online learning on laptop', widthHint: 480, heightHint: 320, sortOrder: 2 },
+		{ key: 'feature_materials', group: 'features', label: 'Feature: Study Materials', url: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=480&q=80', altText: 'Study materials and books', widthHint: 480, heightHint: 320, sortOrder: 3 },
+		{ key: 'feature_support', group: 'features', label: 'Feature: Student Support', url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=480&q=80', altText: 'Dedicated student support team', widthHint: 480, heightHint: 320, sortOrder: 4 },
+	];
+
+	for (const img of siteImages) {
+		await prisma.siteImage.upsert({
+			where: { key: img.key },
+			update: {},
+			create: img,
+		});
+	}
+
 	console.log('Seed complete ✓');
 }
 

@@ -23,6 +23,7 @@ import ContactSettingsPage from './pages/ContactSettingsPage';
 import EmailSettingsPage from './pages/EmailSettingsPage';
 import PaymentLinksPage from './pages/PaymentLinksPage';
 import BackupsPage from './pages/BackupsPage';
+import ImageManagerPage from './pages/ImageManagerPage';
 
 export default function AdminApp() {
 	return (
@@ -54,6 +55,7 @@ export default function AdminApp() {
 					<Route path="email-settings" element={<EmailSettingsPage />} />
 					<Route path="payment-links" element={<PaymentLinksPage />} />
 					<Route path="backups" element={<BackupsPage />} />
+					<Route path="images" element={<ImageManagerPage />} />
 				</Route>
 			</Routes>
 		</AdminAuthProvider>

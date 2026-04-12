@@ -13,6 +13,7 @@ import { TestimonialsModule } from './testimonials/testimonials.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
 import { PaymentLinksModule } from './payment-links/payment-links.module';
 import { BackupsModule } from './backups/backups.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { BackupsModule } from './backups/backups.module';
 		SchedulerModule,
 		PaymentLinksModule,
 		BackupsModule,
+		MediaModule,
 	],
 })
 export class AppModule { }

@@ -322,3 +322,20 @@ model Testimonial {
 
   @@map("testimonials")
 }
+
+// ─── Site Images ──────────────────────────────────────────────────────────────
+model SiteImage {
+  id          String   @id @default(uuid())
+  key         String   @unique              // e.g. "hero_slide_1"
+  group       String                        // e.g. "hero", "courses", "features"
+  label       String                        // human-readable, e.g. "Hero Slide 1"
+  url         String   @db.Text            // current image URL
+  altText     String?  @map("alt_text")
+  widthHint   Int?     @map("width_hint")  // expected width in px (for admin guidance)
+  heightHint  Int?     @map("height_hint") // expected height in px
+  sortOrder   Int      @default(0)         @map("sort_order")
+  createdAt   DateTime @default(now())     @map("created_at")
+  updatedAt   DateTime @updatedAt          @map("updated_at")
+
+  @@map("site_images")
+}

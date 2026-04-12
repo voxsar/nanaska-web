@@ -1,8 +1,17 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { usePricing } from '../context/PricingContext';
 import { getLevelPricesById } from '../data/pricingData';
 import './Courses.css';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+const DEFAULT_COURSE_IMAGES = {
+	certificate: '/images/2021-03-cert-level.jpg',
+	operational: '/images/2021-03-opera-level.jpg',
+	management: '/images/2021-03-manage-level.jpg',
+	strategic: '/images/2021-03-strat-level.jpg',
+};
 
 const LEVELS = [
 	{
@@ -49,10 +58,28 @@ const LEVELS = [
 
 export default function Courses() {
 	const [active, setActive] = useState('certificate');
-	const current = LEVELS.find((l) => l.id === active);
+	const [courseImages, setCourseImages] = useState(DEFAULT_COURSE_IMAGES);
 	const sectionRef = useRef(null);
 	useScrollReveal(sectionRef);
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
+
+	useEffect(() => {
+		fetch(`${API_BASE}/media/public?group=courses`)
+			.then((r) => r.ok ? r.json() : null)
+			.then((data) => {
+				if (Array.isArray(data) && data.length > 0) {
+					const map = {};
+					data.forEach((img) => {
+						const levelId = img.key.replace('course_', '');
+						map[levelId] = img.url;
+					});
+					setCourseImages((prev) => ({ ...prev, ...map }));
+				}
+			})
+			.catch(() => { /* keep defaults */ });
+	}, []);
+
+	const current = LEVELS.find((l) => l.id === active);
 	const levelPrices = getLevelPricesById(current.id);
 	const levelAmount = getAmountForCountry(levelPrices, selectedCountry);
 
@@ -98,7 +125,7 @@ export default function Courses() {
 				>
 					<div className="courses__panel-img-wrap" data-reveal="left">
 						<img
-							src={current.img}
+							src={courseImages[current.id] || current.img}
 							alt={`${current.label} diagram`}
 							className="courses__panel-img"
 							loading="lazy"
