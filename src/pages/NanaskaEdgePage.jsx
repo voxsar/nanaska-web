@@ -3,124 +3,76 @@ import './NanaskaEdgePage.css';
 
 const EDGE_FEATURES = [
 	{
-		category: 'Core Exam Preparation',
-		icon: '📝',
-		features: [
-			{
-				title: 'Mock Exams',
-				description: 'Full timed CIMA mock exam papers with multi-part questions, sub-questions, attempt tracking, suggested answers, and shareable public result summaries.',
-				icon: '🎯',
-				benefit: 'Experience real exam conditions and build confidence'
-			},
-			{
-				title: 'Practice Questions',
-				description: 'Individual targeted-practice questions linked to pre-seen documents, with attempts, suggested answers, and public result sharing.',
-				icon: '✍️',
-				benefit: 'Master specific topics at your own pace'
-			},
-			{
-				title: 'Past Papers',
-				description: 'Comprehensive library of CIMA past papers with detailed view pages to understand exam patterns and expectations.',
-				icon: '📚',
-				benefit: 'Learn from historical exam patterns and improve preparation'
-			},
-			{
-				title: 'Pre-Seen Documents',
-				description: 'Upload, view, and reference CIMA pre-seen materials with an integrated PDF citation viewer for easy navigation.',
-				icon: '📄',
-				benefit: 'Stay organized with all your exam materials in one place'
-			}
-		]
+		title: 'Mock Exams',
+		description: 'Full timed CIMA mock exam papers with multi-part questions, sub-questions, attempt tracking, suggested answers, and shareable public result summaries.',
+		icon: '🎯',
+		benefit: 'Experience real exam conditions and build confidence'
 	},
 	{
-		category: 'AI-Powered Marking',
-		icon: '🤖',
-		features: [
-			{
-				title: 'Automated Marking',
-				description: 'Instant AI-powered marking for both mock exams and practice questions, providing immediate feedback on your performance.',
-				icon: '⚡',
-				benefit: 'Get instant feedback and cut marking time by 90%'
-			},
-			{
-				title: 'Marking Guides & Schemes',
-				description: 'Examiner-style marking with comprehensive answer guides that show you exactly what examiners look for.',
-				icon: '📋',
-				benefit: 'Understand exactly what examiners expect in your answers'
-			},
-			{
-				title: 'Grammar Checking',
-				description: 'Automated grammar evaluation on submitted answers to ensure professional writing standards.',
-				icon: '✅',
-				benefit: 'Improve your professional writing skills'
-			},
-			{
-				title: 'Plagiarism Detection',
-				description: 'Advanced plagiarism checking ensures academic integrity and originality in all submissions.',
-				icon: '🔍',
-				benefit: 'Maintain academic integrity and develop original thinking'
-			}
-		]
+		title: 'Practice Questions',
+		description: 'Individual targeted-practice questions linked to pre-seen documents, with attempts, suggested answers, and public result sharing.',
+		icon: '✍️',
+		benefit: 'Master specific topics at your own pace'
 	},
 	{
-		category: 'AI Study & Skill Tools',
-		icon: '🎓',
-		features: [
-			{
-				title: 'Ask Channa',
-				description: 'Your personal AI tutor available 24/7 to answer questions, clarify concepts, and provide guidance whenever you need it.',
-				icon: '💬',
-				benefit: 'Get expert help anytime, anywhere'
-			},
-			{
-				title: 'Ask Preseen',
-				description: 'Specialized question-asking interface tied directly to pre-seen materials, helping you understand complex scenarios.',
-				icon: '🔎',
-				benefit: 'Master preseen materials with targeted AI assistance'
-			},
-			{
-				title: 'Know Your Industry',
-				description: 'Topic and question bank specifically designed to build industry knowledge relevant to your chosen sector.',
-				icon: '🏢',
-				benefit: 'Understand your industry context for better case study performance'
-			},
-			{
-				title: 'Examiner Chat',
-				description: 'Direct chat access with experienced examiners for insights into marking criteria and exam expectations.',
-				icon: '👨‍🏫',
-				benefit: 'Get insider knowledge from real examiners'
-			},
-			{
-				title: 'Type Tutor',
-				description: 'Typing practice with progress tracking and sessions to improve your speed and accuracy for timed exams.',
-				icon: '⌨️',
-				benefit: 'Increase typing speed and save valuable exam time'
-			}
-		]
+		title: 'Past Papers',
+		description: 'Comprehensive library of CIMA past papers with detailed view pages to understand exam patterns and expectations.',
+		icon: '📚',
+		benefit: 'Learn from historical exam patterns and improve preparation'
 	},
 	{
-		category: 'Learning Resources',
-		icon: '📖',
-		features: [
-			{
-				title: 'Video Library',
-				description: 'On-demand video learning library with expert explanations and walkthroughs of complex topics.',
-				icon: '🎥',
-				benefit: 'Learn visually with expert-led video content'
-			},
-			{
-				title: 'Hovering Video Player',
-				description: 'YouTube mini-player-style floating video that stays with you as you navigate, allowing multitasking.',
-				icon: '📺',
-				benefit: 'Study efficiently with picture-in-picture learning'
-			},
-			{
-				title: 'Business Models Library',
-				description: 'Reference library of business models with student responses to help you understand different frameworks.',
-				icon: '📊',
-				benefit: 'Apply proven business frameworks to your answers'
-			}
-		]
+		title: 'Pre-Seen Documents',
+		description: 'Upload, view, and reference CIMA pre-seen materials with an integrated PDF citation viewer for easy navigation.',
+		icon: '📄',
+		benefit: 'Stay organized with all your exam materials in one place'
+	},
+	{
+		title: 'Automated Marking',
+		description: 'Instant AI-powered marking for both mock exams and practice questions, providing immediate feedback on your performance.',
+		icon: '⚡',
+		benefit: 'Get instant feedback and cut marking time by 90%'
+	},
+	{
+		title: 'Marking Guides & Schemes',
+		description: 'Examiner-style marking with comprehensive answer guides that show you exactly what examiners look for.',
+		icon: '📋',
+		benefit: 'Understand exactly what examiners expect in your answers'
+	},
+	{
+		title: 'Ask Channa',
+		description: 'Your personal AI tutor available 24/7 to answer questions, clarify concepts, and provide guidance whenever you need it.',
+		icon: '💬',
+		benefit: 'Get expert help anytime, anywhere'
+	},
+	{
+		title: 'Ask Preseen',
+		description: 'Specialized question-asking interface tied directly to pre-seen materials, helping you understand complex scenarios.',
+		icon: '🔎',
+		benefit: 'Master preseen materials with targeted AI assistance'
+	},
+	{
+		title: 'Know Your Industry',
+		description: 'Topic and question bank specifically designed to build industry knowledge relevant to your chosen sector.',
+		icon: '🏢',
+		benefit: 'Understand your industry context for better case study performance'
+	},
+	{
+		title: 'Type Tutor',
+		description: 'Typing practice with progress tracking and sessions to improve your speed and accuracy for timed exams.',
+		icon: '⌨️',
+		benefit: 'Increase typing speed and save valuable exam time'
+	},
+	{
+		title: 'Educational Video Library',
+		description: 'On-demand video learning library with expert explanations and walkthroughs of complex topics.',
+		icon: '🎥',
+		benefit: 'Learn visually with expert-led video content'
+	},
+	{
+		title: 'Business Models Library',
+		description: 'Reference library of business models with student responses to help you understand different frameworks.',
+		icon: '📊',
+		benefit: 'Apply proven business frameworks to your answers'
 	}
 ];
 
@@ -208,6 +160,7 @@ export default function NanaskaEdgePage() {
 			<section className="edge-benefits">
 				<div className="edge-container">
 					<div className="edge-section-header">
+						<span className="edge-section-icon">🎯</span>
 						<h2 className="edge-section-title">How Edge Helps You Succeed</h2>
 						<p className="edge-section-subtitle">
 							Powerful features designed to accelerate your learning and boost exam performance
@@ -229,42 +182,38 @@ export default function NanaskaEdgePage() {
 			<section className="edge-features" id="features">
 				<div className="edge-container">
 					<div className="edge-section-header">
+						<span className="edge-section-icon">✨</span>
 						<h2 className="edge-section-title">Complete Feature Set</h2>
 						<p className="edge-section-subtitle">
 							Everything you need to excel in your CIMA exams, powered by cutting-edge AI
 						</p>
 					</div>
 
-					{EDGE_FEATURES.map((category) => (
-						<div key={category.category} className="edge-feature-category">
-							<div className="edge-category-header">
-								<span className="edge-category-icon">{category.icon}</span>
-								<h3 className="edge-category-title">{category.category}</h3>
-							</div>
-							<div className="edge-feature-grid">
-								{category.features.map((feature) => (
-									<div key={feature.title} className="edge-feature-card">
-										<div className="edge-feature-card__icon">{feature.icon}</div>
-										<div className="edge-feature-card__content">
-											<h4 className="edge-feature-card__title">{feature.title}</h4>
-											<p className="edge-feature-card__desc">{feature.description}</p>
-											<div className="edge-feature-card__benefit">
-												<span className="edge-feature-card__benefit-icon">✓</span>
-												<span className="edge-feature-card__benefit-text">{feature.benefit}</span>
-											</div>
-										</div>
+					<div className="edge-feature-grid">
+						{EDGE_FEATURES.map((feature) => (
+							<div key={feature.title} className="edge-feature-card">
+								<div className="edge-feature-card__icon">{feature.icon}</div>
+								<div className="edge-feature-card__content">
+									<h4 className="edge-feature-card__title">{feature.title}</h4>
+									<p className="edge-feature-card__desc">{feature.description}</p>
+									<div className="edge-feature-card__benefit">
+										<span className="edge-feature-card__benefit-icon">✓</span>
+										<span className="edge-feature-card__benefit-text">{feature.benefit}</span>
 									</div>
-								))}
+								</div>
 							</div>
-						</div>
-					))}
+						))}
+					</div>
 				</div>
 			</section>
 
 			{/* Additional Tools Section */}
 			<section className="edge-tools">
 				<div className="edge-container">
-					<h2 className="edge-section-title">Additional Student Tools</h2>
+					<div className="edge-section-header">
+						<span className="edge-section-icon">🔧</span>
+						<h2 className="edge-section-title">Additional Student Tools</h2>
+					</div>
 					<div className="edge-tools-grid">
 						<div className="edge-tool-card">
 							<span className="edge-tool-card__icon">📅</span>
@@ -316,7 +265,10 @@ export default function NanaskaEdgePage() {
 			<section className="edge-difference">
 				<div className="edge-container">
 					<div className="edge-difference-content">
-						<h2 className="edge-section-title">Why Nanaska Edge?</h2>
+						<div className="edge-section-header">
+							<span className="edge-section-icon edge-section-icon--light">💡</span>
+							<h2 className="edge-section-title">Why Nanaska Edge?</h2>
+						</div>
 						<div className="edge-difference-grid">
 							<div className="edge-difference-item">
 								<span className="edge-difference-item__num">01</span>
@@ -374,7 +326,7 @@ export default function NanaskaEdgePage() {
 						<div className="edge-cta__feature">✓ 24/7 Ask Channa AI tutor</div>
 						<div className="edge-cta__feature">✓ Comprehensive mock exams</div>
 						<div className="edge-cta__feature">✓ Industry-specific content</div>
-						<div className="edge-cta__feature">✓ Examiner chat access</div>
+						<div className="edge-cta__feature">✓ Educational video library</div>
 						<div className="edge-cta__feature">✓ Progress tracking & analytics</div>
 					</div>
 				</div>

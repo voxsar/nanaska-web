@@ -181,6 +181,17 @@
 	margin-bottom: 3rem;
 }
 
+.edge-section-icon {
+	display: block;
+	font-size: 3.5rem;
+	margin: 0 auto 1rem;
+	animation: float 3s ease-in-out infinite;
+}
+
+.edge-section-icon--light {
+	opacity: 0.9;
+}
+
 .edge-section-title {
 	font-size: 2.5rem;
 	font-weight: 700;
@@ -194,6 +205,15 @@
 	max-width: 700px;
 	margin: 0 auto;
 	line-height: 1.6;
+}
+
+@keyframes float {
+	0%, 100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-10px);
+	}
 }
 
 /* ============================================
@@ -218,18 +238,33 @@
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 	transition: all 0.3s ease;
 	border: 1px solid #e5e7eb;
+	animation: fadeInUp 0.6s ease-out;
+	animation-fill-mode: both;
 }
 
+.edge-benefit-card:nth-child(1) { animation-delay: 0.1s; }
+.edge-benefit-card:nth-child(2) { animation-delay: 0.2s; }
+.edge-benefit-card:nth-child(3) { animation-delay: 0.3s; }
+.edge-benefit-card:nth-child(4) { animation-delay: 0.4s; }
+.edge-benefit-card:nth-child(5) { animation-delay: 0.5s; }
+.edge-benefit-card:nth-child(6) { animation-delay: 0.6s; }
+
 .edge-benefit-card:hover {
-	transform: translateY(-4px);
+	transform: translateY(-4px) scale(1.02);
 	box-shadow: 0 8px 24px rgba(27, 54, 93, 0.12);
 	border-color: #24ADE3;
+}
+
+.edge-benefit-card:hover .edge-benefit-card__icon {
+	transform: scale(1.1) rotate(5deg);
+	transition: transform 0.3s ease;
 }
 
 .edge-benefit-card__icon {
 	font-size: 3rem;
 	margin-bottom: 1rem;
 	display: block;
+	transition: transform 0.3s ease;
 }
 
 .edge-benefit-card__title {
@@ -254,36 +289,9 @@
 	background: white;
 }
 
-.edge-feature-category {
-	margin-bottom: 4rem;
-}
-
-.edge-feature-category:last-child {
-	margin-bottom: 0;
-}
-
-.edge-category-header {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-	margin-bottom: 2rem;
-	padding-bottom: 1rem;
-	border-bottom: 3px solid #24ADE3;
-}
-
-.edge-category-icon {
-	font-size: 2.5rem;
-}
-
-.edge-category-title {
-	font-size: 2rem;
-	font-weight: 700;
-	color: #1B365D;
-}
-
 .edge-feature-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+	grid-template-columns: repeat(4, 1fr);
 	gap: 1.5rem;
 }
 
@@ -294,18 +302,40 @@
 	border: 1px solid #e5e7eb;
 	transition: all 0.3s ease;
 	display: flex;
+	flex-direction: column;
 	gap: 1.25rem;
+	animation: fadeInUp 0.6s ease-out;
+	animation-fill-mode: both;
 }
+
+.edge-feature-card:nth-child(1) { animation-delay: 0.1s; }
+.edge-feature-card:nth-child(2) { animation-delay: 0.15s; }
+.edge-feature-card:nth-child(3) { animation-delay: 0.2s; }
+.edge-feature-card:nth-child(4) { animation-delay: 0.25s; }
+.edge-feature-card:nth-child(5) { animation-delay: 0.3s; }
+.edge-feature-card:nth-child(6) { animation-delay: 0.35s; }
+.edge-feature-card:nth-child(7) { animation-delay: 0.4s; }
+.edge-feature-card:nth-child(8) { animation-delay: 0.45s; }
+.edge-feature-card:nth-child(9) { animation-delay: 0.5s; }
+.edge-feature-card:nth-child(10) { animation-delay: 0.55s; }
+.edge-feature-card:nth-child(11) { animation-delay: 0.6s; }
+.edge-feature-card:nth-child(12) { animation-delay: 0.65s; }
 
 .edge-feature-card:hover {
 	border-color: #24ADE3;
-	box-shadow: 0 4px 12px rgba(36, 173, 227, 0.15);
-	transform: translateY(-2px);
+	box-shadow: 0 8px 20px rgba(36, 173, 227, 0.2);
+	transform: translateY(-4px) scale(1.02);
+}
+
+.edge-feature-card:hover .edge-feature-card__icon {
+	transform: scale(1.15) rotate(5deg);
 }
 
 .edge-feature-card__icon {
 	font-size: 2.5rem;
 	flex-shrink: 0;
+	transition: transform 0.3s ease;
+	text-align: center;
 }
 
 .edge-feature-card__content {
@@ -371,18 +401,32 @@
 	border: 2px solid #e5e7eb;
 	transition: all 0.3s ease;
 	text-align: center;
+	animation: fadeInUp 0.6s ease-out;
+	animation-fill-mode: both;
 }
+
+.edge-tool-card:nth-child(1) { animation-delay: 0.1s; }
+.edge-tool-card:nth-child(2) { animation-delay: 0.2s; }
+.edge-tool-card:nth-child(3) { animation-delay: 0.3s; }
+.edge-tool-card:nth-child(4) { animation-delay: 0.4s; }
+.edge-tool-card:nth-child(5) { animation-delay: 0.5s; }
+.edge-tool-card:nth-child(6) { animation-delay: 0.6s; }
 
 .edge-tool-card:hover {
 	border-color: #24ADE3;
-	transform: translateY(-4px);
+	transform: translateY(-4px) scale(1.02);
 	box-shadow: 0 8px 20px rgba(36, 173, 227, 0.15);
+}
+
+.edge-tool-card:hover .edge-tool-card__icon {
+	transform: scale(1.2) rotate(10deg);
 }
 
 .edge-tool-card__icon {
 	font-size: 3rem;
 	display: block;
 	margin-bottom: 1rem;
+	transition: transform 0.3s ease;
 }
 
 .edge-tool-card__title {
@@ -427,11 +471,18 @@
 	border-radius: 12px;
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	transition: all 0.3s ease;
+	animation: fadeInUp 0.6s ease-out;
+	animation-fill-mode: both;
 }
+
+.edge-difference-item:nth-child(1) { animation-delay: 0.1s; }
+.edge-difference-item:nth-child(2) { animation-delay: 0.2s; }
+.edge-difference-item:nth-child(3) { animation-delay: 0.3s; }
+.edge-difference-item:nth-child(4) { animation-delay: 0.4s; }
 
 .edge-difference-item:hover {
 	background: rgba(255, 255, 255, 0.1);
-	transform: translateY(-4px);
+	transform: translateY(-4px) scale(1.02);
 	border-color: #24ADE3;
 }
 
@@ -551,8 +602,29 @@
 }
 
 /* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ============================================
    Responsive Design
    ============================================ */
+
+@media (max-width: 1200px) {
+	.edge-feature-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
 
 @media (max-width: 768px) {
 	.edge-hero {
@@ -583,12 +655,8 @@
 		font-size: 1rem;
 	}
 
-	.edge-category-title {
-		font-size: 1.5rem;
-	}
-
 	.edge-feature-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(2, 1fr);
 	}
 
 	.edge-benefits-grid,
@@ -631,14 +699,11 @@
 		font-size: 1.75rem;
 	}
 
-	.edge-category-header {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.5rem;
+	.edge-feature-grid {
+		grid-template-columns: 1fr;
 	}
 
 	.edge-feature-card {
-		flex-direction: column;
 		text-align: center;
 	}
 
