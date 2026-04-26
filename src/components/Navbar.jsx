@@ -105,7 +105,6 @@ export default function Navbar() {
 			to: null,
 			dropdown: coursesDropdown,
 		},
-		{ label: 'Nanaska Edge', to: '/nanaska-edge' },
 		{ label: 'Testimonials', to: '/testimonials' },
 		{ label: 'Blog', to: '/blog' },
 		{ label: 'Contact Us', to: '/contact' },
