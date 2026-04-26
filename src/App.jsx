@@ -51,6 +51,7 @@ import PaymentCancelPage from './pages/PaymentCancelPage';
 import PaymentLinkPage from './pages/PaymentLinkPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
+import NanaskaEdgePage from './pages/NanaskaEdgePage';
 
 import IndividualCoursePage from './components/IndividualCoursePage';
 import { getCourseBySlug, getLevelById } from './data/coursesData';
@@ -151,6 +152,7 @@ function App() {
 							<Route path="/our-faculty" element={<OurFacultyPage />} />
 							<Route path="/our-specialty" element={<OurSpecialtyPage />} />
 							<Route path="/nanaska-alumni" element={<NanaskaAlumniPage />} />
+							<Route path="/nanaska-edge" element={<NanaskaEdgePage />} />
 
 							<Route path="/cima-certificate-level" element={<CertificateLevelPage />} />
 							<Route path="/cima-operational-level" element={<OperationalLevelPage />} />
