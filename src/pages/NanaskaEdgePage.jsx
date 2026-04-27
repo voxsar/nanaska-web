@@ -112,19 +112,57 @@ export default function NanaskaEdgePage() {
 							<span className="edge-hero__stat-label">Instant Feedback</span>
 						</div>
 					</div>
-					<div className="edge-hero__actions">
-						<Link to="/enrollment" className="edge-hero__btn edge-hero__btn--primary">
-							Get Started Now
-						</Link>
-						<a href="#features" className="edge-hero__btn edge-hero__btn--outline">
-							Explore Features
-						</a>
-					</div>
 				</div>
 				<div className="edge-hero__wave">
 					<svg viewBox="0 0 1440 80" preserveAspectRatio="none">
 						<path fill="#f9fbff" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
 					</svg>
+				</div>
+			</section>
+
+			{/* Mock Options Section */}
+			<section className="edge-mock-options">
+				<div className="edge-container">
+					<div className="edge-section-header">
+						<h2 className="edge-section-title">Choose Your Mock Exam Type</h2>
+						<p className="edge-section-subtitle">
+							Select the type of mock exam that fits your preparation needs
+						</p>
+					</div>
+					<div className="edge-mock-grid">
+						<div className="edge-mock-card">
+							<div className="edge-mock-card__icon">🎯</div>
+							<h3 className="edge-mock-card__title">Free Mock Exam</h3>
+							<p className="edge-mock-card__desc">
+								Try our platform with a complimentary mock exam. Experience AI-powered marking and instant feedback.
+							</p>
+							<ul className="edge-mock-card__features">
+								<li>✓ Full timed mock exam</li>
+								<li>✓ AI-powered instant marking</li>
+								<li>✓ Detailed performance feedback</li>
+								<li>✓ No credit card required</li>
+							</ul>
+							<Link to="/nanaska-edge/free-mock/select-cima-type" className="edge-mock-card__btn edge-mock-card__btn--primary">
+								Start Free Mock
+							</Link>
+						</div>
+						<div className="edge-mock-card">
+							<div className="edge-mock-card__icon">📚</div>
+							<h3 className="edge-mock-card__title">Revision Session Mock</h3>
+							<p className="edge-mock-card__desc">
+								Comprehensive revision mocks designed to solidify your understanding and boost exam confidence.
+							</p>
+							<ul className="edge-mock-card__features">
+								<li>✓ Multiple practice sessions</li>
+								<li>✓ Topic-specific revision</li>
+								<li>✓ Progress tracking</li>
+								<li>✓ Expert-designed questions</li>
+							</ul>
+							<Link to="/nanaska-edge/revision-mock/select-cima-type" className="edge-mock-card__btn edge-mock-card__btn--secondary">
+								Start Revision Mock
+							</Link>
+						</div>
+					</div>
 				</div>
 			</section>
 
