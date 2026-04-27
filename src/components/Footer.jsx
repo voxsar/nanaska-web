@@ -95,9 +95,8 @@ export default function Footer() {
 						<div className="footer__contact-item">
 							<span className="footer__contact-icon">📍</span>
 							<p>
-								331 Galle Rd,<br />
-								Colombo 00300<br />
-								Sri Lanka
+								464/1/1 Galle Rd,<br />
+								Colombo 00300
 							</p>
 						</div>
 

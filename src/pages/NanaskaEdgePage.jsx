@@ -33,31 +33,13 @@ const EDGE_FEATURES = [
 		benefit: 'Get instant feedback and cut marking time by 90%'
 	},
 	{
-		title: 'Marking Guides & Schemes',
-		description: 'Examiner-style marking with comprehensive answer guides that show you exactly what examiners look for.',
-		icon: '📋',
-		benefit: 'Understand exactly what examiners expect in your answers'
-	},
-	{
-		title: 'Ask Channa',
-		description: 'Your personal AI tutor available 24/7 to answer questions, clarify concepts, and provide guidance whenever you need it.',
-		icon: '💬',
-		benefit: 'Get expert help anytime, anywhere'
-	},
-	{
 		title: 'Ask Preseen',
 		description: 'Specialized question-asking interface tied directly to pre-seen materials, helping you understand complex scenarios.',
 		icon: '🔎',
 		benefit: 'Master preseen materials with targeted AI assistance'
 	},
 	{
-		title: 'Know Your Industry',
-		description: 'Topic and question bank specifically designed to build industry knowledge relevant to your chosen sector.',
-		icon: '🏢',
-		benefit: 'Understand your industry context for better case study performance'
-	},
-	{
-		title: 'Type Tutor',
+		title: 'Typing Tutor',
 		description: 'Typing practice with progress tracking and sessions to improve your speed and accuracy for timed exams.',
 		icon: '⌨️',
 		benefit: 'Increase typing speed and save valuable exam time'
@@ -88,19 +70,9 @@ const KEY_BENEFITS = [
 		description: 'Ask Preseen feature helps you deeply understand preseen documents through targeted questioning and AI-guided exploration.'
 	},
 	{
-		icon: '🏭',
-		title: 'Industry Knowledge at Your Fingertips',
-		description: 'Know Your Industry tool provides context-specific questions and content for your associated industry sector.'
-	},
-	{
 		icon: '📄',
 		title: 'Past Papers Mastery',
 		description: 'Comprehensive past paper library helps you understand exam patterns, question styles, and marking expectations.'
-	},
-	{
-		icon: '💬',
-		title: 'Ask Channa Anytime',
-		description: 'Your 24/7 AI tutor provides instant answers, clarifications, and guidance whenever you encounter challenges.'
 	},
 	{
 		icon: '🎯',
@@ -216,13 +188,6 @@ export default function NanaskaEdgePage() {
 					</div>
 					<div className="edge-tools-grid">
 						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">📅</span>
-							<h3 className="edge-tool-card__title">Smart Scheduling</h3>
-							<p className="edge-tool-card__desc">
-								Book exam slots, manage scheduled exams, and sync with Google Calendar for seamless planning.
-							</p>
-						</div>
-						<div className="edge-tool-card">
 							<span className="edge-tool-card__icon">📊</span>
 							<h3 className="edge-tool-card__title">Progress Tracking</h3>
 							<p className="edge-tool-card__desc">
@@ -241,13 +206,6 @@ export default function NanaskaEdgePage() {
 							<h3 className="edge-tool-card__title">Student Q&A</h3>
 							<p className="edge-tool-card__desc">
 								Ask questions, get answers, and collaborate with fellow students in our interactive Q&A system.
-							</p>
-						</div>
-						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">🔗</span>
-							<h3 className="edge-tool-card__title">Public Sharing</h3>
-							<p className="edge-tool-card__desc">
-								Share your exam results and achievements publicly to showcase your progress and motivate others.
 							</p>
 						</div>
 						<div className="edge-tool-card">
@@ -323,11 +281,11 @@ export default function NanaskaEdgePage() {
 					</div>
 					<div className="edge-cta__features">
 						<div className="edge-cta__feature">✓ Instant AI marking & feedback</div>
-						<div className="edge-cta__feature">✓ 24/7 Ask Channa AI tutor</div>
 						<div className="edge-cta__feature">✓ Comprehensive mock exams</div>
-						<div className="edge-cta__feature">✓ Industry-specific content</div>
 						<div className="edge-cta__feature">✓ Educational video library</div>
 						<div className="edge-cta__feature">✓ Progress tracking & analytics</div>
+						<div className="edge-cta__feature">✓ Past papers library</div>
+						<div className="edge-cta__feature">✓ Typing tutor practice</div>
 					</div>
 				</div>
 			</section>
