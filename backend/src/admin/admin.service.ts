@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { GoogleSheetsService } from './google-sheets.service';
 import * as bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = 12;
@@ -12,6 +13,7 @@ export class AdminService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly jwt: JwtService,
+		private readonly googleSheets: GoogleSheetsService,
 	) { }
 
 	async login(dto: AdminLoginDto) {
@@ -82,6 +84,10 @@ export class AdminService {
 			},
 			orderBy: { createdAt: 'desc' },
 		});
+	}
+
+	async syncEnrollmentsToGoogleSheets() {
+		return this.googleSheets.syncEnrollmentSubmissions();
 	}
 
 	// ── Superadmin: raw table access ───────────────────────────────────────────

@@ -41,6 +41,8 @@ export default function StudentsPage() {
 	const [dateFilter, setDateFilter] = useState('all');
 	const [search, setSearch] = useState('');
 	const [page, setPage] = useState(1);
+	const [selectedEnrollment, setSelectedEnrollment] = useState(null);
+	const [syncing, setSyncing] = useState(false);
 
 	useEffect(() => {
 		Promise.all([
@@ -54,6 +56,18 @@ export default function StudentsPage() {
 
 	const switchTab = (tab) => { setMainTab(tab); setPage(1); setDateFilter('all'); setSearch(''); };
 	const switchDate = (f) => { setDateFilter(f); setPage(1); };
+
+	const handleSyncToGoogleSheets = async () => {
+		setSyncing(true);
+		try {
+			const response = await api.post('/admin/enrollment-submissions/sync-google-sheets');
+			alert(response.data.message || 'Successfully synced to Google Sheets');
+		} catch (error) {
+			alert(error.response?.data?.message || 'Failed to sync to Google Sheets');
+		} finally {
+			setSyncing(false);
+		}
+	};
 
 	const rawPaid = paidStudents.map((o) => ({
 		id: o.id,
@@ -99,6 +113,16 @@ export default function StudentsPage() {
 				<div style={{ display: 'flex', gap: 8 }}>
 					<span className="badge badge-green">{rawPaid.length} paid</span>
 					<span className="badge badge-yellow">{rawUnpaid.length} unpaid</span>
+					{mainTab === 'unpaid' && (
+						<button
+							className="btn btn-primary btn-sm"
+							onClick={handleSyncToGoogleSheets}
+							disabled={syncing}
+							style={{ marginLeft: 'auto' }}
+						>
+							{syncing ? 'Syncing...' : '📊 Sync to Google Sheets'}
+						</button>
+					)}
 				</div>
 			</div>
 
@@ -200,28 +224,127 @@ export default function StudentsPage() {
 									<th>Country</th>
 									<th>CIMA Stage</th>
 									<th>Amount</th>
+									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
-								{paginated.map((r) => (
-									<tr key={r.id}>
-										<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{new Date(r.createdAt).toLocaleDateString()}</td>
-										<td style={{ fontWeight: 500 }}>{r.name}</td>
-										<td style={{ fontSize: '0.8rem' }}>{r.email}</td>
-										<td style={{ fontSize: '0.8rem' }}>{r.phone}</td>
-										<td style={{ fontSize: '0.8rem' }}>{r.country}</td>
-										<td style={{ fontSize: '0.8rem' }}>{r.cimaStage}</td>
-										<td style={{ fontWeight: 600 }}>{r.currency} {r.amount?.toLocaleString()}</td>
-									</tr>
-								))}
+								{paginated.map((r, idx) => {
+									const fullRecord = unpaidEnrollments.find(e => e.id === r.id);
+									return (
+										<tr key={r.id}>
+											<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{new Date(r.createdAt).toLocaleDateString()}</td>
+											<td style={{ fontWeight: 500 }}>{r.name}</td>
+											<td style={{ fontSize: '0.8rem' }}>{r.email}</td>
+											<td style={{ fontSize: '0.8rem' }}>{r.phone}</td>
+											<td style={{ fontSize: '0.8rem' }}>{r.country}</td>
+											<td style={{ fontSize: '0.8rem' }}>{r.cimaStage}</td>
+											<td style={{ fontWeight: 600 }}>{r.currency} {r.amount?.toLocaleString()}</td>
+											<td>
+												<button
+													className="btn btn-secondary btn-sm"
+													onClick={() => setSelectedEnrollment(fullRecord)}
+													style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+												>
+													View Details
+												</button>
+											</td>
+										</tr>
+									);
+								})}
 								{paginated.length === 0 && (
-									<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No unpaid enrollments found</td></tr>
+									<tr><td colSpan={8} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No unpaid enrollments found</td></tr>
 								)}
 							</tbody>
 						</table>
 					</div>
 					<Pagination page={page} total={searched.length} pageSize={PAGE_SIZE} onPage={setPage} />
 				</>
+			)}
+
+			{/* Enrollment Details Modal */}
+			{selectedEnrollment && (
+				<div className="admin-modal-overlay" onClick={() => setSelectedEnrollment(null)}>
+					<div className="admin-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+						<div className="admin-modal-header">
+							<h2>Enrollment Submission Details</h2>
+							<button className="modal-close" onClick={() => setSelectedEnrollment(null)}>×</button>
+						</div>
+						<div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.875rem' }}>
+							{/* Personal Information */}
+							<div>
+								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Personal Information</h3>
+								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+									<div><strong>First Name:</strong> {selectedEnrollment.firstName || '—'}</div>
+									<div><strong>Last Name:</strong> {selectedEnrollment.lastName || '—'}</div>
+									<div><strong>Email:</strong> {selectedEnrollment.email || '—'}</div>
+									<div><strong>Phone:</strong> {selectedEnrollment.phone || '—'}</div>
+									<div><strong>WhatsApp:</strong> {selectedEnrollment.whatsapp || '—'}</div>
+									<div><strong>Gender:</strong> {selectedEnrollment.gender || '—'}</div>
+									<div><strong>Date of Birth:</strong> {selectedEnrollment.dob || '—'}</div>
+								</div>
+							</div>
+
+							{/* CIMA Information */}
+							<div>
+								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>CIMA Information</h3>
+								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+									<div><strong>CIMA ID:</strong> {selectedEnrollment.cimaId || '—'}</div>
+									<div><strong>CIMA Stage:</strong> {selectedEnrollment.cimaStage || '—'}</div>
+								</div>
+							</div>
+
+							{/* Location */}
+							<div>
+								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Location</h3>
+								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+									<div><strong>Country:</strong> {selectedEnrollment.country || '—'}</div>
+									<div><strong>City:</strong> {selectedEnrollment.city || '—'}</div>
+									<div><strong>Postcode:</strong> {selectedEnrollment.postcode || '—'}</div>
+								</div>
+							</div>
+
+							{/* Payment Information */}
+							<div>
+								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Payment Information</h3>
+								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+									<div><strong>Amount:</strong> {selectedEnrollment.currency} {selectedEnrollment.amount?.toLocaleString() || '0'}</div>
+									<div><strong>Order ID:</strong> {selectedEnrollment.orderId || '—'}</div>
+								</div>
+							</div>
+
+							{/* Cart Items */}
+							{selectedEnrollment.cartJson && Array.isArray(selectedEnrollment.cartJson) && selectedEnrollment.cartJson.length > 0 && (
+								<div>
+									<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Cart Items</h3>
+									<div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
+										{selectedEnrollment.cartJson.map((item, idx) => (
+											<div key={idx} style={{ marginBottom: '4px' }}>
+												• {item.title || item.name || 'Unknown Course'}
+												{item.combinationId && ` (${item.combinationId})`}
+												{item.courseCode && ` (${item.courseCode})`}
+											</div>
+										))}
+									</div>
+								</div>
+							)}
+
+							{/* Notes */}
+							{selectedEnrollment.notes && (
+								<div>
+									<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Notes</h3>
+									<div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', whiteSpace: 'pre-wrap' }}>
+										{selectedEnrollment.notes}
+									</div>
+								</div>
+							)}
+
+							{/* Timestamp */}
+							<div style={{ paddingTop: '8px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.8rem' }}>
+								<strong>Submitted:</strong> {new Date(selectedEnrollment.createdAt).toLocaleString()}
+							</div>
+						</div>
+					</div>
+				</div>
 			)}
 		</div>
 	);

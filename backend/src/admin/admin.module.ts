@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { AdminJwtStrategy } from './admin-jwt.strategy';
+import { GoogleSheetsService } from './google-sheets.service';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { AdminJwtStrategy } from './admin-jwt.strategy';
       },
     }),
   ],
-  providers: [AdminService, AdminJwtStrategy],
+  providers: [AdminService, AdminJwtStrategy, GoogleSheetsService],
   controllers: [AdminController],
+  exports: [GoogleSheetsService],
 })
 export class AdminModule {}

@@ -61,6 +61,12 @@ export class AdminController {
 	}
 
 	@UseGuards(AdminJwtAuthGuard)
+	@Post('enrollment-submissions/sync-google-sheets')
+	syncEnrollmentsToGoogleSheets() {
+		return this.adminService.syncEnrollmentsToGoogleSheets();
+	}
+
+	@UseGuards(AdminJwtAuthGuard)
 	@Get('payments')
 	getPayments() {
 		return this.adminService.getPayments();

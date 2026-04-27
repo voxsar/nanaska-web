@@ -11,6 +11,7 @@ import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 import { EmailService } from '../email/email.service';
+import { GoogleSheetsService } from '../admin/google-sheets.service';
 
 /**
  * PaymentsService
@@ -28,6 +29,7 @@ export class PaymentsService {
 	constructor(
 		private readonly prisma: PrismaService,
 		private readonly email: EmailService,
+		private readonly googleSheets: GoogleSheetsService,
 	) { }
 
 	/**
@@ -482,6 +484,12 @@ export class PaymentsService {
 				amount: dto.amount || 0,
 			},
 		});
+
+		// Auto-sync to Google Sheets (non-blocking)
+		this.googleSheets.syncSingleEnrollment(record.id).catch((error) => {
+			this.logger.error(`Failed to auto-sync enrollment ${record.id} to Google Sheets`, error.message);
+		});
+
 		return { id: record.id };
 	}
 
