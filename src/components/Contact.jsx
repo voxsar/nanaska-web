@@ -26,7 +26,7 @@ const STATIC_INFO_CARDS = [
   {
     icon: '📍',
     title: 'Visit Us',
-    lines: ['No. 464/1/1, Galle Road,', 'Colombo 03, Sri Lanka'],
+    lines: ['464/1/1 Galle Rd,', 'Colombo 00300'],
     href: `https://www.openstreetmap.org/?mlat=${DEFAULT_MAP_LAT}&mlon=${DEFAULT_MAP_LNG}#map=17/${DEFAULT_MAP_LAT}/${DEFAULT_MAP_LNG}`,
     cta: 'Get directions',
   },
@@ -110,7 +110,7 @@ export default function Contact() {
     try { phones = JSON.parse(settingsMap.contact_phones); } catch { phones = ['+94 77 499 7338', '+94 77 711 8902', '+94 112 575 016']; }
   }
   const email = settingsMap.contact_email || 'info@nanaska.com';
-  const address = settingsMap.contact_address || 'No. 464/1/1, Galle Road, Colombo 03, Sri Lanka';
+  const address = settingsMap.contact_address || '464/1/1 Galle Rd, Colombo 00300';
 
   const INFO_CARDS = [
     { icon: '📞', title: 'Call Us', lines: phones, href: `tel:${phones[0].replace(/\s/g, '')}`, cta: 'Call now' },
@@ -312,7 +312,7 @@ export default function Contact() {
         >
           <h3 className="contact__map-heading">Find Us on the Map</h3>
           <p className="contact__map-address">
-            📍 Study Support Centre: No. 464/1/1, Galle Road, Colombo 03, Sri Lanka
+            📍 Study Support Centre: 464/1/1 Galle Rd, Colombo 00300
           </p>
           <div className="contact__map-frame">
             <iframe
