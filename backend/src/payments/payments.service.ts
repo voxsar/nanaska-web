@@ -13,6 +13,8 @@ import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 import { EmailService } from '../email/email.service';
 import { GoogleSheetsService } from '../admin/google-sheets.service';
 
+const EDGE_REGISTRATION_WEBHOOK_URL = 'https://automation.nanaska.com/webhook-test/registration';
+
 /**
  * PaymentsService
  *
@@ -438,6 +440,12 @@ export class PaymentsService {
 				});
 			}
 
+			await this.sendPaidEdgeRegistrationForOrder({
+				...order,
+				status: 'PAID',
+				ipgRef: body.payment_id ?? order.ipgRef,
+			});
+
 			return { message: 'Payment successful' };
 		}
 
@@ -462,8 +470,137 @@ export class PaymentsService {
 		return `NAN-${Date.now()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 	}
 
+	private getCartItems(enrollment: { cartJson: unknown }): any[] {
+		return Array.isArray(enrollment.cartJson) ? enrollment.cartJson : [];
+	}
+
+	private getEdgeCartItem(enrollment: { cartJson: unknown }): any | null {
+		return this.getCartItems(enrollment).find((item) => item?.type === 'nanaska-edge') || null;
+	}
+
+	private getEdgeRegistrationType(enrollment: { cartJson: unknown }): 'free-mock' | 'revision' | null {
+		const item = this.getEdgeCartItem(enrollment);
+		const explicit = item?.registrationType;
+		if (explicit === 'free-mock' || explicit === 'revision') return explicit;
+		if (item?.kind === 'free') return 'free-mock';
+		if (item?.kind === 'revision') return 'revision';
+		return null;
+	}
+
+	private hasEdgeRegistrationBeenSent(enrollment: { cartJson: unknown }): boolean {
+		const item = this.getEdgeCartItem(enrollment);
+		return Boolean(item?.n8nSentAt);
+	}
+
+	private async getEdgeRegistrationWebhookUrl(): Promise<string> {
+		const setting = await this.prisma.siteSetting.findUnique({
+			where: { key: 'edge_n8n_registration_webhook' },
+		});
+		return setting?.value?.trim() || EDGE_REGISTRATION_WEBHOOK_URL;
+	}
+
+	private buildEdgeRegistrationPayload(
+		enrollment: any,
+		registrationType: 'free-mock' | 'revision',
+		paymentStatus: 'unpaid' | 'paid',
+		order?: any,
+	) {
+		const item = this.getEdgeCartItem(enrollment) || {};
+		const firstName = enrollment.firstName || '';
+		const lastName = enrollment.lastName || '';
+		const name = [firstName, lastName].filter(Boolean).join(' ').trim();
+
+		return {
+			registration_type: registrationType,
+			payment_status: paymentStatus,
+			enrollment_id: enrollment.id,
+			order_id: order?.id || enrollment.orderId || null,
+			payment_ref: order?.ipgRef || null,
+			first_name: firstName,
+			last_name: lastName,
+			name,
+			email: enrollment.email,
+			phone: enrollment.phone,
+			whatsapp: enrollment.whatsapp,
+			cima_id: enrollment.cimaId,
+			cima_stage: enrollment.cimaStage,
+			country: enrollment.country,
+			city: enrollment.city,
+			postcode: enrollment.postcode,
+			notes: enrollment.notes,
+			currency: order?.currency || enrollment.currency,
+			amount: order?.amount ?? enrollment.amount,
+			course_code: item.courseCode || null,
+			case_study: item.title || item.name || enrollment.cimaStage || null,
+			combination_id: item.combinationId || order?.combinationId || null,
+			study_mode: item.studyMode || null,
+			cart_items: this.getCartItems(enrollment),
+			submitted_at: enrollment.createdAt,
+			sent_at: new Date().toISOString(),
+		};
+	}
+
+	private async sendEdgeRegistrationToN8n(
+		enrollment: any,
+		paymentStatus: 'unpaid' | 'paid',
+		order?: any,
+	): Promise<boolean> {
+		const registrationType = this.getEdgeRegistrationType(enrollment);
+		if (!registrationType) return false;
+		if (this.hasEdgeRegistrationBeenSent(enrollment)) return false;
+		if (registrationType === 'revision' && paymentStatus !== 'paid') return false;
+
+		const webhookUrl = await this.getEdgeRegistrationWebhookUrl();
+		const payload = this.buildEdgeRegistrationPayload(enrollment, registrationType, paymentStatus, order);
+
+		const res = await fetch(webhookUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload),
+		});
+
+		if (!res.ok) {
+			const responseText = await res.text().catch(() => '');
+			throw new BadRequestException(`Nanaska Edge n8n registration failed (${res.status}) ${responseText}`.trim());
+		}
+
+		const cartItems = this.getCartItems(enrollment).map((item) => (
+			item?.type === 'nanaska-edge'
+				? { ...item, n8nSentAt: payload.sent_at, n8nRegistrationType: registrationType }
+				: item
+		));
+
+		await this.prisma.enrollmentSubmission.update({
+			where: { id: enrollment.id },
+			data: { cartJson: cartItems as any },
+		});
+
+		this.logger.log(`Nanaska Edge ${registrationType} registration ${enrollment.id} sent to n8n`);
+		return true;
+	}
+
+	private async sendPaidEdgeRegistrationForOrder(order: any) {
+		const enrollment = await this.prisma.enrollmentSubmission.findFirst({
+			where: { orderId: order.id },
+			orderBy: { createdAt: 'desc' },
+		});
+
+		if (!enrollment) return;
+		try {
+			await this.sendEdgeRegistrationToN8n(enrollment, 'paid', order);
+		} catch (error) {
+			this.logger.error(`Failed to send paid Nanaska Edge registration for order ${order.id}`, error.message);
+		}
+	}
+
 	/** Saves enrollment form data so admin can see unpaid submissions. */
 	async saveEnrollment(dto: EnrollmentSubmitDto): Promise<{ id: string }> {
+		const cartItems = (dto.cartItems || []).map((item) => (
+			item?.type === 'nanaska-edge'
+				? { ...item, registrationType: dto.registrationType || item.registrationType }
+				: item
+		));
+
 		const record = await this.prisma.enrollmentSubmission.create({
 			data: {
 				firstName: dto.firstName,
@@ -479,7 +616,7 @@ export class PaymentsService {
 				city: dto.city || null,
 				postcode: dto.postcode || null,
 				notes: dto.notes || null,
-				cartJson: (dto.cartItems || []) as any,
+				cartJson: cartItems as any,
 				currency: dto.currency || 'GBP',
 				amount: dto.amount || 0,
 				orderId: dto.orderId || null,
@@ -490,6 +627,10 @@ export class PaymentsService {
 		this.googleSheets.syncSingleEnrollment(record.id).catch((error) => {
 			this.logger.error(`Failed to auto-sync enrollment ${record.id} to Google Sheets`, error.message);
 		});
+
+		if (this.getEdgeRegistrationType(record) === 'free-mock') {
+			await this.sendEdgeRegistrationToN8n(record, 'unpaid');
+		}
 
 		return { id: record.id };
 	}
@@ -718,6 +859,12 @@ export class PaymentsService {
 						paidAt: new Date(),
 					});
 				}
+
+				await this.sendPaidEdgeRegistrationForOrder({
+					...order,
+					status: 'PAID',
+					ipgRef: txnRef || order.ipgRef,
+				});
 			}
 		} else {
 			this.logger.warn(`PAYMENT_COMPLETE: no order found for reqid=${reqid}`);

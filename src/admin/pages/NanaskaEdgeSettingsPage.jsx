@@ -16,6 +16,10 @@ const DEFAULTS = {
 	edge_scs_opens_at: '',
 	edge_mcs_days_from_now: '6',
 	edge_scs_days_from_now: '12',
+	edge_ocs_revision_combination_id: 'op_ocs',
+	edge_mcs_revision_combination_id: 'mg_mcs',
+	edge_scs_revision_combination_id: 'st_scs',
+	edge_n8n_registration_webhook: 'https://automation.nanaska.com/webhook-test/registration',
 };
 
 function toLocalDateTimeValue(value) {
@@ -142,6 +146,46 @@ export default function NanaskaEdgeSettingsPage() {
 								value={settings.edge_scs_days_from_now || '12'}
 								onChange={(e) => handleChange('edge_scs_days_from_now', e.target.value)}
 							/>
+						</div>
+					</div>
+				</div>
+
+				<div className="admin-card">
+					<p className="admin-card-title">Revision Checkout Mapping</p>
+					<div className="admin-form-grid">
+						{CASE_STUDIES.map((item) => {
+							const mappingKey = `edge_${item.code}_revision_combination_id`;
+
+							return (
+								<div key={mappingKey} className="form-group">
+									<label>{item.label} revision combination ID</label>
+									<input
+										value={settings[mappingKey] || ''}
+										onChange={(e) => handleChange(mappingKey, e.target.value)}
+										placeholder={item.code === 'ocs' ? 'op_ocs' : item.code === 'mcs' ? 'mg_mcs' : 'st_scs'}
+									/>
+									<small style={{ color: '#64748b' }}>
+										Used by Nanaska Edge revision checkout and stored with the registration.
+									</small>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+
+				<div className="admin-card">
+					<p className="admin-card-title">Registration Automation</p>
+					<div className="admin-form-grid single">
+						<div className="form-group">
+							<label>n8n registration webhook URL</label>
+							<input
+								value={settings.edge_n8n_registration_webhook || ''}
+								onChange={(e) => handleChange('edge_n8n_registration_webhook', e.target.value)}
+								placeholder="https://automation.nanaska.com/webhook-test/registration"
+							/>
+							<small style={{ color: '#64748b' }}>
+								Free mock posts immediately. Revision posts only after successful payment.
+							</small>
 						</div>
 					</div>
 				</div>

@@ -56,6 +56,10 @@ export class EnrollmentSubmitDto {
 
 	@IsOptional()
 	@IsString()
+	registrationType?: string;
+
+	@IsOptional()
+	@IsString()
 	currency?: string;
 
 	@IsOptional()

@@ -30,6 +30,9 @@ const DEFAULT_EDGE_SETTINGS = {
 	edge_scs_available: 'false',
 	edge_mcs_days_from_now: '6',
 	edge_scs_days_from_now: '12',
+	edge_ocs_revision_combination_id: 'op_ocs',
+	edge_mcs_revision_combination_id: 'mg_mcs',
+	edge_scs_revision_combination_id: 'st_scs',
 };
 
 const CASE_STUDIES = [
@@ -341,7 +344,7 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 	);
 }
 
-function SignupView({ selection, onBack }) {
+function SignupView({ selection, settings, onBack }) {
 	const { selectedCountry, setSelectedCountry, currency, formatAmount } = usePricing();
 	const [form, setForm] = useState({
 		firstName: '',
@@ -358,13 +361,15 @@ function SignupView({ selection, onBack }) {
 	const [error, setError] = useState('');
 
 	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
+	const registrationType = selection.kind === 'free' ? 'free-mock' : 'revision';
 	const productLabel = `${selection.code} ${selection.name} Case Study, ${kindLabel}`;
 	const prices = getCoursePricesByCode(selection.code, 0);
 	const effectiveCountry = form.country || selectedCountry;
 	const selectedCurrency = effectiveCountry ? (effectiveCountry === 'Sri Lanka' ? 'LKR' : 'GBP') : currency;
 	const amount = selection.kind === 'free' ? 0 : getPriceForCountry(prices, effectiveCountry);
 	const priceLabel = selection.kind === 'free' ? 'Complimentary' : formatCurrency(amount, selectedCurrency);
-	const combinationId = getCombinationIdForCourse(selection.code);
+	const revisionCombinationId = settings[`edge_${selection.code.toLowerCase()}_revision_combination_id`] || getCombinationIdForCourse(selection.code);
+	const combinationId = selection.kind === 'revision' ? revisionCombinationId : getCombinationIdForCourse(selection.code);
 
 	const update = (key) => (e) => {
 		const value = e.target.value;
@@ -400,8 +405,10 @@ function SignupView({ selection, onBack }) {
 					courseCode: selection.code,
 					combinationId,
 					kind: selection.kind,
+					registrationType,
 					studyMode: form.studyMode,
 				}],
+				registrationType,
 				currency: selectedCurrency,
 				amount,
 				orderId,
@@ -696,7 +703,7 @@ export default function NanaskaEdgePage() {
 			)}
 
 			{signupSelection && (
-				<SignupView selection={signupSelection} onBack={() => setSignupSelection(null)} />
+				<SignupView selection={signupSelection} settings={settings} onBack={() => setSignupSelection(null)} />
 			)}
 		</div>
 	);
