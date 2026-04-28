@@ -52,7 +52,6 @@ import PaymentLinkPage from './pages/PaymentLinkPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import NanaskaEdgePage from './pages/NanaskaEdgePage';
-import CimaTypeSelectionPage from './pages/CimaTypeSelectionPage';
 import RegistrationSuccessPage from './pages/RegistrationSuccessPage';
 
 import IndividualCoursePage from './components/IndividualCoursePage';
@@ -155,7 +154,7 @@ function App() {
 							<Route path="/our-specialty" element={<OurSpecialtyPage />} />
 							<Route path="/nanaska-alumni" element={<NanaskaAlumniPage />} />
 							<Route path="/nanaska-edge" element={<NanaskaEdgePage />} />
-							<Route path="/nanaska-edge/:mockType/select-cima-type" element={<CimaTypeSelectionPage />} />
+							<Route path="/nanaska-edge/:mockType/select-cima-type" element={<NanaskaEdgePage />} />
 							<Route path="/nanaska-edge/registration-success" element={<RegistrationSuccessPage />} />
 
 							<Route path="/cima-certificate-level" element={<CertificateLevelPage />} />

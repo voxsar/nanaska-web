@@ -49,6 +49,7 @@ const COURSE_COMBINATION_ID_MAP = {
 	E1: 'op_e1',
 	P1: 'op_p1',
 	F1: 'op_f1',
+	OCS: 'op_ocs',
 	E2: 'op_e2',
 	P2: 'mg_p2',
 	F2: 'mg_f2',

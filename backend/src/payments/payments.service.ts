@@ -482,6 +482,7 @@ export class PaymentsService {
 				cartJson: (dto.cartItems || []) as any,
 				currency: dto.currency || 'GBP',
 				amount: dto.amount || 0,
+				orderId: dto.orderId || null,
 			},
 		});
 

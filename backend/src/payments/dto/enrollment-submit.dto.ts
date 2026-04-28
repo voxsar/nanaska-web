@@ -62,4 +62,8 @@ export class EnrollmentSubmitDto {
 	@IsInt()
 	@Min(0)
 	amount?: number;
+
+	@IsOptional()
+	@IsString()
+	orderId?: string;
 }

@@ -24,6 +24,7 @@ import EmailSettingsPage from './pages/EmailSettingsPage';
 import PaymentLinksPage from './pages/PaymentLinksPage';
 import BackupsPage from './pages/BackupsPage';
 import ImageManagerPage from './pages/ImageManagerPage';
+import NanaskaEdgeSettingsPage from './pages/NanaskaEdgeSettingsPage';
 
 export default function AdminApp() {
 	return (
@@ -53,6 +54,7 @@ export default function AdminApp() {
 					<Route path="testimonials" element={<TestimonialsAdminPage />} />
 					<Route path="contact-settings" element={<ContactSettingsPage />} />
 					<Route path="email-settings" element={<EmailSettingsPage />} />
+					<Route path="nanaska-edge-settings" element={<NanaskaEdgeSettingsPage />} />
 					<Route path="payment-links" element={<PaymentLinksPage />} />
 					<Route path="backups" element={<BackupsPage />} />
 					<Route path="images" element={<ImageManagerPage />} />

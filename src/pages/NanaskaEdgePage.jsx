@@ -1,332 +1,700 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { usePricing } from '../context/PricingContext';
+import {
+	formatCurrency,
+	getCombinationIdForCourse,
+	getCoursePricesByCode,
+	getPriceForCountry,
+} from '../data/pricingData';
 import './NanaskaEdgePage.css';
 
-const EDGE_FEATURES = [
-	{
-		title: 'Mock Exams',
-		description: 'Full timed CIMA mock exam papers with multi-part questions, sub-questions, attempt tracking, suggested answers, and shareable public result summaries.',
-		icon: '🎯',
-		benefit: 'Experience real exam conditions and build confidence'
-	},
-	{
-		title: 'Practice Questions',
-		description: 'Individual targeted-practice questions linked to pre-seen documents, with attempts, suggested answers, and public result sharing.',
-		icon: '✍️',
-		benefit: 'Master specific topics at your own pace'
-	},
-	{
-		title: 'Past Papers',
-		description: 'Comprehensive library of CIMA past papers with detailed view pages to understand exam patterns and expectations.',
-		icon: '📚',
-		benefit: 'Learn from historical exam patterns and improve preparation'
-	},
-	{
-		title: 'Pre-Seen Documents',
-		description: 'Upload, view, and reference CIMA pre-seen materials with an integrated PDF citation viewer for easy navigation.',
-		icon: '📄',
-		benefit: 'Stay organized with all your exam materials in one place'
-	},
-	{
-		title: 'Automated Marking',
-		description: 'Instant AI-powered marking for both mock exams and practice questions, providing immediate feedback on your performance.',
-		icon: '⚡',
-		benefit: 'Get instant feedback and cut marking time by 90%'
-	},
-	{
-		title: 'Ask Preseen',
-		description: 'Specialized question-asking interface tied directly to pre-seen materials, helping you understand complex scenarios.',
-		icon: '🔎',
-		benefit: 'Master preseen materials with targeted AI assistance'
-	},
-	{
-		title: 'Typing Tutor',
-		description: 'Typing practice with progress tracking and sessions to improve your speed and accuracy for timed exams.',
-		icon: '⌨️',
-		benefit: 'Increase typing speed and save valuable exam time'
-	},
-	{
-		title: 'Educational Video Library',
-		description: 'On-demand video learning library with expert explanations and walkthroughs of complex topics.',
-		icon: '🎥',
-		benefit: 'Learn visually with expert-led video content'
-	},
-	{
-		title: 'Business Models Library',
-		description: 'Reference library of business models with student responses to help you understand different frameworks.',
-		icon: '📊',
-		benefit: 'Apply proven business frameworks to your answers'
-	}
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
+
+const COUNTRIES = [
+	'Sri Lanka',
+	'United Kingdom',
+	'Australia',
+	'United States',
+	'Canada',
+	'Singapore',
+	'Malaysia',
+	'India',
+	'UAE',
+	'Other',
 ];
 
-const KEY_BENEFITS = [
+const DEFAULT_EDGE_SETTINGS = {
+	edge_ocs_available: 'true',
+	edge_mcs_available: 'false',
+	edge_scs_available: 'false',
+	edge_mcs_days_from_now: '6',
+	edge_scs_days_from_now: '12',
+};
+
+const CASE_STUDIES = [
 	{
-		icon: '⏱️',
-		title: 'Marking Time Cut by 90%',
-		description: 'AI-powered automated marking provides instant feedback, eliminating the wait for manual marking and accelerating your learning cycle.'
+		code: 'OCS',
+		name: 'Operational',
+		cimaStage: 'Operational Case Study',
+		tagline: 'Operational Case Study, built for the operational level of CIMA.',
+		fallbackDays: 0,
 	},
 	{
-		icon: '📖',
-		title: 'Master Preseen Materials',
-		description: 'Ask Preseen feature helps you deeply understand preseen documents through targeted questioning and AI-guided exploration.'
+		code: 'MCS',
+		name: 'Management',
+		cimaStage: 'Management Case Study',
+		tagline: 'Management Case Study, built for the management level of CIMA.',
+		fallbackDays: 6,
 	},
 	{
-		icon: '📄',
-		title: 'Past Papers Mastery',
-		description: 'Comprehensive past paper library helps you understand exam patterns, question styles, and marking expectations.'
+		code: 'SCS',
+		name: 'Strategic',
+		cimaStage: 'Strategic Case Study',
+		tagline: 'Strategic Case Study, built for the final CIMA case study level.',
+		fallbackDays: 12,
 	},
-	{
-		icon: '🎯',
-		title: 'Exam-Ready Confidence',
-		description: 'Full mock exams with real-time marking and detailed feedback ensure you are fully prepared for exam day.'
-	}
 ];
 
-export default function NanaskaEdgePage() {
+const FEATURES = [
+	{ icon: 'target', title: 'Mock Exams', body: 'Full timed CIMA mock papers with multi-part questions, attempt tracking, and shareable result summaries.' },
+	{ icon: 'edit', title: 'Practice Questions', body: 'Targeted practice tied to pre-seen documents so students can master specific topics at their own pace.' },
+	{ icon: 'book', title: 'Past Papers', body: 'A complete CIMA past-paper library for understanding patterns, examiner expectations, and answer structure.' },
+	{ icon: 'doc', title: 'Pre-Seen Documents', body: 'Upload, view, and reference pre-seen materials through an integrated PDF citation viewer.' },
+	{ icon: 'bolt', title: 'Automated Marking', body: 'AI-powered marking for mocks and practice questions, with feedback available the moment an attempt is submitted.' },
+	{ icon: 'search', title: 'Ask Pre-Seen', body: 'A focused question interface tied directly to pre-seen materials to unpack scenarios and assumptions.' },
+	{ icon: 'keyboard', title: 'Typing Tutor', body: 'Practice sessions with progress tracking to build the speed and accuracy timed case-study exams demand.' },
+	{ icon: 'video', title: 'Video Library', body: 'On-demand walkthroughs from expert tutors, covering exam technique and complex business concepts.' },
+	{ icon: 'chart', title: 'Business Models', body: 'A reference library of business frameworks and sample student responses for better answer planning.' },
+];
+
+const WHY_EDGE = [
+	{ num: '01', title: 'AI-Powered Intelligence', body: 'Advanced marking and tutoring provide instant feedback that adapts to each student attempt.' },
+	{ num: '02', title: 'Comprehensive Coverage', body: 'From mock exams to industry knowledge, the key tools for CIMA case-study success live in one platform.' },
+	{ num: '03', title: 'Time-Saving Automation', body: 'Automated marking means students spend more time improving answers and less time waiting for review.' },
+	{ num: '04', title: 'Expert-Designed Content', body: 'Content is shaped around CIMA case-study expectations and Nanaska tutor experience.' },
+];
+
+const Icon = {
+	check: (props) => (
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
+			<polyline points="20 6 9 17 4 12" />
+		</svg>
+	),
+	arrow: (props) => (
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+			<line x1="5" y1="12" x2="19" y2="12" />
+			<polyline points="12 5 19 12 12 19" />
+		</svg>
+	),
+	close: (props) => (
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+			<line x1="18" y1="6" x2="6" y2="18" />
+			<line x1="6" y1="6" x2="18" y2="18" />
+		</svg>
+	),
+	symbol: (name) => {
+		const common = {
+			viewBox: '0 0 24 24',
+			fill: 'none',
+			stroke: 'currentColor',
+			strokeWidth: '1.8',
+			strokeLinecap: 'round',
+			strokeLinejoin: 'round',
+		};
+		const paths = {
+			target: <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>,
+			edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" /></>,
+			book: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /></>,
+			doc: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></>,
+			bolt: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />,
+			search: <><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></>,
+			keyboard: <><rect x="2" y="6" width="20" height="14" rx="2" /><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M10 14h4" /></>,
+			video: <><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" /></>,
+			chart: <><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></>,
+		};
+		return <svg {...common}>{paths[name]}</svg>;
+	},
+};
+
+function settingsToMap(settings) {
+	return settings.reduce((acc, item) => {
+		acc[item.key] = item.value;
+		return acc;
+	}, { ...DEFAULT_EDGE_SETTINGS });
+}
+
+function toBool(value, fallback = false) {
+	if (value === undefined || value === null || value === '') return fallback;
+	return ['true', '1', 'yes', 'on'].includes(String(value).trim().toLowerCase());
+}
+
+function parseTargetMs(value, fallbackMs) {
+	if (!value) return fallbackMs;
+	const timestamp = new Date(value).getTime();
+	return Number.isNaN(timestamp) ? fallbackMs : timestamp;
+}
+
+function splitName(form) {
+	return [form.firstName, form.lastName].filter(Boolean).join(' ').trim();
+}
+
+function useReveal() {
+	useEffect(() => {
+		const els = document.querySelectorAll('.edge-reveal');
+		const io = new IntersectionObserver((entries) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					entry.target.classList.add('is-in');
+					io.unobserve(entry.target);
+				}
+			});
+		}, { threshold: 0.15 });
+		els.forEach((el) => io.observe(el));
+		return () => io.disconnect();
+	}, []);
+}
+
+function useEdgeSettings() {
+	const [settings, setSettings] = useState(DEFAULT_EDGE_SETTINGS);
+
+	useEffect(() => {
+		if (!API_URL) return;
+		fetch(`${API_URL}/settings/public?category=nanaska-edge`)
+			.then((res) => (res.ok ? res.json() : []))
+			.then((data) => setSettings(settingsToMap(Array.isArray(data) ? data : [])))
+			.catch(() => setSettings(DEFAULT_EDGE_SETTINGS));
+	}, []);
+
+	return settings;
+}
+
+function useCountdown(targetMs) {
+	const [now, setNow] = useState(() => Date.now());
+
+	useEffect(() => {
+		const id = window.setInterval(() => setNow(Date.now()), 1000);
+		return () => window.clearInterval(id);
+	}, []);
+
+	const diff = Math.max(0, targetMs - now);
+	return {
+		days: Math.floor(diff / 86400000),
+		hours: Math.floor((diff % 86400000) / 3600000),
+		mins: Math.floor((diff % 3600000) / 60000),
+		secs: Math.floor((diff % 60000) / 1000),
+		done: diff === 0,
+	};
+}
+
+function Countdown({ targetMs }) {
+	const { days, hours, mins, secs } = useCountdown(targetMs);
+	const pad = (n) => String(n).padStart(2, '0');
+
 	return (
-		<div className="edge-page">
-			{/* Hero Section */}
-			<section className="edge-hero">
-				<div className="edge-hero__inner">
-					<div className="edge-hero__badge">
-						<span className="edge-hero__badge-icon">🚀</span>
-						<span>Introducing Nanaska Edge</span>
-					</div>
-					<h1 className="edge-hero__title">
-						The Future of <span className="edge-hero__title-accent">CIMA Preparation</span>
-					</h1>
-					<p className="edge-hero__subtitle">
-						AI-powered exam preparation platform that transforms how you study for CIMA.
-						Get instant feedback, personalized guidance, and comprehensive resources all in one place.
-					</p>
-					<div className="edge-hero__stats">
-						<div className="edge-hero__stat">
-							<span className="edge-hero__stat-num">90%</span>
-							<span className="edge-hero__stat-label">Faster Marking</span>
-						</div>
-						<div className="edge-hero__stat">
-							<span className="edge-hero__stat-num">24/7</span>
-							<span className="edge-hero__stat-label">AI Tutor Support</span>
-						</div>
-						<div className="edge-hero__stat">
-							<span className="edge-hero__stat-num">100%</span>
-							<span className="edge-hero__stat-label">Instant Feedback</span>
-						</div>
-					</div>
-				</div>
-				<div className="edge-hero__wave">
-					<svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-						<path fill="#f9fbff" d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
-					</svg>
-				</div>
-			</section>
+		<div className="edge-countdown" aria-label="Countdown until registration opens">
+			<div className="edge-countdown__cell"><span>{pad(days)}</span><small>Days</small></div>
+			<div className="edge-countdown__cell"><span>{pad(hours)}</span><small>Hrs</small></div>
+			<div className="edge-countdown__cell"><span>{pad(mins)}</span><small>Min</small></div>
+			<div className="edge-countdown__cell"><span>{pad(secs)}</span><small>Sec</small></div>
+		</div>
+	);
+}
 
-			{/* Mock Options Section */}
-			<section className="edge-mock-options">
-				<div className="edge-container">
-					<div className="edge-section-header">
-						<h2 className="edge-section-title">Choose Your Mock Exam Type</h2>
-						<p className="edge-section-subtitle">
-							Select the type of mock exam that fits your preparation needs
-						</p>
-					</div>
-					<div className="edge-mock-grid">
-						<div className="edge-mock-card">
-							<div className="edge-mock-card__icon">🎯</div>
-							<h3 className="edge-mock-card__title">Free Mock Exam</h3>
-							<p className="edge-mock-card__desc">
-								Try our platform with a complimentary mock exam. Experience AI-powered marking and instant feedback.
-							</p>
-							<ul className="edge-mock-card__features">
-								<li>✓ Full timed mock exam</li>
-								<li>✓ AI-powered instant marking</li>
-								<li>✓ Detailed performance feedback</li>
-								<li>✓ No credit card required</li>
-							</ul>
-							<Link to="/nanaska-edge/free-mock/select-cima-type" className="edge-mock-card__btn edge-mock-card__btn--primary">
-								Start Free Mock
-							</Link>
-						</div>
-						<div className="edge-mock-card">
-							<div className="edge-mock-card__icon">📚</div>
-							<h3 className="edge-mock-card__title">Revision Session Mock</h3>
-							<p className="edge-mock-card__desc">
-								Comprehensive revision mocks designed to solidify your understanding and boost exam confidence.
-							</p>
-							<ul className="edge-mock-card__features">
-								<li>✓ Multiple practice sessions</li>
-								<li>✓ Topic-specific revision</li>
-								<li>✓ Progress tracking</li>
-								<li>✓ Expert-designed questions</li>
-							</ul>
-							<Link to="/nanaska-edge/revision-mock/select-cima-type" className="edge-mock-card__btn edge-mock-card__btn--secondary">
-								Start Revision Mock
-							</Link>
-						</div>
-					</div>
-				</div>
-			</section>
+function Aurora() {
+	return (
+		<div className="edge-aurora" aria-hidden="true">
+			<div className="edge-aurora__blob edge-aurora__blob--one" />
+			<div className="edge-aurora__blob edge-aurora__blob--two" />
+			<div className="edge-aurora__blob edge-aurora__blob--three" />
+			<div className="edge-aurora__grain" />
+		</div>
+	);
+}
 
-			{/* Key Benefits Section */}
-			<section className="edge-benefits">
-				<div className="edge-container">
-					<div className="edge-section-header">
-						<span className="edge-section-icon">🎯</span>
-						<h2 className="edge-section-title">How Edge Helps You Succeed</h2>
-						<p className="edge-section-subtitle">
-							Powerful features designed to accelerate your learning and boost exam performance
-						</p>
-					</div>
-					<div className="edge-benefits-grid">
-						{KEY_BENEFITS.map((benefit) => (
-							<div key={benefit.title} className="edge-benefit-card">
-								<div className="edge-benefit-card__icon">{benefit.icon}</div>
-								<h3 className="edge-benefit-card__title">{benefit.title}</h3>
-								<p className="edge-benefit-card__desc">{benefit.description}</p>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
+function Panels({ onPickFree, onPickRevision }) {
+	const onMove = (e) => {
+		const rect = e.currentTarget.getBoundingClientRect();
+		e.currentTarget.style.setProperty('--mx', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+		e.currentTarget.style.setProperty('--my', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+	};
 
-			{/* Features Section */}
-			<section className="edge-features" id="features">
-				<div className="edge-container">
-					<div className="edge-section-header">
-						<span className="edge-section-icon">✨</span>
-						<h2 className="edge-section-title">Complete Feature Set</h2>
-						<p className="edge-section-subtitle">
-							Everything you need to excel in your CIMA exams, powered by cutting-edge AI
-						</p>
-					</div>
+	return (
+		<section className="edge-panels edge-container" id="mock">
+			<div className="edge-reveal">
+				<div className="edge-section-eyebrow">Choose your starting point</div>
+				<h2 className="edge-section-title">Try it <em>free,</em> or commit to <span>revision.</span></h2>
+				<p className="edge-section-sub">Two ways to begin with Edge, both built around CIMA case-study preparation.</p>
+			</div>
 
-					<div className="edge-feature-grid">
-						{EDGE_FEATURES.map((feature) => (
-							<div key={feature.title} className="edge-feature-card">
-								<div className="edge-feature-card__icon">{feature.icon}</div>
-								<div className="edge-feature-card__content">
-									<h4 className="edge-feature-card__title">{feature.title}</h4>
-									<p className="edge-feature-card__desc">{feature.description}</p>
-									<div className="edge-feature-card__benefit">
-										<span className="edge-feature-card__benefit-icon">✓</span>
-										<span className="edge-feature-card__benefit-text">{feature.benefit}</span>
-									</div>
+			<div className="edge-panel-grid">
+				<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickFree}>
+					<div className="edge-panel__glow" />
+					<div className="edge-panel__tag"><span /> Complimentary, no card</div>
+					<h3>Free <em>Mock Exam</em></h3>
+					<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
+					<ul>
+						<li><Icon.check /> Full timed mock exam</li>
+						<li><Icon.check /> AI-powered instant marking</li>
+						<li><Icon.check /> Detailed performance feedback</li>
+						<li><Icon.check /> No credit card required</li>
+					</ul>
+					<div className="edge-panel__cta">
+						<span>Start free mock</span>
+						<i><Icon.arrow /></i>
+					</div>
+				</button>
+
+				<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickRevision}>
+					<div className="edge-panel__glow" />
+					<div className="edge-panel__tag"><span /> Guided programme</div>
+					<h3>Revision <em>Session</em></h3>
+					<p>Enroll in structured revision with expert-designed mocks, practice and progress support.</p>
+					<ul>
+						<li><Icon.check /> Multiple practice sessions</li>
+						<li><Icon.check /> Topic-specific revision</li>
+						<li><Icon.check /> Progress tracking and analytics</li>
+						<li><Icon.check /> Expert-designed questions</li>
+					</ul>
+					<div className="edge-panel__cta">
+						<span>Start revision</span>
+						<i><Icon.arrow /></i>
+					</div>
+				</button>
+			</div>
+		</section>
+	);
+}
+
+function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
+	useEffect(() => {
+		const onKey = (e) => {
+			if (e.key === 'Escape') onClose();
+		};
+		window.addEventListener('keydown', onKey);
+		document.body.style.overflow = 'hidden';
+		return () => {
+			window.removeEventListener('keydown', onKey);
+			document.body.style.overflow = '';
+		};
+	}, [onClose]);
+
+	const title = kind === 'free' ? 'Free Mock' : 'Revision Session';
+	const sub = kind === 'free'
+		? 'Pick your CIMA case study to start a complimentary timed mock with AI marking.'
+		: 'Pick your CIMA case study to enroll in a guided revision programme.';
+
+	return (
+		<div className="edge-overlay" role="dialog" aria-modal="true" aria-label={`${title} case study selection`}>
+			<div className="edge-overlay__bg" />
+			<button className="edge-overlay__close" onClick={onClose} aria-label="Close">
+				<Icon.close />
+			</button>
+
+			<div className="edge-overlay__content">
+				<div className="edge-overlay__eyebrow">{title}, step 1 of 2</div>
+				<h2 className="edge-overlay__title">Choose your <em>case study.</em></h2>
+				<p className="edge-overlay__sub">{sub}</p>
+
+				<div className="edge-option-grid">
+					{CASE_STUDIES.map((option) => {
+						const key = option.code.toLowerCase();
+						const fallbackDays = Number(settings[`edge_${key}_days_from_now`] ?? option.fallbackDays);
+						const fallbackTarget = baseTime + (Number.isFinite(fallbackDays) ? fallbackDays : option.fallbackDays) * 86400000;
+						const configuredTarget = parseTargetMs(settings[`edge_${key}_opens_at`], fallbackTarget);
+						const isOpenByTime = configuredTarget <= Date.now();
+						const available = toBool(settings[`edge_${key}_available`], option.code === 'OCS') || isOpenByTime;
+
+						return (
+							<div key={option.code} className={`edge-option${available ? ' edge-option--available' : ''}`}>
+								<div className="edge-option__code">{option.code}</div>
+								<h3>{option.name} <em>Case Study</em></h3>
+								<p>{option.tagline}</p>
+
+								<div className="edge-option__meta">
+									{available ? (
+										<>
+											<div className="edge-option__status"><span /> Available now</div>
+											<button className="edge-option__cta" onClick={() => onPick({ ...option, kind })}>
+												<span>Continue</span>
+												<i><Icon.arrow /></i>
+											</button>
+										</>
+									) : (
+										<>
+											<div className="edge-option__status"><span /> Opens soon</div>
+											<Countdown targetMs={configuredTarget} />
+											<div className="edge-option__disabled">Registration opens with the next intake window.</div>
+										</>
+									)}
 								</div>
 							</div>
-						))}
-					</div>
+						);
+					})}
 				</div>
-			</section>
+			</div>
+		</div>
+	);
+}
 
-			{/* Additional Tools Section */}
-			<section className="edge-tools">
-				<div className="edge-container">
-					<div className="edge-section-header">
-						<span className="edge-section-icon">🔧</span>
-						<h2 className="edge-section-title">Additional Student Tools</h2>
-					</div>
-					<div className="edge-tools-grid">
-						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">📊</span>
-							<h3 className="edge-tool-card__title">Progress Tracking</h3>
-							<p className="edge-tool-card__desc">
-								Comprehensive dashboard tracks your progress across all activities, highlighting strengths and areas for improvement.
-							</p>
-						</div>
-						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">🔔</span>
-							<h3 className="edge-tool-card__title">Real-Time Updates</h3>
-							<p className="edge-tool-card__desc">
-								Toast notifications and announcements keep you informed of important updates and deadlines.
-							</p>
-						</div>
-						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">💬</span>
-							<h3 className="edge-tool-card__title">Student Q&A</h3>
-							<p className="edge-tool-card__desc">
-								Ask questions, get answers, and collaborate with fellow students in our interactive Q&A system.
-							</p>
-						</div>
-						<div className="edge-tool-card">
-							<span className="edge-tool-card__icon">⚙️</span>
-							<h3 className="edge-tool-card__title">Personalization</h3>
-							<p className="edge-tool-card__desc">
-								Customize your learning experience with student preferences and personalized settings.
-							</p>
-						</div>
-					</div>
-				</div>
-			</section>
+function SignupView({ selection, onBack }) {
+	const { selectedCountry, setSelectedCountry, currency, formatAmount } = usePricing();
+	const [form, setForm] = useState({
+		firstName: '',
+		lastName: '',
+		email: '',
+		phone: '',
+		cimaId: '',
+		studyMode: 'Online',
+		country: selectedCountry || '',
+		notes: '',
+	});
+	const [submitting, setSubmitting] = useState(false);
+	const [submitted, setSubmitted] = useState(false);
+	const [error, setError] = useState('');
 
-			{/* Why Edge is Different */}
-			<section className="edge-difference">
-				<div className="edge-container">
-					<div className="edge-difference-content">
-						<div className="edge-section-header">
-							<span className="edge-section-icon edge-section-icon--light">💡</span>
-							<h2 className="edge-section-title">Why Nanaska Edge?</h2>
-						</div>
-						<div className="edge-difference-grid">
-							<div className="edge-difference-item">
-								<span className="edge-difference-item__num">01</span>
-								<h3 className="edge-difference-item__title">AI-Powered Intelligence</h3>
-								<p className="edge-difference-item__desc">
-									Advanced AI marking and tutoring provide instant, accurate feedback that adapts to your learning style.
-								</p>
-							</div>
-							<div className="edge-difference-item">
-								<span className="edge-difference-item__num">02</span>
-								<h3 className="edge-difference-item__title">Comprehensive Coverage</h3>
-								<p className="edge-difference-item__desc">
-									From mock exams to industry knowledge, every tool you need for CIMA success is integrated in one platform.
-								</p>
-							</div>
-							<div className="edge-difference-item">
-								<span className="edge-difference-item__num">03</span>
-								<h3 className="edge-difference-item__title">Time-Saving Automation</h3>
-								<p className="edge-difference-item__desc">
-									Automated marking and instant feedback mean you spend more time learning and less time waiting for results.
-								</p>
-							</div>
-							<div className="edge-difference-item">
-								<span className="edge-difference-item__num">04</span>
-								<h3 className="edge-difference-item__title">Expert-Designed Content</h3>
-								<p className="edge-difference-item__desc">
-									All content created by experienced CIMA examiners and tutors, ensuring alignment with exam standards.
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</section>
+	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
+	const productLabel = `${selection.code} ${selection.name} Case Study, ${kindLabel}`;
+	const prices = getCoursePricesByCode(selection.code, 0);
+	const effectiveCountry = form.country || selectedCountry;
+	const selectedCurrency = effectiveCountry ? (effectiveCountry === 'Sri Lanka' ? 'LKR' : 'GBP') : currency;
+	const amount = selection.kind === 'free' ? 0 : getPriceForCountry(prices, effectiveCountry);
+	const priceLabel = selection.kind === 'free' ? 'Complimentary' : formatCurrency(amount, selectedCurrency);
+	const combinationId = getCombinationIdForCourse(selection.code);
 
-			{/* CTA Section */}
-			<section className="edge-cta">
-				<div className="edge-container edge-cta__inner">
-					<div className="edge-cta__content">
-						<h2 className="edge-cta__title">Ready to Experience the Edge Advantage?</h2>
-						<p className="edge-cta__subtitle">
-							Join thousands of students using Nanaska Edge to accelerate their CIMA journey.
-							Get instant AI feedback, 24/7 tutor support, and comprehensive exam preparation tools.
+	const update = (key) => (e) => {
+		const value = e.target.value;
+		if (key === 'country') setSelectedCountry(value);
+		setForm((prev) => ({ ...prev, [key]: value }));
+	};
+
+	const saveEnrollment = async ({ orderId } = {}) => {
+		const notes = [
+			'Nanaska Edge registration',
+			`Programme: ${kindLabel}`,
+			`Case study: ${selection.code} ${selection.name}`,
+			`Study mode: ${form.studyMode}`,
+			form.notes ? `Student notes: ${form.notes}` : '',
+		].filter(Boolean).join('\n');
+
+		const res = await fetch(`${API_URL}/payments/enrollment-submit`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				firstName: form.firstName,
+				lastName: form.lastName,
+				email: form.email,
+				phone: form.phone || undefined,
+				cimaId: form.cimaId || undefined,
+				cimaStage: selection.cimaStage,
+				country: form.country || undefined,
+				notes,
+				cartItems: [{
+					type: 'nanaska-edge',
+					title: productLabel,
+					name: productLabel,
+					courseCode: selection.code,
+					combinationId,
+					kind: selection.kind,
+					studyMode: form.studyMode,
+				}],
+				currency: selectedCurrency,
+				amount,
+				orderId,
+			}),
+		});
+
+		if (!res.ok) {
+			const body = await res.json().catch(() => ({}));
+			throw new Error(body.message || 'Could not save your registration.');
+		}
+	};
+
+	const startPayment = async () => {
+		const payload = {
+			firstName: form.firstName,
+			lastName: form.lastName,
+			email: form.email,
+			phone: form.phone || undefined,
+			currency: selectedCurrency,
+			...(combinationId ? { combinationId } : { courseIds: [selection.code] }),
+		};
+
+		const res = await fetch(`${API_URL}/payments/guest-create`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload),
+		});
+
+		if (!res.ok) {
+			const body = await res.json().catch(() => ({}));
+			throw new Error(body.message || 'Could not start payment.');
+		}
+
+		return res.json();
+	};
+
+	const submit = async (e) => {
+		e.preventDefault();
+		setSubmitting(true);
+		setError('');
+
+		try {
+			if (selection.kind === 'revision') {
+				const payment = await startPayment();
+				await saveEnrollment({ orderId: payment.orderId });
+				window.location.href = payment.paymentUrl;
+				return;
+			}
+
+			await saveEnrollment();
+			setSubmitted(true);
+		} catch (err) {
+			setError(err.message || 'Something went wrong. Please try again.');
+		} finally {
+			setSubmitting(false);
+		}
+	};
+
+	return (
+		<div className="edge-signup" role="dialog" aria-modal="true" aria-label={`${productLabel} registration`}>
+			<div className="edge-signup__shell">
+				<aside className="edge-signup__side">
+					<div>
+						<button className="edge-signup__back" onClick={onBack}>
+							<span><Icon.arrow /></span>
+							Back to Edge
+						</button>
+
+						<div className="edge-signup__eyebrow">Enrollment, {selection.code}</div>
+						<h2>You're one step from the <em>{selection.name}</em> case study.</h2>
+						<p>
+							Tell us a little about yourself. We will register your Edge interest in the main Nanaska admin flow
+							and {selection.kind === 'free' ? 'send the next access instructions.' : 'send you to secure payment.'}
 						</p>
-						<div className="edge-cta__actions">
-							<Link to="/enrollment" className="edge-cta__btn edge-cta__btn--primary">
-								Start Your Free Trial
-							</Link>
-							<Link to="/contact" className="edge-cta__btn edge-cta__btn--outline">
-								Contact Us
-							</Link>
-						</div>
 					</div>
-					<div className="edge-cta__features">
-						<div className="edge-cta__feature">✓ Instant AI marking & feedback</div>
-						<div className="edge-cta__feature">✓ Comprehensive mock exams</div>
-						<div className="edge-cta__feature">✓ Educational video library</div>
-						<div className="edge-cta__feature">✓ Progress tracking & analytics</div>
-						<div className="edge-cta__feature">✓ Past papers library</div>
-						<div className="edge-cta__feature">✓ Typing tutor practice</div>
+
+					<div className="edge-signup__summary">
+						<div><span>Programme</span><strong>{kindLabel}</strong></div>
+						<div><span>Case study</span><strong>{selection.code}, {selection.name}</strong></div>
+						<div><span>Format</span><strong>{form.studyMode}</strong></div>
+						<div><span>Price</span><strong>{selection.kind === 'free' ? priceLabel : formatAmount(amount)}</strong></div>
+					</div>
+				</aside>
+
+				<main className="edge-signup__form-wrap">
+					{submitted ? (
+						<div className="edge-success">
+							<div className="edge-success__icon"><Icon.check /></div>
+							<h2>You're <em>in.</em></h2>
+							<p>
+								Thanks {form.firstName || splitName(form)}. Your {productLabel} registration has been saved,
+								and the Nanaska team will contact you at <strong>{form.email}</strong>.
+							</p>
+							<button className="edge-btn edge-btn--primary" onClick={onBack}>
+								Back to Edge <Icon.arrow />
+							</button>
+						</div>
+					) : (
+						<form className="edge-form" onSubmit={submit}>
+							<div className="edge-form__eyebrow">Your details</div>
+							{error && <div className="edge-form__error">{error}</div>}
+
+							<div className="edge-form__row">
+								<label>
+									<span>First name</span>
+									<input required value={form.firstName} onChange={update('firstName')} placeholder="First name" />
+								</label>
+								<label>
+									<span>Last name</span>
+									<input required value={form.lastName} onChange={update('lastName')} placeholder="Last name" />
+								</label>
+							</div>
+
+							<label>
+								<span>Email</span>
+								<input required type="email" value={form.email} onChange={update('email')} placeholder="you@example.com" />
+							</label>
+
+							<div className="edge-form__row">
+								<label>
+									<span>Phone</span>
+									<input required value={form.phone} onChange={update('phone')} placeholder="+94 77 ..." />
+								</label>
+								<label>
+									<span>CIMA Contact ID <small>(optional)</small></span>
+									<input value={form.cimaId} onChange={update('cimaId')} placeholder="0000000" />
+								</label>
+							</div>
+
+							<div className="edge-form__row">
+								<label>
+									<span>Study mode</span>
+									<select value={form.studyMode} onChange={update('studyMode')}>
+										<option>Online</option>
+										<option>Hybrid</option>
+										<option>On-campus (Colombo)</option>
+									</select>
+								</label>
+								<label>
+									<span>Country</span>
+									<select value={form.country} onChange={update('country')}>
+										<option value="">Select country...</option>
+										{COUNTRIES.map((country) => <option key={country}>{country}</option>)}
+									</select>
+								</label>
+							</div>
+
+							<label>
+								<span>Anything we should know?</span>
+								<textarea rows="3" value={form.notes} onChange={update('notes')} placeholder="Goals, prior attempts, scheduling notes..." />
+							</label>
+
+							<button type="submit" className="edge-btn edge-btn--primary" disabled={submitting}>
+								{submitting ? 'Processing...' : selection.kind === 'free' ? 'Start free mock' : `Pay ${priceLabel}`} <Icon.arrow />
+							</button>
+
+							<p className="edge-form__fineprint">
+								{selection.kind === 'free'
+									? 'Your registration will appear under Nanaska admin enrollment submissions.'
+									: 'Secure payment is processed through the main Nanaska payment gateway.'}
+							</p>
+						</form>
+					)}
+				</main>
+			</div>
+		</div>
+	);
+}
+
+export default function NanaskaEdgePage() {
+	const settings = useEdgeSettings();
+	const { mockType } = useParams();
+	const [selectionKind, setSelectionKind] = useState(null);
+	const [signupSelection, setSignupSelection] = useState(null);
+	const baseTime = useMemo(() => Date.now(), []);
+
+	useReveal();
+
+	useEffect(() => {
+		if (mockType === 'free-mock') setSelectionKind('free');
+		if (mockType === 'revision-mock') setSelectionKind('revision');
+	}, [mockType]);
+
+	const openSelection = (kind) => {
+		setSignupSelection(null);
+		setSelectionKind(kind);
+	};
+
+	return (
+		<div className="edge-page" data-edge-theme="light">
+			<Aurora />
+
+			<section className="edge-hero edge-container">
+				<div className="edge-hero__content edge-reveal is-in">
+					<div className="edge-eyebrow"><span /> Introducing Nanaska Edge</div>
+					<h1>The future of <span>CIMA</span><br />preparation, <em>reimagined.</em></h1>
+					<p>
+						AI-powered exam preparation that transforms how you study for CIMA.
+						Instant feedback, focused guidance, and every resource you need in one calm place.
+					</p>
+
+					<div className="edge-hero__actions">
+						<button className="edge-btn edge-btn--primary" onClick={() => openSelection('free')}>
+							Start free mock <Icon.arrow />
+						</button>
+						<button className="edge-btn edge-btn--ghost" onClick={() => openSelection('revision')}>
+							Register for revision
+						</button>
+					</div>
+
+					<div className="edge-stats">
+						<div><strong>90%</strong><span>Faster marking turnaround</span></div>
+						<div><strong>24/7</strong><span>AI tutor support, always on</span></div>
+						<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
 					</div>
 				</div>
 			</section>
+
+			<Panels onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
+
+			<section className="edge-features edge-container">
+				<div className="edge-reveal">
+					<div className="edge-section-eyebrow">Feature set</div>
+					<h2 className="edge-section-title">Everything you need <em>to excel.</em></h2>
+					<p className="edge-section-sub">Nine purpose-built tools that work together across the full case-study journey.</p>
+				</div>
+
+				<div className="edge-feature-grid">
+					{FEATURES.map((feature, index) => (
+						<div key={feature.title} className="edge-feature edge-reveal" style={{ transitionDelay: `${index * 50}ms` }}>
+							<div className="edge-feature__num">{String(index + 1).padStart(2, '0')}</div>
+							<div className="edge-feature__icon">{Icon.symbol(feature.icon)}</div>
+							<h3>{feature.title}</h3>
+							<p>{feature.body}</p>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<section className="edge-why edge-container">
+				<div className="edge-reveal">
+					<div className="edge-section-eyebrow">Why Edge</div>
+					<h2 className="edge-section-title">An <em>edge</em> measured in hours saved.</h2>
+					<p className="edge-section-sub">Built specifically for CIMA students, by people who know what the exam asks of you.</p>
+				</div>
+
+				<div className="edge-why-grid">
+					{WHY_EDGE.map((item, index) => (
+						<div key={item.num} className="edge-why-card edge-reveal" style={{ transitionDelay: `${index * 60}ms` }}>
+							<div>{item.num}</div>
+							<h3>{item.title}</h3>
+							<p>{item.body}</p>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<section className="edge-cta edge-container">
+				<div className="edge-cta__card edge-reveal">
+					<h2>Ready for the <em>Edge</em> advantage?</h2>
+					<p>
+						Start with a free mock or enroll in a guided revision session using the same Nanaska admin,
+						payment, and registration systems you already trust.
+					</p>
+					<div className="edge-cta__actions">
+						<button className="edge-btn edge-btn--primary" onClick={() => openSelection('free')}>
+							Start your free mock <Icon.arrow />
+						</button>
+						<Link className="edge-btn edge-btn--ghost" to="/contact">Talk to an advisor</Link>
+					</div>
+					<div className="edge-cta__bullets">
+						<div><Icon.check /> Instant AI marking</div>
+						<div><Icon.check /> Mock exams</div>
+						<div><Icon.check /> Video library</div>
+						<div><Icon.check /> Progress analytics</div>
+						<div><Icon.check /> Past papers</div>
+						<div><Icon.check /> Typing tutor</div>
+					</div>
+				</div>
+			</section>
+
+			{selectionKind && (
+				<SelectionModal
+					kind={selectionKind}
+					settings={settings}
+					baseTime={baseTime}
+					onClose={() => setSelectionKind(null)}
+					onPick={(selection) => {
+						setSelectionKind(null);
+						setSignupSelection(selection);
+					}}
+				/>
+			)}
+
+			{signupSelection && (
+				<SignupView selection={signupSelection} onBack={() => setSignupSelection(null)} />
+			)}
 		</div>
 	);
 }

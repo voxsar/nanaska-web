@@ -4,6 +4,8 @@ import './RegistrationSuccessPage.css';
 export default function RegistrationSuccessPage() {
 	const location = useLocation();
 	const { cimaType, mockType } = location.state || {};
+	const selectedCimaType = cimaType || 'selected case study';
+	const selectedMockType = mockType || 'Nanaska Edge registration';
 
 	return (
 		<div className="registration-success-page">
@@ -12,10 +14,10 @@ export default function RegistrationSuccessPage() {
 					<div className="registration-success-icon">✓</div>
 					<h1 className="registration-success-title">Registration Successful!</h1>
 					<p className="registration-success-message">
-						Thank you for registering for the <strong>{mockType}</strong> at the <strong>{cimaType}</strong> level.
+						Thank you for registering for <strong>{selectedMockType}</strong> for <strong>{selectedCimaType}</strong>.
 					</p>
 					<p className="registration-success-info">
-						Our team will be in touch with you shortly via email with further instructions and access details.
+						Our team will be in touch shortly with further instructions and access details.
 					</p>
 					<div className="registration-success-actions">
 						<Link to="/nanaska-edge" className="registration-success-btn registration-success-btn--primary">

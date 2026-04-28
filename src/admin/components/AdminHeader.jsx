@@ -13,6 +13,7 @@ const PAGE_TITLES = {
   '/admin/meta-tags': 'Meta Tags',
   '/admin/analytics': 'Analytics & Pixels',
   '/admin/payment-settings': 'Payment Settings',
+  '/admin/nanaska-edge-settings': 'Nanaska Edge Settings',
   '/admin/database': 'Database Viewer',
   '/admin/profile': 'My Profile',
 };

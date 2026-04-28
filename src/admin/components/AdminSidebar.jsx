@@ -26,6 +26,7 @@ const settingItems = [
 	{ label: 'Meta Tags', icon: '🏷️', to: '/admin/meta-tags' },
 	{ label: 'Analytics & Pixels', icon: '📈', to: '/admin/analytics' },
 	{ label: 'Payment Settings', icon: '⚙️', to: '/admin/payment-settings' },
+	{ label: 'Nanaska Edge', icon: '🚀', to: '/admin/nanaska-edge-settings' },
 	{ label: 'Contact Settings', icon: '📞', to: '/admin/contact-settings' },
 	{ label: 'Email Settings', icon: '✉️', to: '/admin/email-settings' },
 ];
