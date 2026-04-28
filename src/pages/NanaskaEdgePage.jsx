@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { usePricing } from '../context/PricingContext';
 import {
@@ -267,13 +267,17 @@ function Panels({ onPickFree, onPickRevision }) {
 }
 
 function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
+	const [now, setNow] = useState(() => Date.now());
+
 	useEffect(() => {
 		const onKey = (e) => {
 			if (e.key === 'Escape') onClose();
 		};
+		const id = window.setInterval(() => setNow(Date.now()), 1000);
 		window.addEventListener('keydown', onKey);
 		document.body.style.overflow = 'hidden';
 		return () => {
+			window.clearInterval(id);
 			window.removeEventListener('keydown', onKey);
 			document.body.style.overflow = '';
 		};
@@ -302,7 +306,7 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 						const fallbackDays = Number(settings[`edge_${key}_days_from_now`] ?? option.fallbackDays);
 						const fallbackTarget = baseTime + (Number.isFinite(fallbackDays) ? fallbackDays : option.fallbackDays) * 86400000;
 						const configuredTarget = parseTargetMs(settings[`edge_${key}_opens_at`], fallbackTarget);
-						const isOpenByTime = configuredTarget <= Date.now();
+						const isOpenByTime = configuredTarget <= now;
 						const available = toBool(settings[`edge_${key}_available`], option.code === 'OCS') || isOpenByTime;
 
 						return (
@@ -570,16 +574,15 @@ function SignupView({ selection, onBack }) {
 export default function NanaskaEdgePage() {
 	const settings = useEdgeSettings();
 	const { mockType } = useParams();
-	const [selectionKind, setSelectionKind] = useState(null);
+	const [selectionKind, setSelectionKind] = useState(() => {
+		if (mockType === 'free-mock') return 'free';
+		if (mockType === 'revision-mock') return 'revision';
+		return null;
+	});
 	const [signupSelection, setSignupSelection] = useState(null);
-	const baseTime = useMemo(() => Date.now(), []);
+	const [baseTime] = useState(() => Date.now());
 
 	useReveal();
-
-	useEffect(() => {
-		if (mockType === 'free-mock') setSelectionKind('free');
-		if (mockType === 'revision-mock') setSelectionKind('revision');
-	}, [mockType]);
 
 	const openSelection = (kind) => {
 		setSignupSelection(null);
