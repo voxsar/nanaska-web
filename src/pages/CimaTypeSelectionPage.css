@@ -1,0 +1,295 @@
+/* ============================================
+   CIMA Type Selection Page Styles
+   ============================================ */
+
+.cima-selection-page {
+	min-height: 100vh;
+	background: #f9fbff;
+}
+
+.cima-selection-header {
+	background: linear-gradient(135deg, #1B365D 0%, #24ADE3 100%);
+	color: white;
+	padding: 4rem 1.5rem;
+	text-align: center;
+}
+
+.cima-selection-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 1.5rem;
+}
+
+.cima-selection-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-bottom: 1rem;
+}
+
+.cima-selection-subtitle {
+	font-size: 1.125rem;
+	opacity: 0.95;
+}
+
+.cima-selection-content {
+	padding: 4rem 1.5rem;
+}
+
+/* ============================================
+   CIMA Types Grid
+   ============================================ */
+
+.cima-types-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 2rem;
+}
+
+.cima-type-card {
+	background: white;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	padding: 2rem;
+	transition: all 0.3s ease;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.cima-type-card:not(.cima-type-card--disabled):hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 24px rgba(27, 54, 93, 0.15);
+	border-color: #24ADE3;
+}
+
+.cima-type-card--disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	background: #fafafa;
+}
+
+.cima-type-card__badge {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: #F5A623;
+	color: white;
+	padding: 0.375rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.cima-type-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+}
+
+.cima-type-card__name {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #1B365D;
+	margin: 0;
+}
+
+.cima-type-card__code {
+	background: #e5f4fb;
+	color: #24ADE3;
+	padding: 0.375rem 0.875rem;
+	border-radius: 6px;
+	font-weight: 600;
+	font-size: 0.875rem;
+}
+
+.cima-type-card__desc {
+	color: #6b7280;
+	line-height: 1.6;
+	margin-bottom: 1rem;
+}
+
+.cima-type-card__exams {
+	color: #1B365D;
+	font-size: 0.9rem;
+	margin-bottom: 1.5rem;
+	padding: 1rem;
+	background: #f9fbff;
+	border-radius: 8px;
+}
+
+.cima-type-card__exams strong {
+	display: block;
+	margin-bottom: 0.5rem;
+	color: #1B365D;
+}
+
+.cima-type-card__btn {
+	width: 100%;
+	padding: 0.875rem 1.5rem;
+	background: #24ADE3;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 1rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.cima-type-card__btn:hover {
+	background: #1B9DD1;
+	transform: translateY(-2px);
+}
+
+/* ============================================
+   Registration Form
+   ============================================ */
+
+.cima-registration-form {
+	max-width: 600px;
+	margin: 0 auto;
+	background: white;
+	padding: 2.5rem;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cima-back-btn {
+	background: transparent;
+	border: none;
+	color: #24ADE3;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0.5rem 0;
+	margin-bottom: 2rem;
+	font-size: 1rem;
+	transition: color 0.3s ease;
+}
+
+.cima-back-btn:hover {
+	color: #1B9DD1;
+}
+
+.cima-registration-header {
+	text-align: center;
+	margin-bottom: 2rem;
+}
+
+.cima-registration-header h2 {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: #1B365D;
+	margin-bottom: 0.5rem;
+}
+
+.cima-registration-header p {
+	color: #6b7280;
+	font-size: 1rem;
+}
+
+.cima-error-message {
+	background: #fee;
+	color: #c33;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1.5rem;
+	text-align: center;
+	font-weight: 500;
+}
+
+.cima-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.cima-form-group {
+	display: flex;
+	flex-direction: column;
+}
+
+.cima-form-group label {
+	font-weight: 600;
+	color: #1B365D;
+	margin-bottom: 0.5rem;
+	font-size: 0.95rem;
+}
+
+.cima-form-group input {
+	padding: 0.875rem 1rem;
+	border: 2px solid #e5e7eb;
+	border-radius: 8px;
+	font-size: 1rem;
+	transition: all 0.3s ease;
+}
+
+.cima-form-group input:focus {
+	outline: none;
+	border-color: #24ADE3;
+	box-shadow: 0 0 0 3px rgba(36, 173, 227, 0.1);
+}
+
+.cima-submit-btn {
+	padding: 1rem 2rem;
+	background: #F5A623;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 1.125rem;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	margin-top: 1rem;
+}
+
+.cima-submit-btn:hover:not(:disabled) {
+	background: #e69515;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+
+.cima-submit-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 768px) {
+	.cima-selection-title {
+		font-size: 2rem;
+	}
+
+	.cima-selection-subtitle {
+		font-size: 1rem;
+	}
+
+	.cima-types-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.cima-registration-form {
+		padding: 1.5rem;
+	}
+
+	.cima-registration-header h2 {
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.cima-selection-header {
+		padding: 3rem 1.5rem;
+	}
+
+	.cima-selection-title {
+		font-size: 1.75rem;
+	}
+
+	.cima-type-card__name {
+		font-size: 1.25rem;
+	}
+}

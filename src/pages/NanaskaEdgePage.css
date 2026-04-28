@@ -173,6 +173,141 @@
 }
 
 /* ============================================
+   Mock Options Section
+   ============================================ */
+
+.edge-mock-options {
+	padding: 5rem 1.5rem;
+	background: white;
+}
+
+.edge-mock-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 2.5rem;
+	max-width: 1000px;
+	margin: 0 auto;
+}
+
+.edge-mock-card {
+	background: #f9fbff;
+	border: 2px solid #e5e7eb;
+	border-radius: 16px;
+	padding: 2.5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	transition: all 0.3s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.edge-mock-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 4px;
+	background: linear-gradient(90deg, #24ADE3, #1B365D);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.3s ease;
+}
+
+.edge-mock-card:hover {
+	transform: translateY(-8px);
+	box-shadow: 0 12px 32px rgba(27, 54, 93, 0.15);
+	border-color: #24ADE3;
+}
+
+.edge-mock-card:hover::before {
+	transform: scaleX(1);
+}
+
+.edge-mock-card__icon {
+	font-size: 4rem;
+	margin-bottom: 1.5rem;
+	display: block;
+	transition: transform 0.3s ease;
+}
+
+.edge-mock-card:hover .edge-mock-card__icon {
+	transform: scale(1.1) rotate(5deg);
+}
+
+.edge-mock-card__title {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: #1B365D;
+	margin-bottom: 1rem;
+}
+
+.edge-mock-card__desc {
+	color: #6b7280;
+	line-height: 1.6;
+	margin-bottom: 1.5rem;
+	font-size: 1rem;
+}
+
+.edge-mock-card__features {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 2rem 0;
+	width: 100%;
+}
+
+.edge-mock-card__features li {
+	color: #1B365D;
+	padding: 0.625rem 0;
+	font-size: 0.95rem;
+	font-weight: 500;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.edge-mock-card__features li:last-child {
+	border-bottom: none;
+}
+
+.edge-mock-card__btn {
+	padding: 1rem 2.5rem;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 1rem;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	display: inline-block;
+	cursor: pointer;
+	border: 2px solid transparent;
+	margin-top: auto;
+}
+
+.edge-mock-card__btn--primary {
+	background: #F5A623;
+	color: white;
+	box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+
+.edge-mock-card__btn--primary:hover {
+	background: #e69515;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+}
+
+.edge-mock-card__btn--secondary {
+	background: #24ADE3;
+	color: white;
+	box-shadow: 0 4px 12px rgba(36, 173, 227, 0.3);
+}
+
+.edge-mock-card__btn--secondary:hover {
+	background: #1B9DD1;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(36, 173, 227, 0.4);
+}
+
+/* ============================================
    Section Headers
    ============================================ */
 
@@ -653,6 +788,11 @@
 
 	.edge-section-subtitle {
 		font-size: 1rem;
+	}
+
+	.edge-mock-grid {
+		grid-template-columns: 1fr;
+		gap: 1.5rem;
 	}
 
 	.edge-feature-grid {

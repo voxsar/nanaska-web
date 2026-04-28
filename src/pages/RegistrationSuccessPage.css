@@ -1,0 +1,168 @@
+/* ============================================
+   Registration Success Page Styles
+   ============================================ */
+
+.registration-success-page {
+	min-height: 100vh;
+	background: linear-gradient(135deg, #1B365D 0%, #24ADE3 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+}
+
+.registration-success-container {
+	max-width: 600px;
+	width: 100%;
+}
+
+.registration-success-card {
+	background: white;
+	border-radius: 16px;
+	padding: 3rem;
+	text-align: center;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.registration-success-icon {
+	width: 80px;
+	height: 80px;
+	background: #22c55e;
+	color: white;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 3rem;
+	font-weight: bold;
+	margin: 0 auto 2rem;
+	animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+	from {
+		transform: scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+.registration-success-title {
+	font-size: 2rem;
+	font-weight: 700;
+	color: #1B365D;
+	margin-bottom: 1rem;
+}
+
+.registration-success-message {
+	font-size: 1.125rem;
+	color: #6b7280;
+	line-height: 1.6;
+	margin-bottom: 1rem;
+}
+
+.registration-success-message strong {
+	color: #1B365D;
+}
+
+.registration-success-info {
+	font-size: 1rem;
+	color: #6b7280;
+	line-height: 1.6;
+	margin-bottom: 2rem;
+	padding: 1rem;
+	background: #f9fbff;
+	border-radius: 8px;
+}
+
+.registration-success-actions {
+	display: flex;
+	gap: 1rem;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.registration-success-btn {
+	padding: 1rem 2rem;
+	border-radius: 8px;
+	font-weight: 600;
+	font-size: 1rem;
+	text-decoration: none;
+	transition: all 0.3s ease;
+	display: inline-block;
+	cursor: pointer;
+	border: 2px solid transparent;
+}
+
+.registration-success-btn--primary {
+	background: #F5A623;
+	color: white;
+	box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+}
+
+.registration-success-btn--primary:hover {
+	background: #e69515;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+}
+
+.registration-success-btn--outline {
+	background: transparent;
+	color: #1B365D;
+	border-color: #1B365D;
+}
+
+.registration-success-btn--outline:hover {
+	background: #1B365D;
+	color: white;
+	transform: translateY(-2px);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 768px) {
+	.registration-success-card {
+		padding: 2rem;
+	}
+
+	.registration-success-title {
+		font-size: 1.75rem;
+	}
+
+	.registration-success-message {
+		font-size: 1rem;
+	}
+
+	.registration-success-actions {
+		flex-direction: column;
+	}
+
+	.registration-success-btn {
+		width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.registration-success-page {
+		padding: 1rem;
+	}
+
+	.registration-success-card {
+		padding: 1.5rem;
+	}
+
+	.registration-success-icon {
+		width: 60px;
+		height: 60px;
+		font-size: 2rem;
+	}
+
+	.registration-success-title {
+		font-size: 1.5rem;
+	}
+}
