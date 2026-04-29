@@ -286,9 +286,6 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 	return (
 		<div className="edge-overlay" role="dialog" aria-modal="true" aria-label={`${title} case study selection`}>
 			<div className="edge-overlay__bg" />
-			<button className="edge-overlay__close" onClick={onClose} aria-label="Close">
-				<Icon.close />
-			</button>
 
 			<div className="edge-overlay__content">
 				<div className="edge-overlay__eyebrow">{title}, step 1 of 2</div>
@@ -330,6 +327,12 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 							</div>
 						);
 					})}
+				</div>
+
+				<div className="edge-overlay__footer">
+					<button className="edge-overlay__close" onClick={onClose} aria-label="Close">
+						<Icon.close /> Close
+					</button>
 				</div>
 			</div>
 		</div>

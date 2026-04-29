@@ -838,26 +838,30 @@
 	}
 }
 
+.edge-overlay__footer {
+	display: flex;
+	justify-content: center;
+	margin-top: 1.5rem;
+}
+
 .edge-overlay__close {
-	position: fixed;
-	top: 1.25rem;
-	right: 1.25rem;
-	z-index: 300;
-	display: grid;
-	place-items: center;
-	width: 2.75rem;
-	height: 2.75rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.65rem 1.4rem;
 	border: 1px solid rgba(255, 255, 255, 0.34);
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.95);
-	color: var(--edge-text);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
 	transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .edge-overlay__close:hover {
-	background: #fff;
-	transform: scale(1.08);
+	background: rgba(255, 255, 255, 0.25);
+	transform: scale(1.04);
 }
 
 .edge-overlay__close svg {
@@ -1353,12 +1357,7 @@
 
 	.edge-overlay {
 		align-items: start;
-		padding: 4rem 1rem 1rem;
-	}
-
-	.edge-overlay__close {
-		top: 0.85rem;
-		right: 0.85rem;
+		padding: 2rem 1rem 2rem;
 	}
 
 	.edge-overlay__sub {
