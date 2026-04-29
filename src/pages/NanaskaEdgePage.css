@@ -106,8 +106,13 @@
 }
 
 @keyframes edgeFloat {
-	from { transform: translate3d(-2vw, -1.5vh, 0) scale(1); }
-	to { transform: translate3d(3vw, 2vh, 0) scale(1.04); }
+	from {
+		transform: translate3d(-2vw, -1.5vh, 0) scale(1);
+	}
+
+	to {
+		transform: translate3d(3vw, 2vh, 0) scale(1.04);
+	}
 }
 
 .edge-btn {
@@ -175,26 +180,142 @@
 }
 
 .edge-hero::after {
-	content: "";
+	display: none;
+}
+
+.edge-hero__logo {
 	position: absolute;
-	right: 0;
-	top: 8rem;
-	width: min(44vw, 520px);
-	aspect-ratio: 1;
-	border: 1px solid rgba(19, 169, 189, 0.18);
-	border-radius: 50%;
-	background:
-		linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0)),
-		repeating-conic-gradient(from 0deg, rgba(19, 169, 189, 0.18) 0deg 8deg, transparent 8deg 18deg);
-	mask-image: radial-gradient(circle, transparent 0 34%, #000 35% 100%);
-	opacity: 0.75;
+	right: -2vw;
+	top: 50%;
+	transform: translateY(-50%);
+	width: min(42vw, 500px);
+	opacity: 0.92;
 	pointer-events: none;
+	z-index: 1;
+	object-fit: contain;
 }
 
 .edge-hero__content {
-	max-width: 820px;
+	max-width: 56%;
 	position: relative;
 	z-index: 1;
+}
+
+/* ── Blue alternating sections ── */
+.edge-section--blue {
+	width: 100%;
+	background: var(--edge-navy);
+}
+
+.edge-section--blue .edge-section-eyebrow {
+	color: var(--edge-teal);
+}
+
+.edge-section--blue .edge-section-title {
+	color: #fff;
+}
+
+.edge-section--blue .edge-section-title em {
+	color: var(--edge-amber);
+}
+
+.edge-section--blue .edge-section-title span {
+	color: var(--edge-teal);
+}
+
+.edge-section--blue .edge-section-sub {
+	color: rgba(255, 255, 255, 0.68);
+}
+
+/* Panels in blue section */
+.edge-section--blue .edge-panel {
+	background: rgba(255, 255, 255, 0.07);
+	border-color: rgba(255, 255, 255, 0.15);
+	box-shadow: 0 28px 70px -36px rgba(0, 0, 0, 0.6);
+}
+
+.edge-section--blue .edge-panel:hover {
+	background: rgba(255, 255, 255, 0.13);
+	border-color: rgba(255, 255, 255, 0.28);
+}
+
+.edge-section--blue .edge-panel h3 {
+	color: #fff;
+}
+
+.edge-section--blue .edge-panel p,
+.edge-section--blue .edge-panel li {
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.edge-section--blue .edge-panel__tag {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.edge-section--blue .edge-panel__cta {
+	border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+.edge-section--blue .edge-panel__cta span {
+	color: #fff;
+}
+
+/* Feature cards in blue section */
+.edge-section--blue .edge-feature {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(255, 255, 255, 0.12);
+}
+
+.edge-section--blue .edge-feature:hover {
+	background: rgba(255, 255, 255, 0.11);
+	border-color: rgba(255, 255, 255, 0.22);
+}
+
+.edge-section--blue .edge-feature h3 {
+	color: #fff;
+}
+
+.edge-section--blue .edge-feature p {
+	color: rgba(255, 255, 255, 0.65);
+}
+
+.edge-section--blue .edge-feature__num {
+	color: rgba(255, 255, 255, 0.32);
+}
+
+.edge-section--blue .edge-feature__icon {
+	background: rgba(19, 169, 189, 0.18);
+	border-color: rgba(19, 169, 189, 0.34);
+	color: var(--edge-teal);
+}
+
+/* CTA card in blue section */
+.edge-section--blue .edge-cta__card {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(255, 255, 255, 0.14);
+}
+
+.edge-section--blue .edge-cta__card h2 {
+	color: #fff;
+}
+
+.edge-section--blue .edge-cta__card p {
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.edge-section--blue .edge-cta__bullets div {
+	color: rgba(255, 255, 255, 0.68);
+}
+
+.edge-section--blue .edge-btn--ghost {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.28);
+	color: #fff;
+}
+
+.edge-section--blue .edge-btn--ghost:hover {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: rgba(255, 255, 255, 0.45);
 }
 
 .edge-eyebrow,
@@ -583,7 +704,7 @@
 	box-shadow: 0 18px 52px -42px rgba(20, 47, 82, 0.7);
 }
 
-.edge-why-card > div {
+.edge-why-card>div {
 	margin-bottom: 1.2rem;
 	font-family: Georgia, "Times New Roman", serif;
 	font-size: 3.2rem;
@@ -681,8 +802,13 @@
 }
 
 @keyframes edgeOverlayIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 .edge-overlay__close {
@@ -759,12 +885,24 @@
 	animation: edgeOptionIn 0.42s ease both;
 }
 
-.edge-option:nth-child(2) { animation-delay: 70ms; }
-.edge-option:nth-child(3) { animation-delay: 130ms; }
+.edge-option:nth-child(2) {
+	animation-delay: 70ms;
+}
+
+.edge-option:nth-child(3) {
+	animation-delay: 130ms;
+}
 
 @keyframes edgeOptionIn {
-	from { opacity: 0; transform: translateY(18px) scale(0.98); }
-	to { opacity: 1; transform: none; }
+	from {
+		opacity: 0;
+		transform: translateY(18px) scale(0.98);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .edge-option--available {
@@ -885,8 +1023,15 @@
 }
 
 @keyframes edgeSignupIn {
-	from { opacity: 0; transform: translateY(14px); }
-	to { opacity: 1; transform: none; }
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .edge-signup__shell {
@@ -1112,9 +1257,9 @@
 		min-height: auto;
 	}
 
-	.edge-hero::after {
-		opacity: 0.28;
-		width: 70vw;
+	.edge-hero__logo {
+		width: 48vw;
+		right: -4vw;
 	}
 
 	.edge-stats,
@@ -1146,6 +1291,14 @@
 
 	.edge-hero {
 		padding-top: 3.25rem;
+	}
+
+	.edge-hero__content {
+		max-width: 100%;
+	}
+
+	.edge-hero__logo {
+		display: none;
 	}
 
 	.edge-hero h1 {

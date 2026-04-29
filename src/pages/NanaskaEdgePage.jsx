@@ -223,47 +223,49 @@ function Panels({ onPickFree, onPickRevision }) {
 	};
 
 	return (
-		<section className="edge-panels edge-container" id="mock">
-			<div className="edge-reveal">
-				<div className="edge-section-eyebrow">Choose your starting point</div>
-				<h2 className="edge-section-title">Try it <em>free,</em> or commit to <span>revision.</span></h2>
-				<p className="edge-section-sub">Two ways to begin with Edge, both built around CIMA case-study preparation.</p>
-			</div>
+		<section className="edge-section--blue" id="mock">
+			<div className="edge-panels edge-container">
+				<div className="edge-reveal">
+					<div className="edge-section-eyebrow">Choose your starting point</div>
+					<h2 className="edge-section-title">Try it <em>free,</em> or commit to <span>revision.</span></h2>
+					<p className="edge-section-sub">Two ways to begin with Edge, both built around CIMA case-study preparation.</p>
+				</div>
 
-			<div className="edge-panel-grid">
-				<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickFree}>
-					<div className="edge-panel__glow" />
-					<div className="edge-panel__tag"><span /> Complimentary, no card</div>
-					<h3>Free <em>Mock Exam</em></h3>
-					<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
-					<ul>
-						<li><Icon.check /> Full timed mock exam</li>
-						<li><Icon.check /> AI-powered instant marking</li>
-						<li><Icon.check /> Detailed performance feedback</li>
-						<li><Icon.check /> No credit card required</li>
-					</ul>
-					<div className="edge-panel__cta">
-						<span>Start free mock</span>
-						<i><Icon.arrow /></i>
-					</div>
-				</button>
+				<div className="edge-panel-grid">
+					<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickFree}>
+						<div className="edge-panel__glow" />
+						<div className="edge-panel__tag"><span /> Complimentary, no card</div>
+						<h3>Free <em>Mock Exam</em></h3>
+						<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
+						<ul>
+							<li><Icon.check /> Full timed mock exam</li>
+							<li><Icon.check /> AI-powered instant marking</li>
+							<li><Icon.check /> Detailed performance feedback</li>
+							<li><Icon.check /> No credit card required</li>
+						</ul>
+						<div className="edge-panel__cta">
+							<span>Start free mock</span>
+							<i><Icon.arrow /></i>
+						</div>
+					</button>
 
-				<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickRevision}>
-					<div className="edge-panel__glow" />
-					<div className="edge-panel__tag"><span /> Guided programme</div>
-					<h3>Revision <em>Session</em></h3>
-					<p>Enroll in structured revision with expert-designed mocks, practice and progress support.</p>
-					<ul>
-						<li><Icon.check /> Multiple practice sessions</li>
-						<li><Icon.check /> Topic-specific revision</li>
-						<li><Icon.check /> Progress tracking and analytics</li>
-						<li><Icon.check /> Expert-designed questions</li>
-					</ul>
-					<div className="edge-panel__cta">
-						<span>Start revision</span>
-						<i><Icon.arrow /></i>
-					</div>
-				</button>
+					<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickRevision}>
+						<div className="edge-panel__glow" />
+						<div className="edge-panel__tag"><span /> Guided programme</div>
+						<h3>Revision <em>Session</em></h3>
+						<p>Enroll in structured revision with expert-designed mocks, practice and progress support.</p>
+						<ul>
+							<li><Icon.check /> Multiple practice sessions</li>
+							<li><Icon.check /> Topic-specific revision</li>
+							<li><Icon.check /> Progress tracking and analytics</li>
+							<li><Icon.check /> Expert-designed questions</li>
+						</ul>
+						<div className="edge-panel__cta">
+							<span>Start revision</span>
+							<i><Icon.arrow /></i>
+						</div>
+					</button>
+				</div>
 			</div>
 		</section>
 	);
@@ -600,13 +602,14 @@ export default function NanaskaEdgePage() {
 		<div className="edge-page" data-edge-theme="light">
 			<Aurora />
 
+			<Panels onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
+
 			<section className="edge-hero edge-container">
 				<div className="edge-hero__content edge-reveal is-in">
 					<div className="edge-eyebrow"><span /> Introducing Nanaska Edge</div>
-					<h1>The future of <span>CIMA</span><br />preparation, <em>reimagined.</em></h1>
+					<h1>Transform Your <span>CIMA CASE STUDY</span><br />Learnings <em>Today</em></h1>
 					<p>
-						AI-powered exam preparation that transforms how you study for CIMA.
-						Instant feedback, focused guidance, and every resource you need in one calm place.
+						Personalized, Instant and Interactive Learning for Superior Performance
 					</p>
 
 					<div className="edge-hero__actions">
@@ -624,26 +627,27 @@ export default function NanaskaEdgePage() {
 						<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
 					</div>
 				</div>
+				<img src="/images/nanaska-edge-logo.png" alt="Nanaska Edge" className="edge-hero__logo" />
 			</section>
 
-			<Panels onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
+			<section className="edge-section--blue">
+				<div className="edge-features edge-container">
+					<div className="edge-reveal">
+						<div className="edge-section-eyebrow">Feature set</div>
+						<h2 className="edge-section-title">Everything you need <em>to excel.</em></h2>
+						<p className="edge-section-sub">Nine purpose-built tools that work together across the full case-study journey.</p>
+					</div>
 
-			<section className="edge-features edge-container">
-				<div className="edge-reveal">
-					<div className="edge-section-eyebrow">Feature set</div>
-					<h2 className="edge-section-title">Everything you need <em>to excel.</em></h2>
-					<p className="edge-section-sub">Nine purpose-built tools that work together across the full case-study journey.</p>
-				</div>
-
-				<div className="edge-feature-grid">
-					{FEATURES.map((feature, index) => (
-						<div key={feature.title} className="edge-feature edge-reveal" style={{ transitionDelay: `${index * 50}ms` }}>
-							<div className="edge-feature__num">{String(index + 1).padStart(2, '0')}</div>
-							<div className="edge-feature__icon">{Icon.symbol(feature.icon)}</div>
-							<h3>{feature.title}</h3>
-							<p>{feature.body}</p>
-						</div>
-					))}
+					<div className="edge-feature-grid">
+						{FEATURES.map((feature, index) => (
+							<div key={feature.title} className="edge-feature edge-reveal" style={{ transitionDelay: `${index * 50}ms` }}>
+								<div className="edge-feature__num">{String(index + 1).padStart(2, '0')}</div>
+								<div className="edge-feature__icon">{Icon.symbol(feature.icon)}</div>
+								<h3>{feature.title}</h3>
+								<p>{feature.body}</p>
+							</div>
+						))}
+					</div>
 				</div>
 			</section>
 
@@ -665,26 +669,28 @@ export default function NanaskaEdgePage() {
 				</div>
 			</section>
 
-			<section className="edge-cta edge-container">
-				<div className="edge-cta__card edge-reveal">
-					<h2>Ready for the <em>Edge</em> advantage?</h2>
-					<p>
-						Start with a free mock or enroll in a guided revision session using the same Nanaska admin,
-						payment, and registration systems you already trust.
-					</p>
-					<div className="edge-cta__actions">
-						<button className="edge-btn edge-btn--primary" onClick={() => openSelection('free')}>
-							Start your free mock <Icon.arrow />
-						</button>
-						<Link className="edge-btn edge-btn--ghost" to="/contact">Talk to an advisor</Link>
-					</div>
-					<div className="edge-cta__bullets">
-						<div><Icon.check /> Instant AI marking</div>
-						<div><Icon.check /> Mock exams</div>
-						<div><Icon.check /> Video library</div>
-						<div><Icon.check /> Progress analytics</div>
-						<div><Icon.check /> Past papers</div>
-						<div><Icon.check /> Typing tutor</div>
+			<section className="edge-section--blue">
+				<div className="edge-cta edge-container">
+					<div className="edge-cta__card edge-reveal">
+						<h2>Ready for the <em>Edge</em> advantage?</h2>
+						<p>
+							Start with a free mock or enroll in a guided revision session using the same Nanaska admin,
+							payment, and registration systems you already trust.
+						</p>
+						<div className="edge-cta__actions">
+							<button className="edge-btn edge-btn--primary" onClick={() => openSelection('free')}>
+								Start your free mock <Icon.arrow />
+							</button>
+							<Link className="edge-btn edge-btn--ghost" to="/contact">Talk to an advisor</Link>
+						</div>
+						<div className="edge-cta__bullets">
+							<div><Icon.check /> Instant AI marking</div>
+							<div><Icon.check /> Mock exams</div>
+							<div><Icon.check /> Video library</div>
+							<div><Icon.check /> Progress analytics</div>
+							<div><Icon.check /> Past papers</div>
+							<div><Icon.check /> Typing tutor</div>
+						</div>
 					</div>
 				</div>
 			</section>
