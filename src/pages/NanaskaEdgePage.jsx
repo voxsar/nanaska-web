@@ -215,7 +215,7 @@ function Aurora() {
 	);
 }
 
-function Panels({ onPickFree, onPickRevision }) {
+function PanelGrid({ onPickFree, onPickRevision }) {
 	const onMove = (e) => {
 		const rect = e.currentTarget.getBoundingClientRect();
 		e.currentTarget.style.setProperty('--mx', `${((e.clientX - rect.left) / rect.width) * 100}%`);
@@ -223,51 +223,41 @@ function Panels({ onPickFree, onPickRevision }) {
 	};
 
 	return (
-		<section className="edge-section--blue" id="mock">
-			<div className="edge-panels edge-container">
-				<div className="edge-reveal">
-					<div className="edge-section-eyebrow">Choose your starting point</div>
-					<h2 className="edge-section-title">Try it <em>free,</em> or commit to <span>revision.</span></h2>
-					<p className="edge-section-sub">Two ways to begin with Edge, both built around CIMA case-study preparation.</p>
+		<div className="edge-panel-grid">
+			<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickFree}>
+				<div className="edge-panel__glow" />
+				<div className="edge-panel__tag"><span /> Complimentary, no card</div>
+				<h3>Free <em>Mock Exam</em></h3>
+				<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
+				<ul>
+					<li><Icon.check /> Full timed mock exam</li>
+					<li><Icon.check /> AI-powered instant marking</li>
+					<li><Icon.check /> Detailed performance feedback</li>
+					<li><Icon.check /> No credit card required</li>
+				</ul>
+				<div className="edge-panel__cta">
+					<span>Start free mock</span>
+					<i><Icon.arrow /></i>
 				</div>
+			</button>
 
-				<div className="edge-panel-grid">
-					<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickFree}>
-						<div className="edge-panel__glow" />
-						<div className="edge-panel__tag"><span /> Complimentary, no card</div>
-						<h3>Free <em>Mock Exam</em></h3>
-						<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
-						<ul>
-							<li><Icon.check /> Full timed mock exam</li>
-							<li><Icon.check /> AI-powered instant marking</li>
-							<li><Icon.check /> Detailed performance feedback</li>
-							<li><Icon.check /> No credit card required</li>
-						</ul>
-						<div className="edge-panel__cta">
-							<span>Start free mock</span>
-							<i><Icon.arrow /></i>
-						</div>
-					</button>
-
-					<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickRevision}>
-						<div className="edge-panel__glow" />
-						<div className="edge-panel__tag"><span /> Guided programme</div>
-						<h3>Revision <em>Session</em></h3>
-						<p>Enroll in structured revision with expert-designed mocks, practice and progress support.</p>
-						<ul>
-							<li><Icon.check /> Multiple practice sessions</li>
-							<li><Icon.check /> Topic-specific revision</li>
-							<li><Icon.check /> Progress tracking and analytics</li>
-							<li><Icon.check /> Expert-designed questions</li>
-						</ul>
-						<div className="edge-panel__cta">
-							<span>Start revision</span>
-							<i><Icon.arrow /></i>
-						</div>
-					</button>
+			<button className="edge-panel edge-reveal" onMouseMove={onMove} onClick={onPickRevision}>
+				<div className="edge-panel__glow" />
+				<div className="edge-panel__tag"><span /> Guided programme</div>
+				<h3>Revision <em>Session</em></h3>
+				<p>Enroll in structured revision with expert-designed mocks, practice and progress support.</p>
+				<ul>
+					<li><Icon.check /> Multiple practice sessions</li>
+					<li><Icon.check /> Topic-specific revision</li>
+					<li><Icon.check /> Progress tracking and analytics</li>
+					<li><Icon.check /> Expert-designed questions</li>
+				</ul>
+				<div className="edge-panel__cta">
+					<span>Start revision</span>
+					<i><Icon.arrow /></i>
 				</div>
-			</div>
-		</section>
+			</button>
+		</div>
 	);
 }
 
@@ -602,32 +592,20 @@ export default function NanaskaEdgePage() {
 		<div className="edge-page" data-edge-theme="light">
 			<Aurora />
 
-			<Panels onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
-
-			<section className="edge-hero edge-container">
-				<div className="edge-hero__content edge-reveal is-in">
-					<div className="edge-eyebrow"><span /> Introducing Nanaska Edge</div>
-					<h1>Transform Your <span>CIMA CASE STUDY</span><br />Learnings <em>Today</em></h1>
-					<p>
-						Personalized, Instant and Interactive Learning for Superior Performance
-					</p>
-
-					<div className="edge-hero__actions">
-						<button className="edge-btn edge-btn--primary" onClick={() => openSelection('free')}>
-							Start free mock <Icon.arrow />
-						</button>
-						<button className="edge-btn edge-btn--ghost" onClick={() => openSelection('revision')}>
-							Register for revision
-						</button>
+			<section className="edge-hero-combined" id="mock">
+				<div className="edge-container">
+					<div className="edge-hero-combined__top edge-reveal is-in">
+						<img src="/images/nanaska-edge-logo.png" alt="Nanaska Edge" className="edge-logo--top" />
+						<h1>Transform Your <span>CIMA CASE STUDY</span><br />Learnings <em>Today</em></h1>
+						<p>Personalized, Instant and Interactive Learning for Superior Performance</p>
+						<div className="edge-stats edge-stats--centered">
+							<div><strong>90%</strong><span>Faster marking turnaround</span></div>
+							<div><strong>24/7</strong><span>AI tutor support, always on</span></div>
+							<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
+						</div>
 					</div>
-
-					<div className="edge-stats">
-						<div><strong>90%</strong><span>Faster marking turnaround</span></div>
-						<div><strong>24/7</strong><span>AI tutor support, always on</span></div>
-						<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
-					</div>
+					<PanelGrid onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
 				</div>
-				<img src="/images/nanaska-edge-logo.png" alt="Nanaska Edge" className="edge-hero__logo" />
 			</section>
 
 			<section className="edge-section--blue">

@@ -171,34 +171,61 @@
 	transform: none;
 }
 
-.edge-hero {
+.edge-hero-combined {
 	position: relative;
-	min-height: min(760px, calc(100vh - 96px));
-	display: grid;
-	align-items: center;
-	padding: clamp(4.5rem, 9vw, 7.5rem) 0 clamp(3.5rem, 7vw, 5.5rem);
+	padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(3rem, 6vw, 5rem);
 }
 
-.edge-hero::after {
-	display: none;
+.edge-hero-combined__top {
+	text-align: center;
+	max-width: 860px;
+	margin-inline: auto;
 }
 
-.edge-hero__logo {
-	position: absolute;
-	right: -2vw;
-	top: 50%;
-	transform: translateY(-50%);
-	width: min(42vw, 500px);
-	opacity: 0.92;
-	pointer-events: none;
-	z-index: 1;
+.edge-logo--top {
+	display: block;
+	margin: 0 auto 2rem;
+	height: 72px;
+	width: auto;
 	object-fit: contain;
 }
 
-.edge-hero__content {
-	max-width: 56%;
-	position: relative;
-	z-index: 1;
+.edge-hero-combined h1 {
+	margin: 0 0 1.1rem;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: clamp(2.6rem, 6vw, 5rem);
+	line-height: 1.05;
+	font-weight: 700;
+	letter-spacing: 0;
+	text-wrap: balance;
+}
+
+.edge-hero-combined h1 span {
+	color: var(--edge-teal-dark);
+}
+
+.edge-hero-combined h1 em {
+	color: var(--edge-amber);
+	font-style: italic;
+	font-weight: 500;
+}
+
+.edge-hero-combined>.edge-container>.edge-hero-combined__top>p {
+	max-width: 600px;
+	margin: 0 auto 0;
+	font-size: clamp(1rem, 1.5vw, 1.15rem);
+	line-height: 1.7;
+	color: var(--edge-muted);
+}
+
+.edge-stats--centered {
+	max-width: 640px;
+	margin-inline: auto;
+	margin-top: 2rem;
+}
+
+.edge-hero-combined .edge-panel-grid {
+	margin-top: 3rem;
 }
 
 /* ── Blue alternating sections ── */
@@ -1253,14 +1280,6 @@
 }
 
 @media (max-width: 980px) {
-	.edge-hero {
-		min-height: auto;
-	}
-
-	.edge-hero__logo {
-		width: 48vw;
-		right: -4vw;
-	}
 
 	.edge-stats,
 	.edge-feature-grid,
@@ -1289,20 +1308,16 @@
 		width: min(100% - 2rem, 1280px);
 	}
 
-	.edge-hero {
-		padding-top: 3.25rem;
+	.edge-hero-combined {
+		padding-top: 2.5rem;
 	}
 
-	.edge-hero__content {
-		max-width: 100%;
+	.edge-logo--top {
+		height: 52px;
 	}
 
-	.edge-hero__logo {
-		display: none;
-	}
-
-	.edge-hero h1 {
-		font-size: clamp(2.7rem, 16vw, 4.1rem);
+	.edge-hero-combined h1 {
+		font-size: clamp(2.2rem, 14vw, 3.5rem);
 	}
 
 	.edge-hero__actions,
