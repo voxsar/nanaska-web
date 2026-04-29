@@ -517,7 +517,8 @@ function SignupView({ selection, settings, onBack }) {
 
 			await saveEnrollment();
 			setSubmitted(true);		// Start 60-second countdown for the password setup email
-		setEmailCountdown(60);		} catch (err) {
+			setEmailCountdown(60);
+		} catch (err) {
 			setError(err.message || 'Something went wrong. Please try again.');
 		} finally {
 			setSubmitting(false);
@@ -586,29 +587,29 @@ function SignupView({ selection, settings, onBack }) {
 							<div className="edge-success__icon"><Icon.check /></div>
 							<h2>You're <em>in.</em></h2>
 							<p>
-							Thanks {form.firstName || splitName(form)}. Your {productLabel} registration has been saved.
-						</p>
-						<div className="edge-success__email-notice">
-							<strong>Check your inbox at {form.email}</strong>
-							<p>We've sent a password setup link to get you into the platform. The link expires in 60 seconds — open it quickly.</p>
-							{emailCountdown > 0 && (
-								<div className="edge-success__countdown">
-									Link expires in <strong>{emailCountdown}s</strong>
-								</div>
-							)}
-							{(emailCountdown === 0 || resendMsg) && (
-								<div className="edge-success__resend">
-									{resendMsg && <span className="edge-success__resend-msg">{resendMsg}</span>}
-									<button
-										className="edge-btn edge-btn--ghost edge-btn--sm"
-										onClick={handleResendEmail}
-										disabled={resending}
-									>
-										{resending ? 'Sending…' : 'Resend email'}
-									</button>
-								</div>
-							)}
-						</div>
+								Thanks {form.firstName || splitName(form)}. Your {productLabel} registration has been saved.
+							</p>
+							<div className="edge-success__email-notice">
+								<strong>Check your inbox at {form.email}</strong>
+								<p>We've sent a password setup link to get you into the platform. The link expires in 60 seconds — open it quickly.</p>
+								{emailCountdown > 0 && (
+									<div className="edge-success__countdown">
+										Link expires in <strong>{emailCountdown}s</strong>
+									</div>
+								)}
+								{(emailCountdown === 0 || resendMsg) && (
+									<div className="edge-success__resend">
+										{resendMsg && <span className="edge-success__resend-msg">{resendMsg}</span>}
+										<button
+											className="edge-btn edge-btn--ghost edge-btn--sm"
+											onClick={handleResendEmail}
+											disabled={resending}
+										>
+											{resending ? 'Sending…' : 'Resend email'}
+										</button>
+									</div>
+								)}
+							</div>
 							<button className="edge-btn edge-btn--primary" onClick={onBack}>
 								Back to Edge <Icon.arrow />
 							</button>
