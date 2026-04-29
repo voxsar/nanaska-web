@@ -20,6 +20,14 @@ const DEFAULTS = {
 	edge_mcs_revision_combination_id: 'mg_mcs',
 	edge_scs_revision_combination_id: 'st_scs',
 	edge_n8n_registration_webhook: 'https://automation.nanaska.com/webhook-test/registration',
+	// Pricing
+	edge_ocs_price_lkr: '26650',
+	edge_ocs_price_gbp: '399',
+	edge_mcs_price_lkr: '27675',
+	edge_mcs_price_gbp: '499',
+	edge_scs_price_lkr: '30750',
+	edge_scs_price_gbp: '599',
+	edge_revision_gateway_amount_lkr: '10',
 };
 
 function toLocalDateTimeValue(value) {
