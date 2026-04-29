@@ -1,0 +1,98 @@
+.terms-page { background: #f9fbff; }
+
+/* Hero */
+.terms-page__hero {
+  background: linear-gradient(135deg, #0d2040 0%, #1a4480 60%, #24ade3 100%);
+  padding: 7rem 2rem 5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.terms-page__hero-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.terms-page__breadcrumb {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.terms-page__breadcrumb a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+}
+
+.terms-page__breadcrumb a:hover { color: #fff; }
+
+.terms-page__title {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  color: #ffffff;
+  margin: 0.75rem 0 1rem;
+  font-weight: 800;
+}
+
+.terms-page__subtitle {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.7;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+/* Body */
+.terms-page__body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 4rem 2rem 5rem;
+}
+
+.terms-page__section {
+  margin-bottom: 2.5rem;
+}
+
+.terms-page__section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1B365D;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #24ade3;
+  display: inline-block;
+}
+
+.terms-page__section p {
+  font-size: 0.97rem;
+  color: #374151;
+  line-height: 1.8;
+  margin-bottom: 0.75rem;
+}
+
+.terms-page__section ul {
+  margin: 0.5rem 0 0.75rem 1.4rem;
+  list-style: disc;
+}
+
+.terms-page__section ul li {
+  font-size: 0.97rem;
+  color: #374151;
+  line-height: 1.8;
+  margin-bottom: 0.35rem;
+}
+
+.terms-page__note {
+  font-style: italic;
+  color: #6b7280 !important;
+  font-size: 0.9rem !important;
+}
+
+.terms-page__updated {
+  font-size: 0.82rem;
+  color: #9ca3af;
+  margin-bottom: 2.5rem;
+}

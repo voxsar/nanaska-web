@@ -16,8 +16,8 @@ const LEARN_MORE_LINKS = [
 	{ label: 'Online Exams', href: 'https://exam.nanaska.com/index.php?r=site/login', external: true },
 	{ label: 'Course Structure', href: '#courses', external: false },
 	{ label: 'Levels & Categories', href: '#courses', external: false },
-	{ label: 'Terms and Conditions', href: 'https://www.nanaska.com/terms-and-conditions/', external: true },
-	{ label: 'Privacy Policy', href: 'https://www.nanaska.com/privacy-policy/', external: true },
+	{ label: 'Terms and Conditions', href: '/terms-and-conditions', external: false },
+	{ label: 'Privacy Policy', href: '/privacy-policy', external: false },
 ];
 
 export default function Footer() {
@@ -200,14 +200,12 @@ export default function Footer() {
 							Terms & Conditions
 						</a>
 
-						<a
-							href="https://www.nanaska.com/privacy-policy/"
+						<Link
+							to="/privacy-policy"
 							className="footer__legal-link"
-							target="_blank"
-							rel="noopener noreferrer"
 						>
 							Privacy Policy
-						</a>
+						</Link>
 					</div>
 
 				</div>

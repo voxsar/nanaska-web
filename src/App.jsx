@@ -53,6 +53,8 @@ import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import NanaskaEdgePage from './pages/NanaskaEdgePage';
 import RegistrationSuccessPage from './pages/RegistrationSuccessPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
 
 import IndividualCoursePage from './components/IndividualCoursePage';
 import { getCourseBySlug, getLevelById } from './data/coursesData';
@@ -169,7 +171,9 @@ function App() {
 							<Route path="/lecturers" element={<LecturersPage />} />
 							<Route path="/enrollment" element={<EnrollmentPage />} />						<Route path="/payment-success" element={<PaymentSuccessPage />} />
 							<Route path="/payment-cancel" element={<PaymentCancelPage />} />
-							{/* Dynamic course pages */}
+						<Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+						<Route path="/terms-and-conditions" element={<TermsPage />} />
+						{/* Dynamic course pages */}
 							<Route path="/:courseSlug" element={<CourseRouteWrapper />} />
 
 						</Route>
