@@ -277,8 +277,17 @@ export class PaymentsService {
 		}
 
 		// Use currency-specific total
-		// Edge revision payments are fixed at 10 LKR for now (test/launch pricing)
-		const amount = dto.isEdgeRevision ? 10 : (currency === 'GBP' ? totalPriceGbp : totalPriceLkr);
+		// For Edge revision, read the gateway charge amount from site settings (falls back to 10 LKR)
+		let amount: number;
+		if (dto.isEdgeRevision) {
+			const gatewaySetting = await this.prisma.siteSetting.findUnique({
+				where: { key: 'edge_revision_gateway_amount_lkr' },
+			});
+			const settingValue = parseInt(gatewaySetting?.value || '10', 10);
+			amount = Number.isFinite(settingValue) && settingValue > 0 ? settingValue : 10;
+		} else {
+			amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+		}
 
 		if (amount <= 0) {
 			throw new BadRequestException('Cart total must be greater than zero');

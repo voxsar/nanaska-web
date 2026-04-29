@@ -382,12 +382,21 @@ function SignupView({ selection, settings, onBack }) {
 	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
 	const registrationType = selection.kind === 'free' ? 'free-mock' : 'revision';
 	const productLabel = `${selection.code} ${selection.name} Case Study, ${kindLabel}`;
-	const prices = getCoursePricesByCode(selection.code, 0);
 	const effectiveCountry = form.country || selectedCountry;
 	const selectedCurrency = effectiveCountry ? (effectiveCountry === 'Sri Lanka' ? 'LKR' : 'GBP') : currency;
-	const amount = selection.kind === 'free' ? 0 : getPriceForCountry(prices, effectiveCountry);
+
+	// Read display prices from Edge settings (admin-editable), fall back to pricingData
+	const codeKey = selection.code.toLowerCase();
+	const settingLkr = settings[`edge_${codeKey}_price_lkr`];
+	const settingGbp = settings[`edge_${codeKey}_price_gbp`];
+	const staticPrices = getCoursePricesByCode(selection.code, 0);
+	const displayPrices = {
+		lkr: settingLkr ? parseInt(settingLkr, 10) : staticPrices.lkr,
+		gbp: settingGbp ? parseInt(settingGbp, 10) : staticPrices.gbp,
+	};
+	const amount = selection.kind === 'free' ? 0 : getPriceForCountry(displayPrices, effectiveCountry);
 	const priceLabel = selection.kind === 'free' ? 'Complimentary' : formatCurrency(amount, selectedCurrency);
-	const revisionCombinationId = settings[`edge_${selection.code.toLowerCase()}_revision_combination_id`] || getCombinationIdForCourse(selection.code);
+	const revisionCombinationId = settings[`edge_${codeKey}_revision_combination_id`] || getCombinationIdForCourse(selection.code);
 	const combinationId = selection.kind === 'revision' ? revisionCombinationId : getCombinationIdForCourse(selection.code);
 
 	const update = (key) => (e) => {

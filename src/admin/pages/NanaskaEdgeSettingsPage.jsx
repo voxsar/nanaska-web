@@ -182,6 +182,54 @@ export default function NanaskaEdgeSettingsPage() {
 				</div>
 
 				<div className="admin-card">
+					<p className="admin-card-title">Pricing</p>
+					<p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
+						Displayed prices shown to students on the Edge page. The gateway amount is what is actually charged through the payment gateway for revision sessions.
+					</p>
+					<div className="admin-form-grid">
+						{CASE_STUDIES.map((item) => (
+							<div key={item.code} className="form-group">
+								<label>{item.label} — {item.name}</label>
+								<div style={{ display: 'flex', gap: '0.5rem' }}>
+									<input
+										type="number"
+										min="0"
+										value={settings[`edge_${item.code}_price_lkr`] || ''}
+										onChange={(e) => handleChange(`edge_${item.code}_price_lkr`, e.target.value)}
+										placeholder="LKR e.g. 26650"
+										style={{ flex: 1 }}
+									/>
+									<input
+										type="number"
+										min="0"
+										value={settings[`edge_${item.code}_price_gbp`] || ''}
+										onChange={(e) => handleChange(`edge_${item.code}_price_gbp`, e.target.value)}
+										placeholder="GBP e.g. 399"
+										style={{ flex: 1 }}
+									/>
+								</div>
+								<small style={{ color: '#64748b' }}>LKR (left) · GBP (right)</small>
+							</div>
+						))}
+					</div>
+					<div className="admin-form-grid" style={{ marginTop: '1rem' }}>
+						<div className="form-group">
+							<label>Gateway charge amount (LKR) for revision sessions</label>
+							<input
+								type="number"
+								min="1"
+								value={settings.edge_revision_gateway_amount_lkr || '10'}
+								onChange={(e) => handleChange('edge_revision_gateway_amount_lkr', e.target.value)}
+								placeholder="e.g. 10"
+							/>
+							<small style={{ color: '#64748b' }}>
+								This is the amount actually sent to the payment gateway. Set to the real price when ready to go live.
+							</small>
+						</div>
+					</div>
+				</div>
+
+				<div className="admin-card">
 					<p className="admin-card-title">Registration Automation</p>
 					<div className="admin-form-grid single">
 						<div className="form-group">
