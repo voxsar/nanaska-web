@@ -17,6 +17,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
+import { RevisionUpgradeDto } from './dto/revision-upgrade.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('payments')
@@ -50,6 +51,17 @@ export class PaymentsController {
 	@Post('enrollment-submit')
 	saveEnrollment(@Body() dto: EnrollmentSubmitDto) {
 		return this.paymentsService.saveEnrollment(dto);
+	}
+
+	/**
+	 * POST /payments/revision-upgrade
+	 * Called by an external system (e.g. n8n / CRM) to register a student directly into
+	 * a Nanaska Edge revision package. Accepts id, name, email, student_id, phone, cima_type.
+	 * cima_type must be one of: OCS | MCS | SCS.
+	 */
+	@Post('revision-upgrade')
+	revisionUpgrade(@Body() dto: RevisionUpgradeDto, @Headers('origin') origin: string) {
+		return this.paymentsService.revisionUpgrade(dto, origin);
 	}
 
 	/**

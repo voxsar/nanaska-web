@@ -10,6 +10,7 @@ import { CreatePaymentDto } from './dto/create-payment.dto';
 import { GuestPaymentDto } from './dto/guest-payment.dto';
 import { WebhookDto } from './dto/webhook.dto';
 import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
+import { RevisionUpgradeDto } from './dto/revision-upgrade.dto';
 import { EmailService } from '../email/email.service';
 import { GoogleSheetsService } from '../admin/google-sheets.service';
 
@@ -647,6 +648,36 @@ export class PaymentsService {
 		} catch (error) {
 			this.logger.error(`Failed to send paid Nanaska Edge registration for order ${order.id}`, error.message);
 		}
+	}
+
+	/**
+	 * POST /payments/revision-upgrade
+	 * Called by an external system (e.g. n8n / CRM) to register a student into a
+	 * Nanaska Edge revision package directly, without going through checkout.
+	 * Creates an enrollment record and fires the n8n registration webhook.
+	 */
+	async revisionUpgrade(
+		dto: RevisionUpgradeDto,
+		origin?: string,
+	): Promise<{ checkoutUrl: string }> {
+		const code = dto.cima_type.toUpperCase();
+
+		// Build a frontend checkout URL with user details pre-filled as query params
+		const frontendBase = this.resolveOrigin(origin);
+
+		const params = new URLSearchParams({
+			code,
+			...(dto.id ? { externalId: dto.id } : {}),
+			...(dto.name ? { name: dto.name } : {}),
+			...(dto.email ? { email: dto.email } : {}),
+			...(dto.student_id ? { studentId: dto.student_id } : {}),
+			...(dto.phone ? { phone: dto.phone } : {}),
+		});
+
+		const checkoutUrl = `${frontendBase}/nanaska-edge/revision-mock/select-cima-type?${params.toString()}`;
+
+		this.logger.log(`Revision upgrade checkout URL generated for ${dto.email} → ${code}`);
+		return { checkoutUrl };
 	}
 
 	/** Saves enrollment form data so admin can see unpaid submissions. */

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { usePricing } from '../context/PricingContext';
 import {
 	formatCurrency,
@@ -359,14 +359,19 @@ async function checkEmailRegistered(email, kind) {
 	}
 }
 
-function SignupView({ selection, settings, onBack }) {
+function SignupView({ selection, settings, onBack, prefill = {} }) {
 	const { selectedCountry, setSelectedCountry, currency, formatAmount } = usePricing();
+
+	// Split prefill.name into first/last if individual fields aren't provided
+	const prefillFirstName = prefill.firstName || (prefill.name ? prefill.name.trim().split(/\s+/)[0] : '');
+	const prefillLastName = prefill.lastName || (prefill.name ? prefill.name.trim().split(/\s+/).slice(1).join(' ') : '');
+
 	const [form, setForm] = useState({
-		firstName: '',
-		lastName: '',
-		email: '',
-		phone: '',
-		cimaId: '',
+		firstName: prefillFirstName,
+		lastName: prefillLastName,
+		email: prefill.email || '',
+		phone: prefill.phone || '',
+		cimaId: prefill.studentId || '',
 		studyMode: 'Online',
 		country: selectedCountry || '',
 		notes: '',
@@ -699,12 +704,32 @@ function SignupView({ selection, settings, onBack }) {
 export default function NanaskaEdgePage() {
 	const settings = useEdgeSettings();
 	const { mockType } = useParams();
+	const [searchParams] = useSearchParams();
+
+	// Pre-fill data from URL params (used by revision-upgrade endpoint)
+	const urlCode = searchParams.get('code')?.toUpperCase();
+	const prefill = urlCode ? {
+		name: searchParams.get('name') || '',
+		email: searchParams.get('email') || '',
+		phone: searchParams.get('phone') || '',
+		studentId: searchParams.get('studentId') || '',
+		externalId: searchParams.get('externalId') || '',
+	} : null;
+
 	const [selectionKind, setSelectionKind] = useState(() => {
 		if (mockType === 'free-mock') return 'free';
 		if (mockType === 'revision-mock') return 'revision';
 		return null;
 	});
-	const [signupSelection, setSignupSelection] = useState(null);
+
+	// If a code is in the URL, auto-select that case study and go straight to SignupView
+	const [signupSelection, setSignupSelection] = useState(() => {
+		if (urlCode && mockType === 'revision-mock') {
+			const matched = CASE_STUDIES.find((cs) => cs.code === urlCode);
+			if (matched) return { ...matched, kind: 'revision' };
+		}
+		return null;
+	});
 	const [baseTime] = useState(() => Date.now());
 
 	useReveal();
@@ -816,7 +841,7 @@ export default function NanaskaEdgePage() {
 			)}
 
 			{signupSelection && (
-				<SignupView selection={signupSelection} settings={settings} onBack={() => setSignupSelection(null)} />
+				<SignupView selection={signupSelection} settings={settings} onBack={() => setSignupSelection(null)} prefill={prefill || {}} />
 			)}
 		</div>
 	);
