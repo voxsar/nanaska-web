@@ -341,6 +341,8 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 
 const EDGE_TRIAL_API = 'https://edge.trial.nanaska.com/api/provision/students/email';
 const EDGE_REVISION_API = 'https://edge.revision.nanaska.com/api/provision/students/email';
+const EDGE_TRIAL_RESEND_API = 'https://edge.trial.nanaska.com/api/auth/resend-setup-email';
+const EDGE_REVISION_RESEND_API = 'https://edge.revision.nanaska.com/api/auth/resend-setup-email';
 
 async function checkEmailRegistered(email, kind) {
 	const base = kind === 'free' ? EDGE_TRIAL_API : EDGE_REVISION_API;
@@ -373,6 +375,9 @@ function SignupView({ selection, settings, onBack }) {
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState('');
 	const [emailWarning, setEmailWarning] = useState('');
+	const [emailCountdown, setEmailCountdown] = useState(0);
+	const [resending, setResending] = useState(false);
+	const [resendMsg, setResendMsg] = useState('');
 
 	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
 	const registrationType = selection.kind === 'free' ? 'free-mock' : 'revision';
@@ -511,11 +516,41 @@ function SignupView({ selection, settings, onBack }) {
 			}
 
 			await saveEnrollment();
-			setSubmitted(true);
-		} catch (err) {
+			setSubmitted(true);		// Start 60-second countdown for the password setup email
+		setEmailCountdown(60);		} catch (err) {
 			setError(err.message || 'Something went wrong. Please try again.');
 		} finally {
 			setSubmitting(false);
+		}
+	};
+
+	// Tick down the password email expiry countdown
+	useEffect(() => {
+		if (emailCountdown <= 0) return;
+		const id = window.setTimeout(() => setEmailCountdown((c) => Math.max(0, c - 1)), 1000);
+		return () => window.clearTimeout(id);
+	}, [emailCountdown]);
+
+	const handleResendEmail = async () => {
+		setResending(true);
+		setResendMsg('');
+		try {
+			const resendUrl = selection.kind === 'free' ? EDGE_TRIAL_RESEND_API : EDGE_REVISION_RESEND_API;
+			const res = await fetch(resendUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: form.email }),
+			});
+			if (res.ok) {
+				setResendMsg('Email resent! Check your inbox.');
+				setEmailCountdown(60);
+			} else {
+				setResendMsg('Could not resend. Please try again shortly.');
+			}
+		} catch {
+			setResendMsg('Could not resend. Please check your connection.');
+		} finally {
+			setResending(false);
 		}
 	};
 
@@ -551,9 +586,29 @@ function SignupView({ selection, settings, onBack }) {
 							<div className="edge-success__icon"><Icon.check /></div>
 							<h2>You're <em>in.</em></h2>
 							<p>
-								Thanks {form.firstName || splitName(form)}. Your {productLabel} registration has been saved,
-								and the Nanaska team will contact you at <strong>{form.email}</strong>.
-							</p>
+							Thanks {form.firstName || splitName(form)}. Your {productLabel} registration has been saved.
+						</p>
+						<div className="edge-success__email-notice">
+							<strong>Check your inbox at {form.email}</strong>
+							<p>We've sent a password setup link to get you into the platform. The link expires in 60 seconds — open it quickly.</p>
+							{emailCountdown > 0 && (
+								<div className="edge-success__countdown">
+									Link expires in <strong>{emailCountdown}s</strong>
+								</div>
+							)}
+							{(emailCountdown === 0 || resendMsg) && (
+								<div className="edge-success__resend">
+									{resendMsg && <span className="edge-success__resend-msg">{resendMsg}</span>}
+									<button
+										className="edge-btn edge-btn--ghost edge-btn--sm"
+										onClick={handleResendEmail}
+										disabled={resending}
+									>
+										{resending ? 'Sending…' : 'Resend email'}
+									</button>
+								</div>
+							)}
+						</div>
 							<button className="edge-btn edge-btn--primary" onClick={onBack}>
 								Back to Edge <Icon.arrow />
 							</button>

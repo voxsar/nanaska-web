@@ -810,12 +810,12 @@
 .edge-overlay {
 	position: fixed;
 	inset: 0;
-	z-index: 200;
+	z-index: 1000;
 	display: flex;
 	flex-direction: column;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
-	padding: 1.25rem;
+	padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
 	background: rgba(9, 28, 51, 0.52);
 	backdrop-filter: blur(24px) saturate(160%);
 	animation: edgeOverlayIn 0.32s ease;
@@ -1304,6 +1304,63 @@
 	line-height: 1.65;
 }
 
+.edge-success__email-notice {
+	width: 100%;
+	padding: 1.15rem 1.35rem;
+	border: 1px solid var(--edge-line);
+	border-radius: 16px;
+	background: rgba(19, 169, 189, 0.06);
+	display: grid;
+	gap: 0.55rem;
+}
+
+.edge-success__email-notice strong {
+	font-size: 0.95rem;
+	color: var(--edge-text);
+	word-break: break-all;
+}
+
+.edge-success__email-notice p {
+	margin: 0;
+	color: var(--edge-muted);
+	font-size: 0.9rem;
+	line-height: 1.55;
+}
+
+.edge-success__countdown {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.88rem;
+	color: var(--edge-teal-dark);
+}
+
+.edge-success__countdown strong {
+	font-family: Georgia, serif;
+	font-size: 1.1rem;
+	color: var(--edge-teal-dark);
+	min-width: 2.5ch;
+	display: inline-block;
+}
+
+.edge-success__resend {
+	display: flex;
+	flexwrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.edge-success__resend-msg {
+	font-size: 0.88rem;
+	color: var(--edge-muted);
+}
+
+.edge-btn--sm {
+	min-height: 36px;
+	padding: 0.5rem 1rem;
+	font-size: 0.85rem;
+}
+
 .edge-stats-bottom {
 	padding: clamp(2.5rem, 5vw, 4rem) 0;
 }
@@ -1342,7 +1399,7 @@
 	.edge-overlay__footer {
 		position: sticky;
 		bottom: 0;
-		padding: 1rem 0 0.5rem;
+		padding: 1rem 0 calc(0.75rem + 62px + env(safe-area-inset-bottom, 0px));
 		background: rgba(9, 28, 51, 0.82);
 		backdrop-filter: blur(16px);
 		z-index: 2;
