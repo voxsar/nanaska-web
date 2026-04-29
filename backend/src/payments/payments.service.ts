@@ -277,7 +277,8 @@ export class PaymentsService {
 		}
 
 		// Use currency-specific total
-		const amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+		// Edge revision payments are fixed at 10 LKR for now (test/launch pricing)
+		const amount = dto.isEdgeRevision ? 10 : (currency === 'GBP' ? totalPriceGbp : totalPriceLkr);
 
 		if (amount <= 0) {
 			throw new BadRequestException('Cart total must be greater than zero');
@@ -306,6 +307,18 @@ export class PaymentsService {
 
 		const frontendOrigin = this.resolveOrigin(origin);
 
+		// Build meta – store enrollment data so we can create the record after payment succeeds
+		const metaJson: Record<string, unknown> | null = dto.isEdgeRevision && dto.enrollmentMeta
+			? {
+				isEdgeRevision: true,
+				firstName: dto.firstName,
+				lastName: dto.lastName,
+				email: dto.email,
+				phone: dto.phone || null,
+				...dto.enrollmentMeta,
+			}
+			: null;
+
 		// Create a PENDING order (no user account required)
 		const order = await this.prisma.order.create({
 			data: {
@@ -318,6 +331,7 @@ export class PaymentsService {
 				guestEmail: dto.email,
 				guestPhone: phone || null,
 				frontendOrigin,
+				metaJson: metaJson as any,
 			},
 		});
 
@@ -580,10 +594,43 @@ export class PaymentsService {
 	}
 
 	private async sendPaidEdgeRegistrationForOrder(order: any) {
-		const enrollment = await this.prisma.enrollmentSubmission.findFirst({
+		let enrollment = await this.prisma.enrollmentSubmission.findFirst({
 			where: { orderId: order.id },
 			orderBy: { createdAt: 'desc' },
 		});
+
+		// If no enrollment exists yet, create one from the order's metaJson
+		// (Edge revision: enrollment was NOT saved before payment to allow clean retries)
+		if (!enrollment && order.metaJson && (order.metaJson as any)?.isEdgeRevision) {
+			const meta = order.metaJson as Record<string, any>;
+			const cartItems = Array.isArray(meta.cartItems) ? meta.cartItems : [];
+			try {
+				enrollment = await this.prisma.enrollmentSubmission.create({
+					data: {
+						firstName: meta.firstName || order.guestName?.split(' ')[0] || '',
+						lastName: meta.lastName || order.guestName?.split(' ').slice(1).join(' ') || '',
+						email: meta.email || order.guestEmail || '',
+						phone: meta.phone || order.guestPhone || null,
+						cimaId: meta.cimaId || null,
+						cimaStage: meta.cimaStage || null,
+						country: meta.country || null,
+						notes: meta.notes || null,
+						cartJson: cartItems as any,
+						currency: order.currency,
+						amount: order.amount,
+						orderId: order.id,
+					},
+				});
+				// Non-blocking Google Sheets sync
+				this.googleSheets.syncSingleEnrollment(enrollment.id).catch((err) => {
+					this.logger.error(`Failed to auto-sync Edge enrollment ${enrollment!.id} to Google Sheets`, err.message);
+				});
+				this.logger.log(`Created Edge enrollment ${enrollment.id} from order ${order.id} metaJson`);
+			} catch (err) {
+				this.logger.error(`Failed to create Edge enrollment from order ${order.id} metaJson`, err.message);
+				return;
+			}
+		}
 
 		if (!enrollment) return;
 		try {

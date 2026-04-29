@@ -64,7 +64,7 @@ const FEATURES = [
 	{ icon: 'edit', title: 'Practice Questions', body: 'Targeted practice tied to pre-seen documents so students can master specific topics at their own pace.' },
 	{ icon: 'book', title: 'Past Papers', body: 'A complete CIMA past-paper library for understanding patterns, examiner expectations, and answer structure.' },
 	{ icon: 'doc', title: 'Pre-Seen Documents', body: 'Upload, view, and reference pre-seen materials through an integrated PDF citation viewer.' },
-	{ icon: 'bolt', title: 'Automated Marking', body: 'AI-powered marking for mocks and practice questions, with feedback available the moment an attempt is submitted.' },
+	{ icon: 'bolt', title: 'Automated Marking', body: 'Intelligent marking for mocks and practice questions, with feedback available the moment an attempt is submitted.' },
 	{ icon: 'search', title: 'Ask Pre-Seen', body: 'A focused question interface tied directly to pre-seen materials to unpack scenarios and assumptions.' },
 	{ icon: 'keyboard', title: 'Typing Tutor', body: 'Practice sessions with progress tracking to build the speed and accuracy timed case-study exams demand.' },
 	{ icon: 'video', title: 'Video Library', body: 'On-demand walkthroughs from expert tutors, covering exam technique and complex business concepts.' },
@@ -72,7 +72,7 @@ const FEATURES = [
 ];
 
 const WHY_EDGE = [
-	{ num: '01', title: 'AI-Powered Intelligence', body: 'Advanced marking and tutoring provide instant feedback that adapts to each student attempt.' },
+	{ num: '01', title: 'Intelligent Marking', body: 'Advanced automated marking provides instant feedback that adapts to each student attempt.' },
 	{ num: '02', title: 'Comprehensive Coverage', body: 'From mock exams to industry knowledge, the key tools for CIMA case-study success live in one platform.' },
 	{ num: '03', title: 'Time-Saving Automation', body: 'Automated marking means students spend more time improving answers and less time waiting for review.' },
 	{ num: '04', title: 'Expert-Designed Content', body: 'Content is shaped around CIMA case-study expectations and Nanaska tutor experience.' },
@@ -228,10 +228,10 @@ function PanelGrid({ onPickFree, onPickRevision }) {
 				<div className="edge-panel__glow" />
 				<div className="edge-panel__tag"><span /> Complimentary, no card</div>
 				<h3>Free <em>Mock Exam</em></h3>
-				<p>Try the platform with a complimentary timed mock and AI-powered feedback before you commit.</p>
+				<p>Try the platform with a complimentary timed mock and instant feedback before you commit.</p>
 				<ul>
 					<li><Icon.check /> Full timed mock exam</li>
-					<li><Icon.check /> AI-powered instant marking</li>
+					<li><Icon.check /> Instant automated marking</li>
 					<li><Icon.check /> Detailed performance feedback</li>
 					<li><Icon.check /> No credit card required</li>
 				</ul>
@@ -280,7 +280,7 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 
 	const title = kind === 'free' ? 'Free Mock' : 'Revision Session';
 	const sub = kind === 'free'
-		? 'Pick your CIMA case study to start a complimentary timed mock with AI marking.'
+		? 'Pick your CIMA case study to start a complimentary timed mock with instant marking.'
 		: 'Pick your CIMA case study to enroll in a guided revision programme.';
 
 	return (
@@ -339,6 +339,24 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 	);
 }
 
+const EDGE_TRIAL_API = 'https://edge.trial.nanaska.com/api/provision/students/email';
+const EDGE_REVISION_API = 'https://edge.revision.nanaska.com/api/provision/students/email';
+
+async function checkEmailRegistered(email, kind) {
+	const base = kind === 'free' ? EDGE_TRIAL_API : EDGE_REVISION_API;
+	try {
+		const res = await fetch(`${base}?email=${encodeURIComponent(email)}`);
+		if (res.ok) {
+			const data = await res.json().catch(() => null);
+			// Registered if response is ok and returns student data
+			return data && (data.id || data.email || data.student);
+		}
+		return false;
+	} catch {
+		return false;
+	}
+}
+
 function SignupView({ selection, settings, onBack }) {
 	const { selectedCountry, setSelectedCountry, currency, formatAmount } = usePricing();
 	const [form, setForm] = useState({
@@ -354,6 +372,7 @@ function SignupView({ selection, settings, onBack }) {
 	const [submitting, setSubmitting] = useState(false);
 	const [submitted, setSubmitted] = useState(false);
 	const [error, setError] = useState('');
+	const [emailWarning, setEmailWarning] = useState('');
 
 	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
 	const registrationType = selection.kind === 'free' ? 'free-mock' : 'revision';
@@ -369,7 +388,16 @@ function SignupView({ selection, settings, onBack }) {
 	const update = (key) => (e) => {
 		const value = e.target.value;
 		if (key === 'country') setSelectedCountry(value);
+		if (key === 'email') setEmailWarning('');
 		setForm((prev) => ({ ...prev, [key]: value }));
+	};
+
+	const handleEmailBlur = async () => {
+		if (!form.email) return;
+		const registered = await checkEmailRegistered(form.email, selection.kind);
+		if (registered) {
+			setEmailWarning('This email is already registered on the Edge platform. If you need help, please contact us.');
+		}
 	};
 
 	const saveEnrollment = async ({ orderId } = {}) => {
@@ -417,6 +445,32 @@ function SignupView({ selection, settings, onBack }) {
 	};
 
 	const startPayment = async () => {
+		// Build enrollment metadata so backend can create the enrollment record
+		// after payment success — no enrollment is saved before payment.
+		const enrollmentMeta = {
+			cimaId: form.cimaId || undefined,
+			cimaStage: selection.cimaStage,
+			country: form.country || undefined,
+			notes: [
+				'Nanaska Edge registration',
+				`Programme: ${kindLabel}`,
+				`Case study: ${selection.code} ${selection.name}`,
+				`Study mode: ${form.studyMode}`,
+				form.notes ? `Student notes: ${form.notes}` : '',
+			].filter(Boolean).join('\n'),
+			cartItems: [{
+				type: 'nanaska-edge',
+				title: productLabel,
+				name: productLabel,
+				courseCode: selection.code,
+				combinationId,
+				kind: selection.kind,
+				registrationType,
+				studyMode: form.studyMode,
+			}],
+			registrationType,
+		};
+
 		const payload = {
 			firstName: form.firstName,
 			lastName: form.lastName,
@@ -424,6 +478,8 @@ function SignupView({ selection, settings, onBack }) {
 			phone: form.phone || undefined,
 			currency: selectedCurrency,
 			...(combinationId ? { combinationId } : { courseIds: [selection.code] }),
+			isEdgeRevision: true,
+			enrollmentMeta,
 		};
 
 		const res = await fetch(`${API_URL}/payments/guest-create`, {
@@ -447,8 +503,9 @@ function SignupView({ selection, settings, onBack }) {
 
 		try {
 			if (selection.kind === 'revision') {
+				// Enrollment is created by the backend webhook AFTER payment succeeds.
+				// No enrollment record is saved here — user can retry freely if payment fails.
 				const payment = await startPayment();
-				await saveEnrollment({ orderId: payment.orderId });
 				window.location.href = payment.paymentUrl;
 				return;
 			}
@@ -519,7 +576,8 @@ function SignupView({ selection, settings, onBack }) {
 
 							<label>
 								<span>Email</span>
-								<input required type="email" value={form.email} onChange={update('email')} placeholder="you@example.com" />
+								<input required type="email" value={form.email} onChange={update('email')} onBlur={handleEmailBlur} placeholder="you@example.com" />
+								{emailWarning && <div className="edge-form__email-warning">{emailWarning}</div>}
 							</label>
 
 							<div className="edge-form__row">
@@ -601,11 +659,6 @@ export default function NanaskaEdgePage() {
 						<img src="/images/nanaska-edge-logo.png" alt="Nanaska Edge" className="edge-logo--top" />
 						<h1>Transform Your <span>CIMA CASE STUDY</span><br />Learnings <em>Today</em></h1>
 						<p>Personalized, Instant and Interactive Learning for Superior Performance</p>
-						<div className="edge-stats edge-stats--centered">
-							<div><strong>90%</strong><span>Faster marking turnaround</span></div>
-							<div><strong>24/7</strong><span>AI tutor support, always on</span></div>
-							<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
-						</div>
 					</div>
 					<PanelGrid onPickFree={() => openSelection('free')} onPickRevision={() => openSelection('revision')} />
 				</div>
@@ -665,7 +718,7 @@ export default function NanaskaEdgePage() {
 							<Link className="edge-btn edge-btn--ghost" to="/contact">Talk to an advisor</Link>
 						</div>
 						<div className="edge-cta__bullets">
-							<div><Icon.check /> Instant AI marking</div>
+							<div><Icon.check /> Instant marking</div>
 							<div><Icon.check /> Mock exams</div>
 							<div><Icon.check /> Video library</div>
 							<div><Icon.check /> Progress analytics</div>
@@ -673,6 +726,14 @@ export default function NanaskaEdgePage() {
 							<div><Icon.check /> Typing tutor</div>
 						</div>
 					</div>
+				</div>
+			</section>
+
+			<section className="edge-stats-bottom edge-container">
+				<div className="edge-stats edge-stats--centered edge-reveal">
+					<div><strong>90%</strong><span>Faster marking turnaround</span></div>
+					<div><strong>24/7</strong><span>Tutor support, always on</span></div>
+					<div><strong>100%</strong><span>Instant feedback on every attempt</span></div>
 				</div>
 			</section>
 

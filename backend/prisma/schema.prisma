@@ -91,6 +91,7 @@ model Order {
   guestEmail      String?     @map("guest_email")
   guestPhone      String?     @map("guest_phone")
   frontendOrigin  String?     @map("frontend_origin") // origin that initiated the payment
+  metaJson        Json?       @map("meta_json")        // arbitrary metadata (Edge enrollment data)
   archivedAt      DateTime?   @map("archived_at")     // set when auto-archived after 2 months pending
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt             @map("updated_at")
