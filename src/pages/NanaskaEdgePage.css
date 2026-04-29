@@ -839,18 +839,25 @@
 }
 
 .edge-overlay__close {
-	position: absolute;
+	position: fixed;
 	top: 1.25rem;
 	right: 1.25rem;
-	z-index: 2;
+	z-index: 300;
 	display: grid;
 	place-items: center;
 	width: 2.75rem;
 	height: 2.75rem;
 	border: 1px solid rgba(255, 255, 255, 0.34);
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.85);
+	background: rgba(255, 255, 255, 0.95);
 	color: var(--edge-text);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+	transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.edge-overlay__close:hover {
+	background: #fff;
+	transform: scale(1.08);
 }
 
 .edge-overlay__close svg {
