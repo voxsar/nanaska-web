@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, IsIn, IsArray, IsBoolean, IsObject } from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsIn, IsArray, IsBoolean, IsObject, IsNumber, Min } from 'class-validator';
 
 export class GuestPaymentDto {
 	/** Single course combination ID (for single package checkout) */
@@ -35,6 +35,12 @@ export class GuestPaymentDto {
 	@IsOptional()
 	@IsIn(['GBP', 'LKR'])
 	currency?: string;
+
+	/** Explicit amount to charge – used by Edge revision to ensure the displayed price matches what is sent to the IPG */
+	@IsOptional()
+	@IsNumber()
+	@Min(1)
+	amount?: number;
 
 	/** Flag that this is a Nanaska Edge revision payment – forces 10 LKR and stores enrollment metadata */
 	@IsOptional()

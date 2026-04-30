@@ -151,6 +151,34 @@ export class EmailService {
 		}
 	}
 
+	async sendEdgeRegistrationConfirmationEmail(opts: {
+		name: string;
+		email: string;
+		enrollmentId: string;
+		programme: string;
+		caseStudy: string;
+		registrationType: 'free-mock' | 'revision';
+		amount: number;
+		currency: string;
+		paidAt?: Date;
+	}): Promise<void> {
+		try {
+			const cfg = await this.getConfig();
+			const subject = opts.registrationType === 'free-mock'
+				? `Nanaska Edge – Free Mock Registration Confirmed (${opts.caseStudy})`
+				: `Nanaska Edge – Revision Session Receipt (${opts.caseStudy})`;
+			await this.postToWebhook(
+				opts.email,
+				subject,
+				this.edgeRegistrationConfirmationTemplate(opts),
+				cfg.paymentCc,
+			);
+			this.logger.log(`Edge registration confirmation sent to ${opts.email}`);
+		} catch (err: any) {
+			this.logger.error(`Failed to send Edge registration confirmation to ${opts.email}: ${err.message}`);
+		}
+	}
+
 	async sendEnrollmentReminderEmail(opts: {
 		name: string;
 		email: string;
@@ -474,6 +502,76 @@ export class EmailService {
 </body></html>`;
 	}
 
+	private edgeRegistrationConfirmationTemplate(opts: {
+		name: string;
+		email: string;
+		enrollmentId: string;
+		programme: string;
+		caseStudy: string;
+		registrationType: 'free-mock' | 'revision';
+		amount: number;
+		currency: string;
+		paidAt?: Date;
+	}): string {
+		const isFree = opts.registrationType === 'free-mock';
+		const formattedAmount = isFree
+			? 'Complimentary'
+			: opts.currency === 'GBP'
+				? `&pound;${opts.amount.toLocaleString()}`
+				: `LKR ${opts.amount.toLocaleString()}`;
+		const formattedDate = (opts.paidAt || new Date()).toLocaleDateString('en-GB', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		});
+		const ref = opts.enrollmentId.slice(-8).toUpperCase();
+
+		return `<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+  body{font-family:Arial,sans-serif;background:#f4f4f4;margin:0;padding:0}
+  .wrap{max-width:600px;margin:40px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .hdr{background:#1B365D;padding:32px;text-align:center}
+  .hdr h1{color:#fff;margin:0;font-size:28px}
+  .hdr p{color:#24ADE3;margin:8px 0 0;font-size:14px}
+  .body{padding:32px;color:#333}
+  .body h2{color:#1B365D;margin-top:0}
+  .badge{display:inline-block;background:#e8f8e8;color:#2a7a2a;border:1px solid #b8e8b8;padding:4px 14px;border-radius:20px;font-size:13px;margin-bottom:16px}
+  .receipt{border:1px solid #e0e0e0;border-radius:6px;overflow:hidden;margin:24px 0}
+  .receipt-hdr{background:#1B365D;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px}
+  .row{display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f0f0f0;font-size:14px}
+  .row:last-child{border-bottom:none}
+  .row.total{background:#f0f8ff;font-weight:bold;color:#1B365D;font-size:15px}
+  .lbl{color:#888}
+  .ftr{background:#f9f9f9;padding:24px;text-align:center;color:#999;font-size:12px;border-top:1px solid #eee}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="hdr"><h1>Nanaska Edge</h1><p>CIMA Case Study Platform</p></div>
+  <div class="body">
+    <h2>${isFree ? 'Free Mock Registration Confirmed' : 'Revision Session Receipt'}</h2>
+    <span class="badge">&#10003; ${isFree ? 'Registration Confirmed' : 'Payment Confirmed'}</span>
+    <p>Dear ${opts.name}, your ${isFree ? 'free mock registration' : 'revision session enrollment'} has been confirmed. Our team will be in touch with your platform access details shortly.</p>
+    <div class="receipt">
+      <div class="receipt-hdr">Registration Details</div>
+      <div class="row"><span class="lbl">Reference</span><span>${ref}</span></div>
+      <div class="row"><span class="lbl">Date</span><span>${formattedDate}</span></div>
+      <div class="row"><span class="lbl">Student Name</span><span>${opts.name}</span></div>
+      <div class="row"><span class="lbl">Email</span><span>${opts.email}</span></div>
+      <div class="row"><span class="lbl">Programme</span><span>${opts.programme}</span></div>
+      <div class="row"><span class="lbl">Case Study</span><span>${opts.caseStudy}</span></div>
+      <div class="row total"><span>${isFree ? 'Price' : 'Total Paid'}</span><span>${formattedAmount}</span></div>
+    </div>
+    <p>Please retain this confirmation for your records. For any queries, contact us at <a href="mailto:info@nanaska.com">info@nanaska.com</a>.</p>
+  </div>
+  <div class="ftr">
+    <p>&copy; ${new Date().getFullYear()} Nanaska. All rights reserved.</p>
+    <p>This is an automated confirmation. Please do not reply directly to this email.</p>
+  </div>
+</div>
+</body></html>`;
+	}
+
 	private enrollmentReminderTemplate(opts: {
 		name: string;
 		email: string;
@@ -487,25 +585,25 @@ export class EmailService {
 			opts.currency === 'GBP'
 				? `&pound;${opts.amount.toLocaleString()}`
 				: `LKR ${opts.amount.toLocaleString()}`;
-		
+
 		// Format cart items as a visually appealing list based on item type
 		const cartList = Array.isArray(opts.cartItems) && opts.cartItems.length
 			? opts.cartItems.map((i: any) => {
-					if (i.type === 'level') {
-						return `<li style="margin-bottom:12px;padding:10px;background:#f0f8ff;border-left:3px solid #24ADE3;border-radius:4px;">
+				if (i.type === 'level') {
+					return `<li style="margin-bottom:12px;padding:10px;background:#f0f8ff;border-left:3px solid #24ADE3;border-radius:4px;">
 								<div style="color:#1B365D;font-weight:bold;font-size:15px;margin-bottom:4px;">${i.levelTitle || 'CIMA Level Package'}</div>
 								<div style="color:#666;font-size:13px;">📚 Full Level Programme · ${i.courseCount || 'Multiple'} courses</div>
 							</li>`;
-					} else if (i.type === 'course') {
-						return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #1B365D;border-radius:4px;">
+				} else if (i.type === 'course') {
+					return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #1B365D;border-radius:4px;">
 								<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.courseCode ? `${i.courseCode} — ` : ''}${i.courseName || 'CIMA Course'}</div>
 							</li>`;
-					}
-					// Fallback for legacy or unexpected formats
-					return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #24ADE3;border-radius:4px;">
+				}
+				// Fallback for legacy or unexpected formats
+				return `<li style="margin-bottom:12px;padding:10px;background:#f9f9f9;border-left:3px solid #24ADE3;border-radius:4px;">
 							<div style="color:#1B365D;font-weight:bold;font-size:15px;">${i.name || i.title || i.courseName || i.levelTitle || 'Selected programme'}</div>
 						</li>`;
-			  }).join('')
+			}).join('')
 			: '<li style="padding:10px;">Your selected programme</li>';
 		return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">

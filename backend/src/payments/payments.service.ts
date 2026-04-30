@@ -277,12 +277,17 @@ export class PaymentsService {
 			}
 		}
 
-		// Use currency-specific total
-		const amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+		// Use currency-specific total — Edge revision passes an explicit amount that
+		// matches the price shown on the Edge page (admin-editable via settings).
+		// Always prefer the explicit amount when provided to keep display and charge in sync.
+		const amount = (dto.isEdgeRevision && dto.amount && dto.amount > 0)
+			? dto.amount
+			: currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
 
 		if (amount <= 0) {
 			throw new BadRequestException('Cart total must be greater than zero');
 		}
+
 
 		// Create or find combination for this cart
 		let finalComboId = dto.combinationId;
@@ -705,8 +710,33 @@ export class PaymentsService {
 			this.logger.error(`Failed to auto-sync enrollment ${record.id} to Google Sheets`, error.message);
 		});
 
-		if (this.getEdgeRegistrationType(record) === 'free-mock') {
+		const edgeType = this.getEdgeRegistrationType(record);
+
+		if (edgeType === 'free-mock') {
 			await this.sendEdgeRegistrationToN8n(record, 'unpaid');
+		}
+
+		// Send confirmation email for all Edge registrations (free mock immediately;
+		// paid revision is handled by the payment webhook receipt flow)
+		if (edgeType === 'free-mock' && dto.email) {
+			const edgeItem = this.getEdgeCartItem(record);
+			const name = [dto.firstName, dto.lastName].filter(Boolean).join(' ') || 'Student';
+			const caseStudy = edgeItem?.courseCode
+				? `${edgeItem.courseCode} – ${edgeItem.title || edgeItem.name || 'Case Study'}`
+				: (dto.cimaStage || 'CIMA Case Study');
+			this.email.sendEdgeRegistrationConfirmationEmail({
+				name,
+				email: dto.email,
+				enrollmentId: record.id,
+				programme: 'Free Mock',
+				caseStudy,
+				registrationType: 'free-mock',
+				amount: 0,
+				currency: dto.currency || 'GBP',
+				paidAt: new Date(),
+			}).catch((err) => {
+				this.logger.error(`Failed to send Edge free mock confirmation email: ${err.message}`);
+			});
 		}
 
 		return { id: record.id };

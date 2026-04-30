@@ -496,6 +496,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 			email: form.email,
 			phone: form.phone || undefined,
 			currency: selectedCurrency,
+			amount,
 			...(combinationId ? { combinationId } : { courseIds: [selection.code] }),
 			isEdgeRevision: true,
 			enrollmentMeta,
