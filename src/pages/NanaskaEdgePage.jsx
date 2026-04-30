@@ -716,18 +716,19 @@ export default function NanaskaEdgePage() {
 		externalId: searchParams.get('externalId') || '',
 	} : null;
 
-	const [selectionKind, setSelectionKind] = useState(() => {
-		if (mockType === 'free-mock') return 'free';
-		if (mockType === 'revision-mock') return 'revision';
-		return null;
-	});
-
 	// If a code is in the URL, auto-select that case study and go straight to SignupView
 	const [signupSelection, setSignupSelection] = useState(() => {
 		if (urlCode && mockType === 'revision-mock') {
 			const matched = CASE_STUDIES.find((cs) => cs.code === urlCode);
 			if (matched) return { ...matched, kind: 'revision' };
 		}
+		return null;
+	});
+
+	// Only open the SelectionModal if we don't already have an auto-selected course
+	const [selectionKind, setSelectionKind] = useState(() => {
+		if (mockType === 'free-mock') return 'free';
+		if (mockType === 'revision-mock' && !urlCode) return 'revision';
 		return null;
 	});
 	const [baseTime] = useState(() => Date.now());
