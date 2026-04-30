@@ -27,7 +27,7 @@ const DEFAULTS = {
 	edge_mcs_price_gbp: '499',
 	edge_scs_price_lkr: '30750',
 	edge_scs_price_gbp: '599',
-	edge_revision_gateway_amount_lkr: '10',
+	edge_revision_gateway_amount_lkr: '',
 };
 
 function toLocalDateTimeValue(value) {
@@ -218,7 +218,7 @@ export default function NanaskaEdgeSettingsPage() {
 							<input
 								type="number"
 								min="1"
-								value={settings.edge_revision_gateway_amount_lkr || '10'}
+								value={settings.edge_revision_gateway_amount_lkr || ''}
 								onChange={(e) => handleChange('edge_revision_gateway_amount_lkr', e.target.value)}
 								placeholder="e.g. 10"
 							/>

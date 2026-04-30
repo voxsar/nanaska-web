@@ -278,14 +278,17 @@ export class PaymentsService {
 		}
 
 		// Use currency-specific total
-		// For Edge revision, read the gateway charge amount from site settings (falls back to 10 LKR)
+		// For Edge revision, read the gateway charge amount from site settings
 		let amount: number;
 		if (dto.isEdgeRevision) {
 			const gatewaySetting = await this.prisma.siteSetting.findUnique({
 				where: { key: 'edge_revision_gateway_amount_lkr' },
 			});
-			const settingValue = parseInt(gatewaySetting?.value || '10', 10);
-			amount = Number.isFinite(settingValue) && settingValue > 0 ? settingValue : 10;
+			const settingValue = parseInt(gatewaySetting?.value || '', 10);
+			if (!Number.isFinite(settingValue) || settingValue <= 0) {
+				throw new BadRequestException('Edge revision gateway amount is not configured. Please set it in Nanaska Edge Settings.');
+			}
+			amount = settingValue;
 		} else {
 			amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
 		}
