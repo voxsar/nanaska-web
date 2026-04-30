@@ -488,6 +488,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 				studyMode: form.studyMode,
 			}],
 			registrationType,
+			externalId: prefill?.externalId || undefined,
 		};
 
 		const payload = {

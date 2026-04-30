@@ -638,6 +638,40 @@ export class PaymentsService {
 		}
 
 		if (!enrollment) return;
+
+		// Fire upgrade webhook for revision upgrades that originated from an external system (externalId present)
+		const meta = (order.metaJson as Record<string, any>) || {};
+		const externalId = meta.externalId || null;
+		if (meta.isEdgeRevision && externalId) {
+			const cartItems: any[] = Array.isArray(meta.cartItems) ? meta.cartItems : [];
+			const edgeItem = cartItems.find((i) => i?.type === 'nanaska-edge') || {};
+			const upgradePayload = {
+				externalId,
+				firstName: enrollment.firstName,
+				lastName: enrollment.lastName,
+				email: enrollment.email,
+				phone: enrollment.phone || undefined,
+				cimaId: enrollment.cimaId || undefined,
+				cimaStage: enrollment.cimaStage || undefined,
+				country: enrollment.country || undefined,
+				currency: order.currency,
+				amount: order.amount,
+				orderId: order.id,
+				paymentRef: order.ipgRef || undefined,
+				caseStudyCode: edgeItem.courseCode || undefined,
+				combinationId: edgeItem.combinationId || meta.combinationId || undefined,
+				paidAt: new Date().toISOString(),
+			};
+			fetch('https://automation.nanaska.com/webhook/upgrade', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(upgradePayload),
+			}).catch((err) => {
+				this.logger.error(`Failed to fire upgrade webhook for order ${order.id}`, err.message);
+			});
+			this.logger.log(`Upgrade webhook fired for externalId=${externalId}, order=${order.id}`);
+		}
+
 		try {
 			await this.sendEdgeRegistrationToN8n(enrollment, 'paid', order);
 		} catch (error) {
