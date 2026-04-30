@@ -27,7 +27,6 @@ const DEFAULTS = {
 	edge_mcs_price_gbp: '499',
 	edge_scs_price_lkr: '30750',
 	edge_scs_price_gbp: '599',
-	edge_revision_gateway_amount_lkr: '',
 };
 
 function toLocalDateTimeValue(value) {
@@ -212,22 +211,7 @@ export default function NanaskaEdgeSettingsPage() {
 							</div>
 						))}
 					</div>
-					<div className="admin-form-grid" style={{ marginTop: '1rem' }}>
-						<div className="form-group">
-							<label>Gateway charge amount (LKR) for revision sessions</label>
-							<input
-								type="number"
-								min="1"
-								value={settings.edge_revision_gateway_amount_lkr || ''}
-								onChange={(e) => handleChange('edge_revision_gateway_amount_lkr', e.target.value)}
-								placeholder="e.g. 10"
-							/>
-							<small style={{ color: '#64748b' }}>
-								This is the amount actually sent to the payment gateway. Set to the real price when ready to go live.
-							</small>
-						</div>
-					</div>
-				</div>
+
 
 				<div className="admin-card">
 					<p className="admin-card-title">Registration Automation</p>
