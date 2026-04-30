@@ -516,6 +516,32 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 		return res.json();
 	};
 
+	const sendUpgradeWebhook = (paymentUrl) => {
+		const payload = {
+			firstName: form.firstName,
+			lastName: form.lastName,
+			email: form.email,
+			phone: form.phone || undefined,
+			cimaId: form.cimaId || undefined,
+			cimaStage: selection.cimaStage,
+			country: form.country || undefined,
+			studyMode: form.studyMode,
+			caseStudyCode: selection.code,
+			caseStudyName: selection.name,
+			programme: 'Revision Session',
+			combinationId,
+			currency: selectedCurrency,
+			amount,
+			externalId: prefill?.externalId || undefined,
+			paymentUrl: paymentUrl || undefined,
+		};
+		fetch('https://automation.nanaska.com/webhook/upgrade', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload),
+		}).catch(() => { });
+	};
+
 	const submit = async (e) => {
 		e.preventDefault();
 		setSubmitting(true);
@@ -526,6 +552,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 				// Enrollment is created by the backend webhook AFTER payment succeeds.
 				// No enrollment record is saved here — user can retry freely if payment fails.
 				const payment = await startPayment();
+				sendUpgradeWebhook(payment.paymentUrl);
 				window.location.href = payment.paymentUrl;
 				return;
 			}
