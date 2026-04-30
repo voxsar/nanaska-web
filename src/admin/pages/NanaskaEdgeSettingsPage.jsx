@@ -213,26 +213,26 @@ export default function NanaskaEdgeSettingsPage() {
 					</div>
 
 
-				<div className="admin-card">
-					<p className="admin-card-title">Registration Automation</p>
-					<div className="admin-form-grid single">
-						<div className="form-group">
-							<label>n8n registration webhook URL</label>
-							<input
-								value={settings.edge_n8n_registration_webhook || ''}
-								onChange={(e) => handleChange('edge_n8n_registration_webhook', e.target.value)}
-								placeholder="https://automation.nanaska.com/webhook-test/registration"
-							/>
-							<small style={{ color: '#64748b' }}>
-								Free mock posts immediately. Revision posts only after successful payment.
-							</small>
+					<div className="admin-card">
+						<p className="admin-card-title">Registration Automation</p>
+						<div className="admin-form-grid single">
+							<div className="form-group">
+								<label>n8n registration webhook URL</label>
+								<input
+									value={settings.edge_n8n_registration_webhook || ''}
+									onChange={(e) => handleChange('edge_n8n_registration_webhook', e.target.value)}
+									placeholder="https://automation.nanaska.com/webhook-test/registration"
+								/>
+								<small style={{ color: '#64748b' }}>
+									Free mock posts immediately. Revision posts only after successful payment.
+								</small>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<button type="submit" className="btn btn-primary" disabled={saving}>
-					{saving ? 'Saving...' : 'Save Edge Settings'}
-				</button>
+					<button type="submit" className="btn btn-primary" disabled={saving}>
+						{saving ? 'Saving...' : 'Save Edge Settings'}
+					</button>
 			</form>
 		</div>
 	);
