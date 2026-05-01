@@ -52,6 +52,7 @@ import PaymentLinkPage from './pages/PaymentLinkPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import NanaskaEdgePage from './pages/NanaskaEdgePage';
+import NanaskaEdgeLoginPage from './pages/NanaskaEdgeLoginPage';
 import RegistrationSuccessPage from './pages/RegistrationSuccessPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
@@ -158,6 +159,7 @@ function App() {
 							<Route path="/nanaska-edge" element={<NanaskaEdgePage />} />
 							<Route path="/nanaska-edge/:mockType/select-cima-type" element={<NanaskaEdgePage />} />
 							<Route path="/nanaska-edge/registration-success" element={<RegistrationSuccessPage />} />
+							<Route path="/nanaska-edge-login" element={<NanaskaEdgeLoginPage />} />
 
 							<Route path="/cima-certificate-level" element={<CertificateLevelPage />} />
 							<Route path="/cima-operational-level" element={<OperationalLevelPage />} />

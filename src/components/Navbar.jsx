@@ -37,6 +37,7 @@ const TOP_LINKS = [
 	{ label: 'LMS', href: 'https://nanaska.webcolms.com/login' },
 	{ label: 'Online Exams', href: 'https://exam.nanaska.com/index.php?r=site/login' },
 	{ label: 'Nanaska Connect', href: '/#connect' },
+	{ label: 'Nanaska Edge Login', to: '/nanaska-edge-login' },
 ];
 
 export default function Navbar() {
@@ -107,6 +108,7 @@ export default function Navbar() {
 		},
 		{ label: 'Testimonials', to: '/testimonials' },
 		{ label: 'Blog', to: '/blog' },
+		{ label: 'Nanaska Edge', to: '/nanaska-edge' },
 		{ label: 'Contact Us', to: '/contact' },
 	];
 
@@ -119,15 +121,21 @@ export default function Navbar() {
 						<ul className="topbar__links">
 							{TOP_LINKS.map((link) => (
 								<li key={link.label}>
-									<a
-										href={link.href}
-										className="topbar__link"
-										target={link.href.startsWith('http') ? '_blank' : undefined}
-										rel="noopener noreferrer"
-										onClick={handleLinkClick}
-									>
-										{link.label}
-									</a>
+									{link.to ? (
+										<Link to={link.to} className="topbar__link" onClick={handleLinkClick}>
+											{link.label}
+										</Link>
+									) : (
+										<a
+											href={link.href}
+											className="topbar__link"
+											target={link.href.startsWith('http') ? '_blank' : undefined}
+											rel="noopener noreferrer"
+											onClick={handleLinkClick}
+										>
+											{link.label}
+										</a>
+									)}
 								</li>
 							))}
 						</ul>
