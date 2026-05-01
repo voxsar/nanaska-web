@@ -341,6 +341,7 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 
 const EDGE_TRIAL_API = 'https://edge.trial.nanaska.com/api/provision/students/email';
 const EDGE_REVISION_API = 'https://edge.revision.nanaska.com/api/provision/students/email';
+const EDGE_REVISION_REGISTER_API = 'https://edge.revision.nanaska.com/api/provision/students';
 const EDGE_TRIAL_RESEND_API = 'https://edge.trial.nanaska.com/api/auth/resend-setup-email';
 const EDGE_REVISION_RESEND_API = 'https://edge.revision.nanaska.com/api/auth/resend-setup-email';
 
@@ -356,6 +357,33 @@ async function checkEmailRegistered(email, kind) {
 		return false;
 	} catch {
 		return false;
+	}
+}
+
+/**
+ * For upgrade flows: ensures the student exists on the revision server.
+ * If not found, registers them so n8n can transfer the mock.
+ */
+async function ensureRevisionStudent(form) {
+	try {
+		const checkRes = await fetch(`${EDGE_REVISION_API}?email=${encodeURIComponent(form.email)}`);
+		if (checkRes.ok) {
+			const data = await checkRes.json().catch(() => null);
+			if (data && (data.id || data.email || data.student)) return; // already registered
+		}
+		// Not found — register them on the revision server
+		await fetch(EDGE_REVISION_REGISTER_API, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				firstName: form.firstName,
+				lastName: form.lastName,
+				email: form.email,
+				...(form.phone ? { phone: form.phone } : {}),
+			}),
+		});
+	} catch {
+		// Non-blocking — n8n will handle recovery if needed
 	}
 }
 
@@ -550,7 +578,11 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 
 		try {
 			if (selection.kind === 'revision') {
-				// Enrollment is created by the backend webhook AFTER payment succeeds.
+				// For upgrade flows (prefilled from CRM), ensure the student exists on the revision
+				// server before calling the upgrade webhook — n8n needs them registered to transfer the mock.
+				if (prefill?.email) {
+					await ensureRevisionStudent(form);
+				}
 				// No enrollment record is saved here — user can retry freely if payment fails.
 				const payment = await startPayment();
 				sendUpgradeWebhook(payment.paymentUrl);

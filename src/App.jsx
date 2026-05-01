@@ -171,9 +171,9 @@ function App() {
 							<Route path="/lecturers" element={<LecturersPage />} />
 							<Route path="/enrollment" element={<EnrollmentPage />} />						<Route path="/payment-success" element={<PaymentSuccessPage />} />
 							<Route path="/payment-cancel" element={<PaymentCancelPage />} />
-							<Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-							<Route path="/terms-and-conditions" element={<TermsPage />} />
-							{/* Dynamic course pages */}
+						<Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+						<Route path="/terms-and-conditions" element={<TermsPage />} />
+						{/* Dynamic course pages */}
 							<Route path="/:courseSlug" element={<CourseRouteWrapper />} />
 
 						</Route>
