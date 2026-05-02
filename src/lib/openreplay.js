@@ -10,6 +10,18 @@ const tracker = new Tracker({
 });
 
 tracker.use(trackerAssist());
-tracker.start();
+
+tracker
+  .start()
+  .then((result) => {
+    console.log('[OpenReplay] started', result);
+  })
+  .catch((err) => {
+    console.error('[OpenReplay] failed to start', err);
+  });
+
+if (typeof window !== 'undefined') {
+  window.__openreplay = tracker;
+}
 
 export default tracker;
