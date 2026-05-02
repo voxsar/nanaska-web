@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@microsoft/clarity": "^1.0.2",
+    "@openreplay/tracker": "^18.0.6",
+    "@openreplay/tracker-assist": "^11.0.13",
     "axios": "^1.13.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
