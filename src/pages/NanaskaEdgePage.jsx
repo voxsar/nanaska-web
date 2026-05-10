@@ -24,17 +24,6 @@ const COUNTRIES = [
 	'Other',
 ];
 
-const DEFAULT_EDGE_SETTINGS = {
-	edge_ocs_available: 'true',
-	edge_mcs_available: 'false',
-	edge_scs_available: 'false',
-	edge_mcs_days_from_now: '6',
-	edge_scs_days_from_now: '12',
-	edge_ocs_revision_combination_id: 'op_ocs',
-	edge_mcs_revision_combination_id: 'mg_mcs',
-	edge_scs_revision_combination_id: 'st_scs',
-};
-
 const CASE_STUDIES = [
 	{
 		code: 'OCS',
@@ -58,6 +47,28 @@ const CASE_STUDIES = [
 		fallbackDays: 12,
 	},
 ];
+
+const PROGRAMMES = [
+	{ key: 'free', label: 'Trial / Free Mock', statusLabel: 'trial / free mock' },
+	{ key: 'revision', label: 'Revision Session', statusLabel: 'revision' },
+];
+
+const DEFAULT_EDGE_SETTINGS = {
+	edge_ocs_available: 'true',
+	edge_mcs_available: 'false',
+	edge_scs_available: 'false',
+	edge_mcs_days_from_now: '6',
+	edge_scs_days_from_now: '12',
+	edge_ocs_revision_combination_id: 'op_ocs',
+	edge_mcs_revision_combination_id: 'mg_mcs',
+	edge_scs_revision_combination_id: 'st_scs',
+	...Object.fromEntries(
+		PROGRAMMES.flatMap((programme) => CASE_STUDIES.flatMap((item) => ([
+			[`edge_${programme.key}_${item.code.toLowerCase()}_available`, 'true'],
+			[`edge_${programme.key}_${item.code.toLowerCase()}_unavailable_at`, ''],
+		]))),
+	),
+};
 
 const FEATURES = [
 	{ icon: 'target', title: 'Mock Exams', body: 'Full timed CIMA mock papers with multi-part questions, attempt tracking, and shareable result summaries.' },
@@ -138,6 +149,73 @@ function parseTargetMs(value, fallbackMs) {
 	return Number.isNaN(timestamp) ? fallbackMs : timestamp;
 }
 
+function parseOptionalTargetMs(value) {
+	if (!value) return null;
+	const timestamp = new Date(value).getTime();
+	return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+function getProgramme(kind) {
+	return PROGRAMMES.find((programme) => programme.key === kind) || PROGRAMMES[0];
+}
+
+function getCaseStudyAvailability({ settings, option, kind, baseTime, now }) {
+	const key = option.code.toLowerCase();
+	const fallbackDaysRaw = Number(settings[`edge_${key}_days_from_now`]);
+	const fallbackDays = Number.isFinite(fallbackDaysRaw) ? fallbackDaysRaw : option.fallbackDays;
+	const fallbackTarget = baseTime + fallbackDays * 86400000;
+	const opensAtMs = parseTargetMs(settings[`edge_${key}_opens_at`], fallbackTarget);
+	const isOpenByTime = opensAtMs <= now;
+	const isOpenBySetting = toBool(settings[`edge_${key}_available`], option.code === 'OCS');
+
+	if (!isOpenBySetting && !isOpenByTime) {
+		return {
+			state: 'opens-soon',
+			available: false,
+			statusLabel: 'Opens soon',
+			targetMs: opensAtMs,
+			countdownIntro: 'Opens in',
+			message: 'Registration opens with the next intake window.',
+		};
+	}
+
+	const programme = getProgramme(kind);
+	const isSubjectAvailable = toBool(settings[`edge_${kind}_${key}_available`], true);
+	const unavailableAtMs = parseOptionalTargetMs(settings[`edge_${kind}_${key}_unavailable_at`]);
+	const isClosedBySchedule = unavailableAtMs !== null && unavailableAtMs <= now;
+
+	if (!isSubjectAvailable || isClosedBySchedule) {
+		return {
+			state: 'unavailable',
+			available: false,
+			statusLabel: 'Unavailable',
+			targetMs: null,
+			countdownIntro: '',
+			message: `This subject is currently unavailable for ${programme.statusLabel}.`,
+		};
+	}
+
+	if (unavailableAtMs !== null) {
+		return {
+			state: 'closing-soon',
+			available: true,
+			statusLabel: 'Available now',
+			targetMs: unavailableAtMs,
+			countdownIntro: 'Unavailable in',
+			message: `This subject becomes unavailable for ${programme.statusLabel} when the countdown ends.`,
+		};
+	}
+
+	return {
+		state: 'available',
+		available: true,
+		statusLabel: 'Available now',
+		targetMs: null,
+		countdownIntro: '',
+		message: '',
+	};
+}
+
 function splitName(form) {
 	return [form.firstName, form.lastName].filter(Boolean).join(' ').trim();
 }
@@ -190,12 +268,12 @@ function useCountdown(targetMs) {
 	};
 }
 
-function Countdown({ targetMs }) {
+function Countdown({ targetMs, ariaLabel = 'Countdown' }) {
 	const { days, hours, mins, secs } = useCountdown(targetMs);
 	const pad = (n) => String(n).padStart(2, '0');
 
 	return (
-		<div className="edge-countdown" aria-label="Countdown until registration opens">
+		<div className="edge-countdown" aria-label={ariaLabel}>
 			<div className="edge-countdown__cell"><span>{pad(days)}</span><small>Days</small></div>
 			<div className="edge-countdown__cell"><span>{pad(hours)}</span><small>Hrs</small></div>
 			<div className="edge-countdown__cell"><span>{pad(mins)}</span><small>Min</small></div>
@@ -294,35 +372,49 @@ function SelectionModal({ kind, settings, baseTime, onClose, onPick }) {
 
 				<div className="edge-option-grid">
 					{CASE_STUDIES.map((option) => {
-						const key = option.code.toLowerCase();
-						const fallbackDays = Number(settings[`edge_${key}_days_from_now`] ?? option.fallbackDays);
-						const fallbackTarget = baseTime + (Number.isFinite(fallbackDays) ? fallbackDays : option.fallbackDays) * 86400000;
-						const configuredTarget = parseTargetMs(settings[`edge_${key}_opens_at`], fallbackTarget);
-						const isOpenByTime = configuredTarget <= now;
-						const available = toBool(settings[`edge_${key}_available`], option.code === 'OCS') || isOpenByTime;
+						const availability = getCaseStudyAvailability({ settings, option, kind, baseTime, now });
+						const className = [
+							'edge-option',
+							availability.available ? 'edge-option--available' : '',
+							availability.state === 'closing-soon' ? 'edge-option--closing-soon' : '',
+							availability.state === 'unavailable' ? 'edge-option--unavailable' : '',
+						].filter(Boolean).join(' ');
 
 						return (
-							<div key={option.code} className={`edge-option${available ? ' edge-option--available' : ''}`}>
+							<div key={option.code} className={className}>
 								<div className="edge-option__code">{option.code}</div>
 								<h3>{option.name} <em>Case Study</em></h3>
 								<p>{option.tagline}</p>
 
 								<div className="edge-option__meta">
-									{available ? (
+									<div className={`edge-option__status edge-option__status--${availability.state}`}><span /> {availability.statusLabel}</div>
+
+									{availability.targetMs && (
 										<>
-											<div className="edge-option__status"><span /> Available now</div>
+											<div className="edge-option__countdown-label">{availability.countdownIntro}</div>
+											<Countdown
+												targetMs={availability.targetMs}
+												ariaLabel={availability.state === 'closing-soon'
+													? `Countdown until ${option.code} becomes unavailable`
+													: `Countdown until ${option.code} opens`}
+											/>
+										</>
+									)}
+
+									{availability.message && (
+										<div className={`edge-option__note${availability.state === 'closing-soon' ? ' edge-option__note--warning' : ''}`}>
+											{availability.message}
+										</div>
+									)}
+
+									{availability.available ? (
+										<>
 											<button className="edge-option__cta" onClick={() => onPick({ ...option, kind })}>
 												<span>Continue</span>
 												<i><Icon.arrow /></i>
 											</button>
 										</>
-									) : (
-										<>
-											<div className="edge-option__status"><span /> Opens soon</div>
-											<Countdown targetMs={configuredTarget} />
-											<div className="edge-option__disabled">Registration opens with the next intake window.</div>
-										</>
-									)}
+									) : null}
 								</div>
 							</div>
 						);
@@ -762,6 +854,82 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 	);
 }
 
+function SignupGate({ selection, settings, baseTime, onBack, prefill = {} }) {
+	const [now, setNow] = useState(() => Date.now());
+	const kindLabel = selection.kind === 'free' ? 'Free Mock' : 'Revision Session';
+	const availability = getCaseStudyAvailability({ settings, option: selection, kind: selection.kind, baseTime, now });
+
+	useEffect(() => {
+		const id = window.setInterval(() => setNow(Date.now()), 1000);
+		return () => window.clearInterval(id);
+	}, []);
+
+	if (availability.available) {
+		return <SignupView selection={selection} settings={settings} onBack={onBack} prefill={prefill} />;
+	}
+
+	return (
+		<div className="edge-signup" role="dialog" aria-modal="true" aria-label={`${selection.code} ${kindLabel} availability`}>
+			<div className="edge-signup__shell">
+				<aside className="edge-signup__side">
+					<div>
+						<button className="edge-signup__back" onClick={onBack}>
+							<span><Icon.arrow /></span>
+							Back to Edge
+						</button>
+
+						<div className="edge-signup__eyebrow">Availability, {selection.code}</div>
+						<h2>
+							{availability.state === 'opens-soon'
+								? <>Registration <em>opens soon.</em></>
+								: <>Currently <em>unavailable.</em></>}
+						</h2>
+						<p>
+							{availability.state === 'opens-soon'
+								? 'This case study will reopen with the next Nanaska Edge intake window.'
+								: `This case study is not currently accepting ${kindLabel.toLowerCase()} registrations.`}
+						</p>
+					</div>
+
+					<div className="edge-signup__summary">
+						<div><span>Programme</span><strong>{kindLabel}</strong></div>
+						<div><span>Case study</span><strong>{selection.code}, {selection.name}</strong></div>
+						<div><span>Status</span><strong>{availability.statusLabel}</strong></div>
+					</div>
+				</aside>
+
+				<main className="edge-signup__form-wrap">
+					<div className="edge-success">
+						<div className="edge-success__icon edge-success__icon--warning"><Icon.close /></div>
+						<h2>
+							{availability.state === 'opens-soon'
+								? <>Registration <em>opens soon.</em></>
+								: <>Currently <em>unavailable.</em></>}
+						</h2>
+						<p>{availability.message}</p>
+
+						{availability.targetMs && (
+							<div className="edge-success__email-notice edge-success__email-notice--neutral">
+								<strong>{availability.countdownIntro}</strong>
+								<Countdown
+									targetMs={availability.targetMs}
+									ariaLabel={availability.state === 'closing-soon'
+										? `Countdown until ${selection.code} becomes unavailable`
+										: `Countdown until ${selection.code} opens`}
+								/>
+							</div>
+						)}
+
+						<button className="edge-btn edge-btn--primary" onClick={onBack}>
+							Back to Edge <Icon.arrow />
+						</button>
+					</div>
+				</main>
+			</div>
+		</div>
+	);
+}
+
 export default function NanaskaEdgePage() {
 	const settings = useEdgeSettings();
 	const { mockType } = useParams();
@@ -903,7 +1071,13 @@ export default function NanaskaEdgePage() {
 			)}
 
 			{signupSelection && (
-				<SignupView selection={signupSelection} settings={settings} onBack={() => setSignupSelection(null)} prefill={prefill || {}} />
+				<SignupGate
+					selection={signupSelection}
+					settings={settings}
+					baseTime={baseTime}
+					onBack={() => setSignupSelection(null)}
+					prefill={prefill || {}}
+				/>
 			)}
 		</div>
 	);

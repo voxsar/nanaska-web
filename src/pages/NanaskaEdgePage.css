@@ -949,6 +949,16 @@
 	border-color: rgba(19, 169, 189, 0.44);
 }
 
+.edge-option--closing-soon {
+	border-color: rgba(245, 166, 35, 0.48);
+	box-shadow: 0 24px 74px -42px rgba(245, 166, 35, 0.38);
+}
+
+.edge-option--unavailable {
+	background: rgba(255, 255, 255, 0.76);
+	border-color: rgba(115, 131, 153, 0.24);
+}
+
 .edge-option__code {
 	font-size: 0.78rem;
 	font-weight: 900;
@@ -993,8 +1003,33 @@
 	color: var(--edge-dim);
 }
 
-.edge-option--available .edge-option__status {
+.edge-option__status--available {
 	color: var(--edge-teal-dark);
+}
+
+.edge-option__status--closing-soon,
+.edge-option__status--opens-soon {
+	color: #a75a07;
+}
+
+.edge-option__status--closing-soon span,
+.edge-option__status--opens-soon span {
+	background: var(--edge-amber);
+	box-shadow: 0 0 0 6px rgba(245, 166, 35, 0.16);
+}
+
+.edge-option__status--unavailable span {
+	background: #94a3b8;
+	box-shadow: 0 0 0 6px rgba(148, 163, 184, 0.16);
+}
+
+.edge-option__countdown-label {
+	margin-top: 0.85rem;
+	font-size: 0.68rem;
+	font-weight: 900;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--edge-dim);
 }
 
 .edge-option__cta {
@@ -1014,10 +1049,15 @@
 	font-weight: 700;
 }
 
-.edge-option__disabled {
+.edge-option__note {
 	margin-top: 0.75rem;
 	color: var(--edge-dim);
 	font-size: 0.86rem;
+	line-height: 1.55;
+}
+
+.edge-option__note--warning {
+	color: #8b5d08;
 }
 
 .edge-countdown {
@@ -1050,6 +1090,11 @@
 	font-weight: 900;
 	letter-spacing: 0.09em;
 	text-transform: uppercase;
+}
+
+.edge-option--closing-soon .edge-countdown__cell,
+.edge-success__email-notice--neutral .edge-countdown__cell {
+	background: rgba(245, 166, 35, 0.12);
 }
 
 .edge-signup {
@@ -1286,6 +1331,12 @@
 	height: 1.8rem;
 }
 
+.edge-success__icon--warning {
+	background: rgba(245, 166, 35, 0.18);
+	color: #8b5d08;
+	box-shadow: 0 18px 46px -24px rgba(245, 166, 35, 0.72);
+}
+
 .edge-success h2 {
 	margin: 0;
 	font-family: Georgia, "Times New Roman", serif;
@@ -1325,6 +1376,11 @@
 	color: var(--edge-muted);
 	font-size: 0.9rem;
 	line-height: 1.55;
+}
+
+.edge-success__email-notice--neutral {
+	background: rgba(245, 166, 35, 0.1);
+	border-color: rgba(245, 166, 35, 0.24);
 }
 
 .edge-success__countdown {

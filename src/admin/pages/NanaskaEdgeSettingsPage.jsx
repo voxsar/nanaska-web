@@ -7,6 +7,11 @@ const CASE_STUDIES = [
 	{ code: 'scs', label: 'SCS', name: 'Strategic Case Study' },
 ];
 
+const PROGRAMMES = [
+	{ key: 'free', label: 'Trial / Free Mock' },
+	{ key: 'revision', label: 'Revision Session' },
+];
+
 const DEFAULTS = {
 	edge_ocs_available: 'true',
 	edge_mcs_available: 'false',
@@ -27,6 +32,12 @@ const DEFAULTS = {
 	edge_mcs_price_gbp: '499',
 	edge_scs_price_lkr: '30750',
 	edge_scs_price_gbp: '599',
+	...Object.fromEntries(
+		PROGRAMMES.flatMap((programme) => CASE_STUDIES.flatMap((item) => ([
+			[`edge_${programme.key}_${item.code}_available`, 'true'],
+			[`edge_${programme.key}_${item.code}_unavailable_at`, ''],
+		]))),
+	),
 };
 
 function toLocalDateTimeValue(value) {
@@ -102,7 +113,10 @@ export default function NanaskaEdgeSettingsPage() {
 
 			<form onSubmit={handleSave}>
 				<div className="admin-card">
-					<p className="admin-card-title">Case Study Availability</p>
+					<p className="admin-card-title">Case Study Opening Availability</p>
+					<p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
+						These settings control when each case study first opens on Nanaska Edge for both Trial and Revision.
+					</p>
 					<div className="admin-form-grid">
 						{CASE_STUDIES.map((item) => {
 							const availableKey = `edge_${item.code}_available`;
@@ -134,7 +148,54 @@ export default function NanaskaEdgeSettingsPage() {
 				</div>
 
 				<div className="admin-card">
-					<p className="admin-card-title">Fallback Countdown Days</p>
+					<p className="admin-card-title">Trial & Revision Subject Availability</p>
+					<p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.9rem' }}>
+						Use these settings to disable a subject specifically for Trial / Free Mock or Revision. If you set an
+						future “Unavailable from” date while the subject is still available, the frontend shows a countdown and
+						switches to Unavailable automatically when that date arrives.
+					</p>
+					{PROGRAMMES.map((programme, index) => (
+						<div
+							key={programme.key}
+							style={index
+								? { marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #e2e8f0' }
+								: undefined}
+						>
+							<p style={{ marginBottom: '0.85rem', fontWeight: 600, color: '#0f172a' }}>{programme.label}</p>
+							<div className="admin-form-grid">
+								{CASE_STUDIES.map((item) => {
+									const availableKey = `edge_${programme.key}_${item.code}_available`;
+									const unavailableAtKey = `edge_${programme.key}_${item.code}_unavailable_at`;
+
+									return (
+										<div key={availableKey} className="form-group">
+											<label>{item.label} - {item.name}</label>
+											<select
+												value={settings[availableKey] || 'true'}
+												onChange={(e) => handleChange(availableKey, e.target.value)}
+											>
+												<option value="true">Available</option>
+												<option value="false">Unavailable</option>
+											</select>
+											<input
+												type="datetime-local"
+												value={toLocalDateTimeValue(settings[unavailableAtKey])}
+												onChange={(e) => handleChange(unavailableAtKey, fromLocalDateTimeValue(e.target.value))}
+												placeholder="Unavailable from"
+											/>
+											<small style={{ color: '#64748b' }}>
+												Optional. Leave blank to keep this subject available indefinitely for {programme.label}.
+											</small>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					))}
+				</div>
+
+				<div className="admin-card">
+					<p className="admin-card-title">Opening Countdown Fallback Days</p>
 					<div className="admin-form-grid">
 						<div className="form-group">
 							<label>MCS fallback days from page visit</label>
