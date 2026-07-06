@@ -1,5 +1,15 @@
 import { useState, useEffect } from 'react';
 import api from '../api';
+import {
+	CartItems,
+	DetailGrid,
+	DetailModal,
+	DetailSection,
+	JsonBlock,
+	formatCurrency,
+	formatDate,
+	formatDateTime,
+} from '../components/RecordDetails';
 
 const PAGE_SIZE = 20;
 
@@ -33,6 +43,69 @@ function Pagination({ page, total, pageSize, onPage }) {
 	);
 }
 
+function getOrderName(order) {
+	const enrollment = order.enrollmentSubmission;
+	const enrollmentName = [enrollment?.firstName, enrollment?.lastName].filter(Boolean).join(' ');
+	return order.user?.name || order.guestName || enrollmentName || '—';
+}
+
+function getOrderEmail(order) {
+	return order.user?.email || order.guestEmail || order.enrollmentSubmission?.email || order.metaJson?.email || '—';
+}
+
+function getOrderPhone(order) {
+	return order.guestPhone || order.enrollmentSubmission?.phone || order.metaJson?.phone || order.metaJson?.studentPhone || '—';
+}
+
+function getOrderCourses(order) {
+	const courseIds = order.combination?.items?.map((i) => i.course?.id).filter(Boolean);
+	if (courseIds?.length) return courseIds.join(', ');
+	if (order.paymentLink?.label) return order.paymentLink.label;
+	const cartItems = order.enrollmentSubmission?.cartJson || order.metaJson?.cartItems;
+	if (Array.isArray(cartItems) && cartItems.length > 0) {
+		return cartItems.map((item) => item.courseCode || item.title || item.name || item.combinationId || item.id).filter(Boolean).join(', ') || '—';
+	}
+	return '—';
+}
+
+function EnrollmentDetails({ enrollment }) {
+	if (!enrollment) return null;
+	return (
+		<>
+			<DetailSection title="Registration Details">
+				<DetailGrid items={[
+					{ label: 'First Name', value: enrollment.firstName },
+					{ label: 'Last Name', value: enrollment.lastName },
+					{ label: 'Email', value: enrollment.email },
+					{ label: 'Phone', value: enrollment.phone },
+					{ label: 'WhatsApp', value: enrollment.whatsapp },
+					{ label: 'CIMA ID', value: enrollment.cimaId },
+					{ label: 'CIMA Stage', value: enrollment.cimaStage },
+					{ label: 'Date of Birth', value: enrollment.dob },
+					{ label: 'Gender', value: enrollment.gender },
+					{ label: 'Country', value: enrollment.country },
+					{ label: 'Street', value: enrollment.street },
+					{ label: 'City', value: enrollment.city },
+					{ label: 'Postcode', value: enrollment.postcode },
+					{ label: 'Submitted', value: formatDateTime(enrollment.createdAt) },
+				]} />
+			</DetailSection>
+			{Array.isArray(enrollment.cartJson) && enrollment.cartJson.length > 0 && (
+				<DetailSection title="Cart Items">
+					<CartItems items={enrollment.cartJson} />
+				</DetailSection>
+			)}
+			{enrollment.notes && (
+				<DetailSection title="Notes">
+					<div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12, whiteSpace: 'pre-wrap' }}>
+						{enrollment.notes}
+					</div>
+				</DetailSection>
+			)}
+		</>
+	);
+}
+
 export default function StudentsPage() {
 	const [paidStudents, setPaidStudents] = useState([]);
 	const [unpaidEnrollments, setUnpaidEnrollments] = useState([]);
@@ -42,6 +115,7 @@ export default function StudentsPage() {
 	const [search, setSearch] = useState('');
 	const [page, setPage] = useState(1);
 	const [selectedEnrollment, setSelectedEnrollment] = useState(null);
+	const [selectedPaidOrder, setSelectedPaidOrder] = useState(null);
 	const [syncing, setSyncing] = useState(false);
 
 	useEffect(() => {
@@ -71,12 +145,14 @@ export default function StudentsPage() {
 
 	const rawPaid = paidStudents.map((o) => ({
 		id: o.id,
-		name: o.user?.name || o.guestName || '—',
-		email: o.user?.email || o.guestEmail || '—',
-		courses: o.combination?.items?.map((i) => i.course?.id).join(', ') || '—',
+		name: getOrderName(o),
+		email: getOrderEmail(o),
+		phone: getOrderPhone(o),
+		courses: getOrderCourses(o),
 		currency: o.currency,
 		amount: o.amount,
 		createdAt: o.createdAt,
+		order: o,
 	}));
 
 	const rawUnpaid = unpaidEnrollments.map((s) => ({
@@ -95,7 +171,8 @@ export default function StudentsPage() {
 	const dateSrc = applyDateFilter(source, 'createdAt', dateFilter);
 	const searched = dateSrc.filter((r) =>
 		r.name.toLowerCase().includes(search.toLowerCase()) ||
-		r.email.toLowerCase().includes(search.toLowerCase())
+		r.email.toLowerCase().includes(search.toLowerCase()) ||
+		r.phone.toLowerCase().includes(search.toLowerCase())
 	);
 	const paginated = searched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -171,7 +248,7 @@ export default function StudentsPage() {
 			<div className="admin-filter-bar">
 				<input
 					className="admin-search"
-					placeholder="Search by name or email…"
+					placeholder="Search by name, email or phone..."
 					value={search}
 					onChange={(e) => { setSearch(e.target.value); setPage(1); }}
 				/>
@@ -189,22 +266,34 @@ export default function StudentsPage() {
 									<th>Date</th>
 									<th>Name</th>
 									<th>Email</th>
+									<th>Phone</th>
 									<th>Courses</th>
 									<th>Amount</th>
+									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 								{paginated.map((r) => (
 									<tr key={r.id}>
-										<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{new Date(r.createdAt).toLocaleDateString()}</td>
+										<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{formatDate(r.createdAt)}</td>
 										<td style={{ fontWeight: 500 }}>{r.name}</td>
 										<td style={{ fontSize: '0.8rem' }}>{r.email}</td>
+										<td style={{ fontSize: '0.8rem' }}>{r.phone}</td>
 										<td style={{ fontSize: '0.8rem' }}>{r.courses}</td>
-										<td style={{ fontWeight: 600 }}>{r.currency} {r.amount?.toLocaleString()}</td>
+										<td style={{ fontWeight: 600 }}>{formatCurrency(r.amount, r.currency)}</td>
+										<td>
+											<button
+												className="btn btn-secondary btn-sm"
+												onClick={() => setSelectedPaidOrder(r.order)}
+												style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+											>
+												View More
+											</button>
+										</td>
 									</tr>
 								))}
 								{paginated.length === 0 && (
-									<tr><td colSpan={5} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No paid students found</td></tr>
+									<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No paid students found</td></tr>
 								)}
 							</tbody>
 						</table>
@@ -228,24 +317,24 @@ export default function StudentsPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{paginated.map((r, idx) => {
+								{paginated.map((r) => {
 									const fullRecord = unpaidEnrollments.find(e => e.id === r.id);
 									return (
 										<tr key={r.id}>
-											<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{new Date(r.createdAt).toLocaleDateString()}</td>
+											<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{formatDate(r.createdAt)}</td>
 											<td style={{ fontWeight: 500 }}>{r.name}</td>
 											<td style={{ fontSize: '0.8rem' }}>{r.email}</td>
 											<td style={{ fontSize: '0.8rem' }}>{r.phone}</td>
 											<td style={{ fontSize: '0.8rem' }}>{r.country}</td>
 											<td style={{ fontSize: '0.8rem' }}>{r.cimaStage}</td>
-											<td style={{ fontWeight: 600 }}>{r.currency} {r.amount?.toLocaleString()}</td>
+											<td style={{ fontWeight: 600 }}>{formatCurrency(r.amount, r.currency)}</td>
 											<td>
 												<button
 													className="btn btn-secondary btn-sm"
 													onClick={() => setSelectedEnrollment(fullRecord)}
 													style={{ fontSize: '0.75rem', padding: '4px 8px' }}
 												>
-													View Details
+													View More
 												</button>
 											</td>
 										</tr>
@@ -261,90 +350,53 @@ export default function StudentsPage() {
 				</>
 			)}
 
-			{/* Enrollment Details Modal */}
+			{selectedPaidOrder && (
+				<DetailModal title="Paid Registration Details" onClose={() => setSelectedPaidOrder(null)}>
+					<DetailSection title="Student">
+						<DetailGrid items={[
+							{ label: 'Name', value: getOrderName(selectedPaidOrder) },
+							{ label: 'Email', value: getOrderEmail(selectedPaidOrder) },
+							{ label: 'Phone', value: getOrderPhone(selectedPaidOrder) },
+							{ label: 'User ID', value: selectedPaidOrder.user?.id },
+						]} />
+					</DetailSection>
+					<DetailSection title="Payment">
+						<DetailGrid items={[
+							{ label: 'Status', value: selectedPaidOrder.status },
+							{ label: 'Amount', value: formatCurrency(selectedPaidOrder.amount, selectedPaidOrder.currency) },
+							{ label: 'Order ID', value: selectedPaidOrder.id },
+							{ label: 'Gateway Ref', value: selectedPaidOrder.ipgRef },
+							{ label: 'Merchant Ref', value: selectedPaidOrder.ipgMerchantRef },
+							{ label: 'Payment Link', value: selectedPaidOrder.paymentLink?.label },
+							{ label: 'Created', value: formatDateTime(selectedPaidOrder.createdAt) },
+							{ label: 'Updated', value: formatDateTime(selectedPaidOrder.updatedAt) },
+						]} />
+					</DetailSection>
+					<DetailSection title="Courses">
+						<DetailGrid items={[
+							{ label: 'Package', value: selectedPaidOrder.combination?.name || selectedPaidOrder.paymentLink?.description || getOrderCourses(selectedPaidOrder) },
+							{ label: 'Course Codes', value: getOrderCourses(selectedPaidOrder) },
+						]} />
+					</DetailSection>
+					<EnrollmentDetails enrollment={selectedPaidOrder.enrollmentSubmission} />
+					{selectedPaidOrder.metaJson && (
+						<DetailSection title="Payment Metadata">
+							<JsonBlock value={selectedPaidOrder.metaJson} />
+						</DetailSection>
+					)}
+				</DetailModal>
+			)}
+
 			{selectedEnrollment && (
-				<div className="admin-modal-overlay" onClick={() => setSelectedEnrollment(null)}>
-					<div className="admin-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
-						<div className="admin-modal-header">
-							<h2>Enrollment Submission Details</h2>
-							<button className="modal-close" onClick={() => setSelectedEnrollment(null)}>×</button>
-						</div>
-						<div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.875rem' }}>
-							{/* Personal Information */}
-							<div>
-								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Personal Information</h3>
-								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-									<div><strong>First Name:</strong> {selectedEnrollment.firstName || '—'}</div>
-									<div><strong>Last Name:</strong> {selectedEnrollment.lastName || '—'}</div>
-									<div><strong>Email:</strong> {selectedEnrollment.email || '—'}</div>
-									<div><strong>Phone:</strong> {selectedEnrollment.phone || '—'}</div>
-									<div><strong>WhatsApp:</strong> {selectedEnrollment.whatsapp || '—'}</div>
-									<div><strong>Gender:</strong> {selectedEnrollment.gender || '—'}</div>
-									<div><strong>Date of Birth:</strong> {selectedEnrollment.dob || '—'}</div>
-								</div>
-							</div>
-
-							{/* CIMA Information */}
-							<div>
-								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>CIMA Information</h3>
-								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-									<div><strong>CIMA ID:</strong> {selectedEnrollment.cimaId || '—'}</div>
-									<div><strong>CIMA Stage:</strong> {selectedEnrollment.cimaStage || '—'}</div>
-								</div>
-							</div>
-
-							{/* Location */}
-							<div>
-								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Location</h3>
-								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-									<div><strong>Country:</strong> {selectedEnrollment.country || '—'}</div>
-									<div><strong>City:</strong> {selectedEnrollment.city || '—'}</div>
-									<div><strong>Postcode:</strong> {selectedEnrollment.postcode || '—'}</div>
-								</div>
-							</div>
-
-							{/* Payment Information */}
-							<div>
-								<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Payment Information</h3>
-								<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-									<div><strong>Amount:</strong> {selectedEnrollment.currency} {selectedEnrollment.amount?.toLocaleString() || '0'}</div>
-									<div><strong>Order ID:</strong> {selectedEnrollment.orderId || '—'}</div>
-								</div>
-							</div>
-
-							{/* Cart Items */}
-							{selectedEnrollment.cartJson && Array.isArray(selectedEnrollment.cartJson) && selectedEnrollment.cartJson.length > 0 && (
-								<div>
-									<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Cart Items</h3>
-									<div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-										{selectedEnrollment.cartJson.map((item, idx) => (
-											<div key={idx} style={{ marginBottom: '4px' }}>
-												• {item.title || item.name || 'Unknown Course'}
-												{item.combinationId && ` (${item.combinationId})`}
-												{item.courseCode && ` (${item.courseCode})`}
-											</div>
-										))}
-									</div>
-								</div>
-							)}
-
-							{/* Notes */}
-							{selectedEnrollment.notes && (
-								<div>
-									<h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '8px', color: '#1B365D' }}>Notes</h3>
-									<div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', whiteSpace: 'pre-wrap' }}>
-										{selectedEnrollment.notes}
-									</div>
-								</div>
-							)}
-
-							{/* Timestamp */}
-							<div style={{ paddingTop: '8px', borderTop: '1px solid #e2e8f0', color: '#64748b', fontSize: '0.8rem' }}>
-								<strong>Submitted:</strong> {new Date(selectedEnrollment.createdAt).toLocaleString()}
-							</div>
-						</div>
-					</div>
-				</div>
+				<DetailModal title="Registration Details" onClose={() => setSelectedEnrollment(null)}>
+					<EnrollmentDetails enrollment={selectedEnrollment} />
+					<DetailSection title="Payment">
+						<DetailGrid items={[
+							{ label: 'Amount', value: formatCurrency(selectedEnrollment.amount, selectedEnrollment.currency) },
+							{ label: 'Order ID', value: selectedEnrollment.orderId },
+						]} />
+					</DetailSection>
+				</DetailModal>
 			)}
 		</div>
 	);

@@ -166,6 +166,7 @@ model EnrollmentSubmission {
   dob       String?
   gender    String?
   country   String?
+  street    String?
   city      String?
   postcode  String?
   notes     String?  @db.Text

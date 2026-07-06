@@ -58,14 +58,16 @@ export class AdminService {
 	}
 
 	async getPaidStudents() {
-		return this.prisma.order.findMany({
+		const orders = await this.prisma.order.findMany({
 			where: { status: 'PAID' },
 			include: {
 				user: { select: { id: true, email: true, name: true } },
 				combination: { include: { items: { include: { course: true } } } },
+				paymentLink: true,
 			},
 			orderBy: { createdAt: 'desc' },
 		});
+		return this.attachEnrollmentSubmissions(orders);
 	}
 
 	async getNewsletter() {
@@ -77,17 +79,69 @@ export class AdminService {
 	}
 
 	async getPayments() {
-		return this.prisma.order.findMany({
+		const orders = await this.prisma.order.findMany({
 			include: {
 				user: { select: { id: true, email: true, name: true } },
 				combination: { include: { items: { include: { course: true } } } },
+				paymentLink: true,
 			},
 			orderBy: { createdAt: 'desc' },
 		});
+		return this.attachEnrollmentSubmissions(orders);
 	}
 
 	async syncEnrollmentsToGoogleSheets() {
 		return this.googleSheets.syncEnrollmentSubmissions();
+	}
+
+	private async attachEnrollmentSubmissions(orders: any[]) {
+		const orderIds = orders.map((order) => order.id).filter(Boolean);
+		const emails = orders
+			.map((order) => order.user?.email || order.guestEmail)
+			.filter(Boolean);
+		if (orderIds.length === 0 && emails.length === 0) return orders;
+
+		const enrollments = await this.prisma.enrollmentSubmission.findMany({
+			where: {
+				OR: [
+					...(orderIds.length ? [{ orderId: { in: orderIds } }] : []),
+					...(emails.length ? [{ email: { in: emails } }] : []),
+				],
+			},
+			orderBy: { createdAt: 'desc' },
+		});
+		const enrollmentByOrderId = new Map<string, any>();
+		const enrollmentsByEmail = new Map<string, any[]>();
+		for (const enrollment of enrollments) {
+			if (!enrollmentByOrderId.has(enrollment.orderId)) {
+				enrollmentByOrderId.set(enrollment.orderId, enrollment);
+			}
+			if (!enrollmentsByEmail.has(enrollment.email)) {
+				enrollmentsByEmail.set(enrollment.email, []);
+			}
+			enrollmentsByEmail.get(enrollment.email).push(enrollment);
+		}
+
+		return orders.map((order) => ({
+			...order,
+			enrollmentSubmission: enrollmentByOrderId.get(order.id) || this.findLikelyEnrollment(order, enrollmentsByEmail) || null,
+		}));
+	}
+
+	private findLikelyEnrollment(order: any, enrollmentsByEmail: Map<string, any[]>) {
+		const email = order.user?.email || order.guestEmail;
+		if (!email) return null;
+		const candidates = enrollmentsByEmail.get(email) || [];
+		if (candidates.length === 0) return null;
+
+		const orderCreatedAt = new Date(order.createdAt).getTime();
+		const oneDayMs = 24 * 60 * 60 * 1000;
+		return candidates.find((enrollment) => {
+			const enrollmentCreatedAt = new Date(enrollment.createdAt).getTime();
+			const closeToOrder = Math.abs(orderCreatedAt - enrollmentCreatedAt) <= oneDayMs;
+			const sameAmount = !enrollment.amount || enrollment.amount === order.amount;
+			return closeToOrder && sameAmount;
+		}) || candidates[0];
 	}
 
 	// ── Superadmin: raw table access ───────────────────────────────────────────

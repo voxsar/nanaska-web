@@ -30,6 +30,7 @@ export default function FormDataPage() {
 		(s) =>
 			(s.name || '').toLowerCase().includes(search.toLowerCase()) ||
 			(s.email || '').toLowerCase().includes(search.toLowerCase()) ||
+			(s.phone || '').toLowerCase().includes(search.toLowerCase()) ||
 			(s.subject || '').toLowerCase().includes(search.toLowerCase()),
 	);
 	const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -44,7 +45,7 @@ export default function FormDataPage() {
 			<div className="admin-filter-bar">
 				<input
 					className="admin-search"
-					placeholder="Search by name, email or subject…"
+					placeholder="Search by name, email, phone or subject..."
 					value={search}
 					onChange={(e) => { setSearch(e.target.value); setPage(1); }}
 				/>
@@ -64,11 +65,12 @@ export default function FormDataPage() {
 									<th>Phone</th>
 									<th>Subject</th>
 									<th>Message</th>
+									<th>Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 								{paginated.map((s) => (
-									<tr key={s.id} onClick={() => setSelected(s)} style={{ cursor: 'pointer' }}>
+									<tr key={s.id}>
 										<td style={{ fontSize: '0.8rem', color: '#64748b' }}>{new Date(s.createdAt).toLocaleDateString()}</td>
 										<td style={{ fontWeight: 500 }}>{s.name}</td>
 										<td>{s.email}</td>
@@ -77,10 +79,19 @@ export default function FormDataPage() {
 										<td style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.8rem', color: '#64748b' }}>
 											{s.message}
 										</td>
+										<td>
+											<button
+												className="btn btn-secondary btn-sm"
+												onClick={() => setSelected(s)}
+												style={{ fontSize: '0.75rem', padding: '4px 8px' }}
+											>
+												View More
+											</button>
+										</td>
 									</tr>
 								))}
 								{paginated.length === 0 && (
-									<tr><td colSpan={6} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No submissions found</td></tr>
+									<tr><td colSpan={7} style={{ textAlign: 'center', color: '#94a3b8', padding: '32px' }}>No submissions found</td></tr>
 								)}
 							</tbody>
 						</table>

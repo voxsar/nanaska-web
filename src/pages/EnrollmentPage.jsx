@@ -264,6 +264,7 @@ export default function EnrollmentPage() {
 						dob: form.dob || undefined,
 						gender: form.gender || undefined,
 						country: form.country || undefined,
+						street: form.street || undefined,
 						city: form.city || undefined,
 						postcode: form.postcode || undefined,
 						notes: form.notes || undefined,

@@ -40,6 +40,10 @@ export class EnrollmentSubmitDto {
 
 	@IsOptional()
 	@IsString()
+	street?: string;
+
+	@IsOptional()
+	@IsString()
 	city?: string;
 
 	@IsOptional()
