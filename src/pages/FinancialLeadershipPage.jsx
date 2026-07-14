@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import FunnelHeader from '../components/FunnelHeader';
 import { useSEO } from '../hooks/useSEO';
@@ -155,6 +155,7 @@ export default function FinancialLeadershipPage() {
 	const [lecturerTab, setLecturerTab] = useState('operational');
 	const [programTab, setProgramTab] = useState(0);
 	const [trackerIdx, setTrackerIdx] = useState(0);
+	const [showStickyBar, setShowStickyBar] = useState(false);
 
 	/* ── Lead-capture CTA form ── */
 	const [form, setForm] = useState(EMPTY_FORM);
@@ -163,6 +164,30 @@ export default function FinancialLeadershipPage() {
 	const formStarted = useRef(false);
 
 	const FORM_NAME = 'flp_lead';
+
+	/* Show the sticky sign-up bar after the hero, hide it once the form is on screen. */
+	useEffect(() => {
+		const onScroll = () => {
+			const y = window.scrollY;
+			const register = document.getElementById('register');
+			const formInView = register && register.getBoundingClientRect().top < window.innerHeight - 120;
+			setShowStickyBar(y > 640 && !formInView);
+		};
+		onScroll();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		return () => window.removeEventListener('scroll', onScroll);
+	}, []);
+
+	/* Smooth-scroll to the lead form and focus the first field. */
+	const scrollToForm = (label) => {
+		trackButtonClick(label, 'flp_sticky');
+		const register = document.getElementById('register');
+		if (register) register.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		setTimeout(() => {
+			const el = document.getElementById('flp-fullname');
+			if (el) el.focus({ preventScroll: true });
+		}, 600);
+	};
 
 	const handleFieldFocus = () => {
 		if (!formStarted.current) {
@@ -740,7 +765,7 @@ export default function FinancialLeadershipPage() {
 								<div className="flp-form__row">
 									<label className="flp-form__field">
 										<span>Full Name *</span>
-										<input type="text" name="fullName" value={form.fullName} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="Your full name" autoComplete="name" required />
+										<input id="flp-fullname" type="text" name="fullName" value={form.fullName} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="Your full name" autoComplete="name" required />
 									</label>
 									<label className="flp-form__field">
 										<span>Email *</span>
@@ -802,6 +827,18 @@ export default function FinancialLeadershipPage() {
 					<a href="https://www.nanaska.com/terms-and-conditions/" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions</a>
 				</p>
 			</footer>
+
+			{/* ── Sticky sign-up bar (follows scroll) ── */}
+			<div className={`flp-sticky-cta ${showStickyBar ? 'flp-sticky-cta--show' : ''}`} role="complementary" aria-hidden={!showStickyBar}>
+				<div className="flp-sticky-cta__text">
+					<span className="flp-sticky-cta__pulse" aria-hidden="true" />
+					<span className="flp-sticky-cta__title">Qualify CIMA in 12 months — only 3 exams</span>
+					<span className="flp-sticky-cta__sub">Free exemption &amp; eligibility check</span>
+				</div>
+				<button type="button" className="flp-btn flp-btn--primary flp-sticky-cta__btn" onClick={() => scrollToForm('sticky_register')}>
+					Register Now →
+				</button>
+			</div>
 		</div>
 	);
 }
