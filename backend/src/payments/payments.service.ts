@@ -385,6 +385,7 @@ export class PaymentsService {
 			include: {
 				user: true,
 				combination: { include: { items: { include: { course: true } } } },
+				paymentLink: true,
 			},
 		});
 		if (!order) {
@@ -440,18 +441,12 @@ export class PaymentsService {
 			}
 
 			// Send payment receipt email
-			const recipientName = order.userId
-				? (order.user?.name ?? order.guestName ?? 'Student')
-				: (order.guestName ?? 'Student');
-			const recipientEmail = order.userId
-				? (order.user?.email ?? order.guestEmail ?? '')
-				: (order.guestEmail ?? '');
-			if (recipientEmail) {
+			const receiptDetails = await this.getReceiptStudentDetails(order);
+			if (receiptDetails.email) {
 				this.email.sendPaymentReceiptEmail({
-					name: recipientName,
-					email: recipientEmail,
+					...receiptDetails,
 					orderId: order.id,
-					courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
+					courseName: this.getReceiptCourseName(order),
 					amount: order.amount,
 					currency: order.currency,
 					ipgRef: body.payment_id ?? undefined,
@@ -682,6 +677,68 @@ export class PaymentsService {
 		}
 	}
 
+	private async findEnrollmentForOrder(order: any) {
+		const email = order.user?.email || order.guestEmail || (order.metaJson as any)?.email;
+		const candidates = await this.prisma.enrollmentSubmission.findMany({
+			where: {
+				OR: [
+					{ orderId: order.id },
+					...(email ? [{ email }] : []),
+				],
+			},
+			orderBy: { createdAt: 'desc' },
+			take: 25,
+		});
+
+		const exact = candidates.find((enrollment) => enrollment.orderId === order.id);
+		if (exact) return exact;
+
+		const orderCreatedAt = new Date(order.createdAt).getTime();
+		const oneDayMs = 24 * 60 * 60 * 1000;
+		return candidates.find((enrollment) => {
+			const enrollmentCreatedAt = new Date(enrollment.createdAt).getTime();
+			const closeToOrder = Math.abs(orderCreatedAt - enrollmentCreatedAt) <= oneDayMs;
+			const sameAmount = !enrollment.amount || enrollment.amount === order.amount;
+			return closeToOrder && sameAmount;
+		}) || candidates[0] || null;
+	}
+
+	private async getReceiptStudentDetails(order: any) {
+		const enrollment = await this.findEnrollmentForOrder(order);
+		const meta = (order.metaJson as Record<string, any>) || {};
+		const enrollmentName = [enrollment?.firstName, enrollment?.lastName].filter(Boolean).join(' ').trim();
+
+		return {
+			name: order.user?.name || order.guestName || enrollmentName || meta.name || 'Student',
+			email: order.user?.email || order.guestEmail || enrollment?.email || meta.email || '',
+			phone: order.guestPhone || enrollment?.phone || meta.phone || meta.studentPhone || undefined,
+			whatsapp: enrollment?.whatsapp || meta.whatsapp || undefined,
+			cimaId: enrollment?.cimaId || meta.cimaId || meta.studentId || undefined,
+			cimaStage: enrollment?.cimaStage || meta.cimaStage || undefined,
+			dob: enrollment?.dob || meta.dob || undefined,
+			gender: enrollment?.gender || meta.gender || undefined,
+			country: enrollment?.country || meta.country || undefined,
+			street: enrollment?.street || meta.street || undefined,
+			city: enrollment?.city || meta.city || undefined,
+			postcode: enrollment?.postcode || meta.postcode || undefined,
+			notes: enrollment?.notes || meta.notes || undefined,
+		};
+	}
+
+	private getReceiptCourseName(order: any): string {
+		if (order.combination?.name) return order.combination.name;
+		if (order.combination?.id) return order.combination.id;
+		if (order.paymentLink?.description) return order.paymentLink.description;
+		if (order.paymentLink?.label) return order.paymentLink.label;
+
+		const meta = (order.metaJson as Record<string, any>) || {};
+		const cartItems = Array.isArray(meta.cartItems) ? meta.cartItems : [];
+		const itemNames = cartItems
+			.map((item) => item?.title || item?.name || item?.courseCode || item?.combinationId)
+			.filter(Boolean);
+		return itemNames.length ? itemNames.join(', ') : 'Custom Payment';
+	}
+
 	/**
 	 * POST /payments/revision-upgrade
 	 * Called by an external system (e.g. n8n / CRM) to register a student into a
@@ -765,6 +822,11 @@ export class PaymentsService {
 			this.email.sendEdgeRegistrationConfirmationEmail({
 				name,
 				email: dto.email,
+				phone: dto.phone || undefined,
+				whatsapp: dto.whatsapp || undefined,
+				cimaId: dto.cimaId || undefined,
+				cimaStage: dto.cimaStage || undefined,
+				country: dto.country || undefined,
 				enrollmentId: record.id,
 				programme: 'Free Mock',
 				caseStudy,
@@ -959,6 +1021,7 @@ export class PaymentsService {
 			include: {
 				user: true,
 				combination: { include: { items: { include: { course: true } } } },
+				paymentLink: true,
 			},
 		});
 
@@ -990,14 +1053,12 @@ export class PaymentsService {
 
 			// Send payment receipt email on success
 			if (success) {
-				const recipientName = order.user?.name ?? order.guestName ?? 'Student';
-				const recipientEmail = order.user?.email ?? order.guestEmail ?? '';
-				if (recipientEmail) {
+				const receiptDetails = await this.getReceiptStudentDetails(order);
+				if (receiptDetails.email) {
 					this.email.sendPaymentReceiptEmail({
-						name: recipientName,
-						email: recipientEmail,
+						...receiptDetails,
 						orderId: order.id,
-						courseName: order.combination?.name || order.combination?.id || 'Custom Payment',
+						courseName: this.getReceiptCourseName(order),
 						amount: order.amount,
 						currency: order.currency,
 						ipgRef: txnRef || undefined,

@@ -325,6 +325,23 @@ model Testimonial {
   @@map("testimonials")
 }
 
+// ─── FLP Leads (CGMA Finance Leadership Programme enquiries) ────────────────────
+model FlpLead {
+  id            String   @id @default(uuid())
+  fullName      String   @map("full_name")
+  email         String
+  phone         String?
+  whatsapp      String?
+  qualification String?  @db.Text          // prior academic / professional qualification
+  entryLevel    String?  @map("entry_level") // Operational | Management | Strategic | Not sure
+  message       String?  @db.Text
+  source        String   @default("flp-page")
+  createdAt     DateTime @default(now())   @map("created_at")
+
+  @@index([createdAt])
+  @@map("flp_leads")
+}
+
 // ─── Site Images ──────────────────────────────────────────────────────────────
 model SiteImage {
   id          String   @id @default(uuid())

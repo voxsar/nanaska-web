@@ -129,6 +129,17 @@ export class EmailService {
 	async sendPaymentReceiptEmail(opts: {
 		name: string;
 		email: string;
+		phone?: string;
+		whatsapp?: string;
+		cimaId?: string;
+		cimaStage?: string;
+		dob?: string;
+		gender?: string;
+		country?: string;
+		street?: string;
+		city?: string;
+		postcode?: string;
+		notes?: string;
 		orderId: string;
 		courseName: string;
 		amount: number;
@@ -154,6 +165,11 @@ export class EmailService {
 	async sendEdgeRegistrationConfirmationEmail(opts: {
 		name: string;
 		email: string;
+		phone?: string;
+		whatsapp?: string;
+		cimaId?: string;
+		cimaStage?: string;
+		country?: string;
 		enrollmentId: string;
 		programme: string;
 		caseStudy: string;
@@ -255,6 +271,12 @@ export class EmailService {
 					this.paymentReceiptTemplate({
 						name: 'Test Student',
 						email: to,
+						phone: '+94 77 000 0000',
+						whatsapp: '+94 77 000 0000',
+						cimaId: 'CIMA-TEST-001',
+						cimaStage: 'Certificate Level',
+						country: 'Sri Lanka',
+						city: 'Colombo',
 						orderId: 'test-order-00001234',
 						courseName: 'CIMA Certificate Level (BA1, BA2, BA3, BA4)',
 						amount: 25000,
@@ -368,6 +390,17 @@ export class EmailService {
 	private paymentReceiptTemplate(opts: {
 		name: string;
 		email: string;
+		phone?: string;
+		whatsapp?: string;
+		cimaId?: string;
+		cimaStage?: string;
+		dob?: string;
+		gender?: string;
+		country?: string;
+		street?: string;
+		city?: string;
+		postcode?: string;
+		notes?: string;
 		orderId: string;
 		courseName: string;
 		amount: number;
@@ -385,6 +418,21 @@ export class EmailService {
 			day: 'numeric',
 		});
 		const ref = opts.ipgRef || opts.orderId.slice(-8).toUpperCase();
+		const studentRows = [
+			['Student Name', opts.name],
+			['Email', opts.email],
+			['Mobile / Phone', opts.phone],
+			['WhatsApp', opts.whatsapp],
+			['CIMA ID', opts.cimaId],
+			['CIMA Stage', opts.cimaStage],
+			['Date of Birth', opts.dob],
+			['Gender', opts.gender],
+			['Country', opts.country],
+			['Street Address', opts.street],
+			['City', opts.city],
+			['Postcode', opts.postcode],
+			['Notes', opts.notes],
+		].filter(([, value]) => Boolean(value));
 
 		return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
@@ -401,6 +449,7 @@ export class EmailService {
   .receipt-hdr{background:#1B365D;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px}
   .row{display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f0f0f0;font-size:14px}
   .row:last-child{border-bottom:none}
+  .row span:last-child{text-align:right;max-width:62%;word-break:break-word}
   .row.total{background:#f0f8ff;font-weight:bold;color:#1B365D;font-size:15px}
   .lbl{color:#888}
   .ftr{background:#f9f9f9;padding:24px;text-align:center;color:#999;font-size:12px;border-top:1px solid #eee}
@@ -413,11 +462,13 @@ export class EmailService {
     <span class="badge">&#10003; Payment Confirmed</span>
     <p>Dear ${opts.name}, your payment has been received and your enrollment is confirmed.</p>
     <div class="receipt">
+      <div class="receipt-hdr">Student Details</div>
+      ${studentRows.map(([label, value]) => `<div class="row"><span class="lbl">${label}</span><span>${value}</span></div>`).join('')}
+    </div>
+    <div class="receipt">
       <div class="receipt-hdr">Receipt Details</div>
       <div class="row"><span class="lbl">Reference</span><span>${ref}</span></div>
       <div class="row"><span class="lbl">Date</span><span>${formattedDate}</span></div>
-      <div class="row"><span class="lbl">Student Name</span><span>${opts.name}</span></div>
-      <div class="row"><span class="lbl">Email</span><span>${opts.email}</span></div>
       <div class="row"><span class="lbl">Course / Program</span><span>${opts.courseName}</span></div>
       <div class="row total"><span>Total Paid</span><span>${formattedAmount}</span></div>
     </div>
@@ -505,6 +556,11 @@ export class EmailService {
 	private edgeRegistrationConfirmationTemplate(opts: {
 		name: string;
 		email: string;
+		phone?: string;
+		whatsapp?: string;
+		cimaId?: string;
+		cimaStage?: string;
+		country?: string;
 		enrollmentId: string;
 		programme: string;
 		caseStudy: string;
@@ -525,6 +581,15 @@ export class EmailService {
 			day: 'numeric',
 		});
 		const ref = opts.enrollmentId.slice(-8).toUpperCase();
+		const studentRows = [
+			['Student Name', opts.name],
+			['Email', opts.email],
+			['Mobile / Phone', opts.phone],
+			['WhatsApp', opts.whatsapp],
+			['CIMA ID', opts.cimaId],
+			['CIMA Stage', opts.cimaStage],
+			['Country', opts.country],
+		].filter(([, value]) => Boolean(value));
 
 		return `<!DOCTYPE html>
 <html><head><meta charset="utf-8">
@@ -541,6 +606,7 @@ export class EmailService {
   .receipt-hdr{background:#1B365D;color:#fff;padding:12px 16px;font-weight:bold;font-size:14px}
   .row{display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px solid #f0f0f0;font-size:14px}
   .row:last-child{border-bottom:none}
+  .row span:last-child{text-align:right;max-width:62%;word-break:break-word}
   .row.total{background:#f0f8ff;font-weight:bold;color:#1B365D;font-size:15px}
   .lbl{color:#888}
   .ftr{background:#f9f9f9;padding:24px;text-align:center;color:#999;font-size:12px;border-top:1px solid #eee}
@@ -553,11 +619,13 @@ export class EmailService {
     <span class="badge">&#10003; ${isFree ? 'Registration Confirmed' : 'Payment Confirmed'}</span>
     <p>Dear ${opts.name}, your ${isFree ? 'free mock registration' : 'revision session enrollment'} has been confirmed. Our team will be in touch with your platform access details shortly.</p>
     <div class="receipt">
+      <div class="receipt-hdr">Student Details</div>
+      ${studentRows.map(([label, value]) => `<div class="row"><span class="lbl">${label}</span><span>${value}</span></div>`).join('')}
+    </div>
+    <div class="receipt">
       <div class="receipt-hdr">Registration Details</div>
       <div class="row"><span class="lbl">Reference</span><span>${ref}</span></div>
       <div class="row"><span class="lbl">Date</span><span>${formattedDate}</span></div>
-      <div class="row"><span class="lbl">Student Name</span><span>${opts.name}</span></div>
-      <div class="row"><span class="lbl">Email</span><span>${opts.email}</span></div>
       <div class="row"><span class="lbl">Programme</span><span>${opts.programme}</span></div>
       <div class="row"><span class="lbl">Case Study</span><span>${opts.caseStudy}</span></div>
       <div class="row total"><span>${isFree ? 'Price' : 'Total Paid'}</span><span>${formattedAmount}</span></div>
@@ -712,4 +780,3 @@ export class EmailService {
 </body></html>`;
 	}
 }
-

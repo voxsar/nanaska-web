@@ -14,6 +14,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
 import { PaymentLinksModule } from './payment-links/payment-links.module';
 import { BackupsModule } from './backups/backups.module';
 import { MediaModule } from './media/media.module';
+import { FlpLeadsModule } from './flp-leads/flp-leads.module';
 
 @Module({
 	imports: [
@@ -32,6 +33,7 @@ import { MediaModule } from './media/media.module';
 		PaymentLinksModule,
 		BackupsModule,
 		MediaModule,
+		FlpLeadsModule,
 	],
 })
 export class AppModule { }
