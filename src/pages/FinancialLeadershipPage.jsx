@@ -4,9 +4,66 @@ import FunnelHeader from '../components/FunnelHeader';
 import { useSEO } from '../hooks/useSEO';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useApi } from '../hooks/useApi';
+import {
+	trackButtonClick,
+	trackFormStart,
+	trackFormSubmit,
+	trackFormError,
+	trackEvent,
+} from '../hooks/useTracking';
 import './FinancialLeadershipPage.css';
 
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
+const BROCHURE_URL = '/images/2025-07-Nanaska-FLP-Pathway.pdf';
+
 /* ─── Data ────────────────────────────────────────────────────── */
+
+/* The CIMA T-shaped Professional model (from the CGMA FLP brochure) */
+const TSHAPE_WIDE = [
+	{ icon: '🔭', label: 'Anticipation & Resilience' },
+	{ icon: '🗣️', label: 'Communication & Storytelling' },
+	{ icon: '🧠', label: 'Strategic & Critical Thinking' },
+	{ icon: '⭐', label: 'Leadership & Impact' },
+	{ icon: '💡', label: 'Innovation & Collaboration' },
+];
+const TSHAPE_DEEP = [
+	{ icon: '🤖', label: 'AI & Digital Skills' },
+	{ icon: '📊', label: 'Technical & Functional Knowledge' },
+	{ icon: '🤝', label: 'Trust & Ethics' },
+];
+
+/* Key features of the CIMA FLP pathway */
+const KEY_FEATURES = [
+	{ icon: '📝', title: 'Only 3 Exams', desc: 'Complete the CIMA Professional Qualification with just three case-study exams.' },
+	{ icon: '⏱️', title: 'Qualify in 12 Months', desc: 'A fast-track route to the CGMA designation for driven professionals.' },
+	{ icon: '💰', title: 'Cost-Effective', desc: 'Significantly cheaper than the traditional CIMA route.' },
+	{ icon: '🌍', title: 'Study Anytime, Anywhere', desc: 'Perfect for working professionals — learn at your own pace.' },
+	{ icon: '💻', title: 'Digital-First Platform', desc: 'All content, assessments and resources are accessible online.' },
+	{ icon: '🏆', title: 'Same CGMA Qualification', desc: 'Earn the exact same globally recognised CGMA designation.' },
+];
+
+/* What the all-inclusive 1-year subscription voucher covers */
+const FEE_INCLUDES = [
+	'CIMA Registration Fee',
+	'CIMA Annual Subscription for the year',
+	'CIMA Case Study exam fees (2 credits each exam)',
+	'CIMA Registration re-activation fee (if applicable)',
+	'Tuition Fee for all your Self-Assessment subjects',
+	'Case Study Exam Tuition Fee (1 attempt for each case)',
+];
+
+/* CGMA FLP registration process */
+const REGISTRATION_STEPS = [
+	{ title: 'Share Your Academic Details', desc: 'Send us your prior academic details to clear exemptions / CIMA profile, if any.' },
+	{ title: 'Confirm Your Eligibility', desc: 'Receive confirmation on your eligibility and entry point.' },
+	{ title: 'Register & Pay First Installment', desc: 'Register through the Nanaska website and pay the first installment of GBP 500 to get class and LMS access.' },
+	{ title: 'Start Your Studies', desc: 'Begin your studies with Nanaska right away.' },
+	{ title: 'Complete the Balance Payment', desc: 'Settle the balance payment by the registration deadline.' },
+	{ title: 'Registration Sent to CIMA UK', desc: 'Nanaska sends your registration request to CIMA UK.' },
+	{ title: 'CIMA UK Onboards You', desc: 'CIMA UK communicates with you directly regarding FLP learning-platform registration.' },
+];
+
+const ENTRY_LEVEL_OPTIONS = ['Operational Level', 'Management Level', 'Strategic Level', 'Not sure yet'];
 
 const WHY_POINTS = [
 	{ icon: '/images/2025-07-certificate.png', title: 'Official Partner for CGMA FLP', alt: 'Certificate icon' },
@@ -91,11 +148,79 @@ const PROGRAM_TABS = [
 
 /* ─── Component ───────────────────────────────────────────────── */
 
+const EMPTY_FORM = { fullName: '', email: '', phone: '', whatsapp: '', qualification: '', entryLevel: '', message: '' };
+
 export default function FinancialLeadershipPage() {
 	const pageRef = useRef(null);
 	const [lecturerTab, setLecturerTab] = useState('operational');
 	const [programTab, setProgramTab] = useState(0);
 	const [trackerIdx, setTrackerIdx] = useState(0);
+
+	/* ── Lead-capture CTA form ── */
+	const [form, setForm] = useState(EMPTY_FORM);
+	const [formState, setFormState] = useState('idle'); // idle | submitting | success | error
+	const [formError, setFormError] = useState('');
+	const formStarted = useRef(false);
+
+	const FORM_NAME = 'flp_lead';
+
+	const handleFieldFocus = () => {
+		if (!formStarted.current) {
+			formStarted.current = true;
+			trackFormStart(FORM_NAME);
+		}
+	};
+
+	const handleFieldChange = (e) => {
+		const { name, value } = e.target;
+		setForm((prev) => ({ ...prev, [name]: value }));
+	};
+
+	/* Track any CTA click (GA4 + Clarity) and pass the label + section context. */
+	const trackCTA = (label, category = 'flp_cta') => trackButtonClick(label, category);
+
+	const trackBrochure = (location) => trackEvent('brochure_download', { form_name: FORM_NAME, location });
+
+	const handleFormSubmit = async (e) => {
+		e.preventDefault();
+		if (formState === 'submitting') return;
+
+		if (!form.fullName.trim()) {
+			setFormError('Please enter your full name.');
+			trackFormError(FORM_NAME, 'fullName');
+			return;
+		}
+		if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+			setFormError('Please enter a valid email address.');
+			trackFormError(FORM_NAME, 'email');
+			return;
+		}
+		if (!form.phone.trim()) {
+			setFormError('Please enter your phone number.');
+			trackFormError(FORM_NAME, 'phone');
+			return;
+		}
+
+		setFormError('');
+		setFormState('submitting');
+		try {
+			const res = await fetch(`${API_URL}/flp-leads`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ ...form, source: 'flp-page' }),
+			});
+			if (!res.ok) throw new Error('Request failed');
+			setFormState('success');
+			// GA4: standard lead events + Clarity upgrade
+			trackFormSubmit(FORM_NAME, { entry_level: form.entryLevel || 'unspecified' });
+			trackEvent('generate_lead', { form_name: FORM_NAME, currency: 'GBP', value: 2000 });
+			setForm(EMPTY_FORM);
+		} catch (err) {
+			setFormState('error');
+			setFormError('Something went wrong. Please try again or contact us on WhatsApp.');
+			trackEvent('form_submit_failed', { form_name: FORM_NAME });
+		}
+	};
 
 	useSEO({
 		title: 'Financial Leadership Program - Nanaska',
@@ -136,7 +261,11 @@ export default function FinancialLeadershipPage() {
 
 	return (
 		<div className="flp-page" ref={pageRef}>
-			<FunnelHeader ctaText="Register Now" ctaHref="#register" />
+			<FunnelHeader
+				ctaText="Register Now"
+				ctaHref="#register"
+				onCtaClick={() => trackCTA('header_register_now', 'flp_nav')}
+			/>
 
 			{/* ── Hero ── */}
 			<section className="flp-hero">
@@ -153,12 +282,13 @@ export default function FinancialLeadershipPage() {
 						to the prestigious ACMA/CGMA designation.
 					</p>
 					<div className="flp-hero__actions">
-						<a href="#register" className="flp-btn flp-btn--primary">Get In Touch</a>
+						<a href="#register" className="flp-btn flp-btn--primary" onClick={() => trackCTA('hero_get_in_touch')}>Get In Touch</a>
 						<a
-							href="/images/2025-07-Nanaska-FLP-Pathway.pdf"
+							href={BROCHURE_URL}
 							className="flp-btn flp-btn--outline"
 							target="_blank"
 							rel="noopener noreferrer"
+							onClick={() => trackBrochure('hero')}
 						>
 							Download Brochure
 						</a>
@@ -239,11 +369,12 @@ export default function FinancialLeadershipPage() {
 							leadership roles while accelerating their CIMA career progression.
 						</p>
 						<a
-							href="/images/2025-07-Nanaska-FLP-Pathway.pdf"
+							href={BROCHURE_URL}
 							className="flp-btn flp-btn--primary"
 							target="_blank"
 							rel="noopener noreferrer"
 							style={{ marginTop: '1.5rem', display: 'inline-block' }}
+							onClick={() => trackBrochure('about')}
 						>
 							Download Brochure
 						</a>
@@ -254,6 +385,55 @@ export default function FinancialLeadershipPage() {
 							alt="Nanaska FLP Brochure Cover"
 							loading="lazy"
 						/>
+					</div>
+				</div>
+			</section>
+
+			{/* ── Key Features ── */}
+			<section className="flp-features" id="features">
+				<div className="flp-container">
+					<h2 className="flp-section-title" data-reveal>Key Features of the CIMA FLP Pathway</h2>
+					<p className="flp-section-sub" data-reveal>A guided digital learning route built for ambitious, working professionals</p>
+					<div className="flp-features__grid">
+						{KEY_FEATURES.map((f) => (
+							<div key={f.title} className="flp-feature-card" data-reveal>
+								<span className="flp-feature-card__icon">{f.icon}</span>
+								<h3>{f.title}</h3>
+								<p>{f.desc}</p>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+
+			{/* ── The T-Shaped Finance Professional ── */}
+			<section className="flp-tshape" id="tshape">
+				<div className="flp-container">
+					<h2 className="flp-section-title flp-section-title--white" data-reveal>The T-Shaped Finance Professional</h2>
+					<p className="flp-section-sub flp-section-sub--white" data-reveal>
+						CIMA develops deep technical expertise <em>and</em> broad, boundary-crossing business skills
+					</p>
+					<div className="flp-tshape__diagram" data-reveal>
+						<div className="flp-tshape__wide">
+							<span className="flp-tshape__badge">WIDE · Boundary-crossing skills</span>
+							<div className="flp-tshape__row">
+								{TSHAPE_WIDE.map((s) => (
+									<div key={s.label} className="flp-tshape__cell">
+										<span className="flp-tshape__icon">{s.icon}</span>
+										<p>{s.label}</p>
+									</div>
+								))}
+							</div>
+						</div>
+						<div className="flp-tshape__deep">
+							<span className="flp-tshape__badge">DEEP</span>
+							{TSHAPE_DEEP.map((s) => (
+								<div key={s.label} className="flp-tshape__cell flp-tshape__cell--deep">
+									<span className="flp-tshape__icon">{s.icon}</span>
+									<p>{s.label}</p>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 			</section>
@@ -308,7 +488,7 @@ export default function FinancialLeadershipPage() {
 							Seats are filling fast for the August 2025 cohort. Secure your place today and begin your
 							journey to the CGMA designation.
 						</p>
-						<a href="#register" className="flp-btn flp-btn--primary">Register Now</a>
+						<a href="#register" className="flp-btn flp-btn--primary" onClick={() => trackCTA('intake_register_now')}>Register Now</a>
 					</div>
 				</div>
 			</section>
@@ -388,7 +568,7 @@ export default function FinancialLeadershipPage() {
 							ensuring a tailored learning pathway that maximises efficiency in completing the CIMA course
 							and earning the CGMA designation.
 						</p>
-						<a href="#register" className="flp-btn flp-btn--outline-light">Check Your Exemptions</a>
+						<a href="#register" className="flp-btn flp-btn--outline-light" onClick={() => trackCTA('entry_check_exemptions')}>Check Your Exemptions</a>
 					</div>
 				</div>
 			</section>
@@ -414,7 +594,7 @@ export default function FinancialLeadershipPage() {
 								With CGMA FLP as opposed to the traditional pathway — fewer exams, less time,
 								and significantly reduced cost.
 							</p>
-							<a href="#register" className="flp-btn flp-btn--primary">Know More</a>
+							<a href="#register" className="flp-btn flp-btn--primary" onClick={() => trackCTA('cost_know_more')}>Know More</a>
 						</div>
 					</div>
 				</div>
@@ -435,9 +615,38 @@ export default function FinancialLeadershipPage() {
 								<div className="flp-payment-card__num">{p.num}</div>
 								<div className="flp-payment-card__label">{p.label}</div>
 								<p>{p.desc}</p>
-								<a href="#register" className="flp-btn flp-btn--primary flp-btn--sm">Register Now</a>
+								<a href="#register" className="flp-btn flp-btn--primary flp-btn--sm" onClick={() => trackCTA(`payment_plan_${p.num}_register`)}>Register Now</a>
 							</div>
 						))}
+					</div>
+				</div>
+			</section>
+
+			{/* ── What the Fee Includes ── */}
+			<section className="flp-fee" id="fee">
+				<div className="flp-container flp-fee__inner">
+					<div className="flp-fee__text" data-reveal>
+						<h2 className="flp-section-title flp-section-title--left">An All-Inclusive Subscription</h2>
+						<p>
+							The CGMA FLP is a subscription-based route — students acquire an annual subscription.
+							The <strong>1-year subscription voucher</strong> is an all-inclusive package that covers:
+						</p>
+						<ul className="flp-fee__list">
+							{FEE_INCLUDES.map((item) => (
+								<li key={item}><span className="flp-fee__check">✓</span>{item}</li>
+							))}
+						</ul>
+						<p className="flp-fee__note">
+							<strong>Undergraduate students:</strong> the FLP Undergraduate Programme lets you complete
+							the CGMA–FLP in parallel with your university studies on a discounted arrangement.
+							Reach out to our team for more information.
+						</p>
+						<a href="#register" className="flp-btn flp-btn--primary" onClick={() => trackCTA('fee_talk_to_us')}>Talk to Our Team</a>
+					</div>
+					<div className="flp-fee__badge-card" data-reveal>
+						<span className="flp-fee__badge-tag">FLP 1-Year License</span>
+						<div className="flp-fee__badge-price">GBP 2,000</div>
+						<p>All-inclusive · Registration + Subscription + Exam &amp; Tuition fees</p>
 					</div>
 				</div>
 			</section>
@@ -460,26 +669,126 @@ export default function FinancialLeadershipPage() {
 				</div>
 			</section>
 
-			{/* ── Register / CTA ── */}
+			{/* ── Registration Process ── */}
+			<section className="flp-process" id="process">
+				<div className="flp-container">
+					<h2 className="flp-section-title" data-reveal>CGMA FLP Registration Process</h2>
+					<p className="flp-section-sub" data-reveal>Seven simple steps from enquiry to CIMA UK onboarding</p>
+					<div className="flp-process__steps">
+						{REGISTRATION_STEPS.map((s, i) => (
+							<div key={s.title} className="flp-process-step" data-reveal>
+								<div className="flp-process-step__num">{i + 1}</div>
+								<div className="flp-process-step__body">
+									<h3>{s.title}</h3>
+									<p>{s.desc}</p>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</section>
+
+			{/* ── Register / Lead-capture form ── */}
 			<section className="flp-register" id="register">
 				<div className="flp-container">
 					<div className="flp-register__inner" data-reveal>
-						<h2>Ready to Fast-Track Your CIMA Journey?</h2>
-						<p>
-							Fill out the form below or contact us directly — our team will guide you through
-							exemptions, entry points, and payment options.
-						</p>
-						<div className="flp-register__actions">
-							<Link
-								to="/enrollment"
-								className="flp-btn flp-btn--primary flp-btn--lg"
-							>
-								Start Registration
-							</Link>
-							<a href="https://wa.me/94777123456" className="flp-btn flp-btn--whatsapp" target="_blank" rel="noopener noreferrer">
-								💬 WhatsApp Us
-							</a>
+						<div className="flp-register__intro">
+							<h2>Ready to Fast-Track Your CIMA Journey?</h2>
+							<p>
+								Share your details and our team will contact you to clear exemptions, confirm your
+								entry point, and walk you through the payment options — no obligation.
+							</p>
+							<ul className="flp-register__ticks">
+								<li>✓ Free exemption &amp; eligibility check</li>
+								<li>✓ Guidance from CGMA FLP specialists</li>
+								<li>✓ Flexible 3-installment payment plan</li>
+							</ul>
+							<div className="flp-register__alt">
+								<Link to="/enrollment" className="flp-btn flp-btn--outline-light" onClick={() => trackCTA('register_start_enrollment', 'flp_secondary')}>
+									Start Full Registration →
+								</Link>
+								<a
+									href="https://wa.me/94777123456"
+									className="flp-btn flp-btn--whatsapp"
+									target="_blank"
+									rel="noopener noreferrer"
+									onClick={() => trackCTA('register_whatsapp', 'flp_secondary')}
+								>
+									💬 WhatsApp Us
+								</a>
+							</div>
 						</div>
+
+						{formState === 'success' ? (
+							<div className="flp-form flp-form--success" data-reveal>
+								<div className="flp-form__success-icon">🎉</div>
+								<h3>Thank you!</h3>
+								<p>Your enquiry has been received. Our team will reach out to you shortly to guide you through the CGMA FLP pathway.</p>
+								<a
+									href={BROCHURE_URL}
+									className="flp-btn flp-btn--primary"
+									target="_blank"
+									rel="noopener noreferrer"
+									onClick={() => trackBrochure('form_success')}
+								>
+									Download the Brochure
+								</a>
+							</div>
+						) : (
+							<form className="flp-form" data-reveal onSubmit={handleFormSubmit} noValidate>
+								<h3 className="flp-form__title">Request a Callback</h3>
+								<div className="flp-form__row">
+									<label className="flp-form__field">
+										<span>Full Name *</span>
+										<input type="text" name="fullName" value={form.fullName} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="Your full name" autoComplete="name" required />
+									</label>
+									<label className="flp-form__field">
+										<span>Email *</span>
+										<input type="email" name="email" value={form.email} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="you@example.com" autoComplete="email" required />
+									</label>
+								</div>
+								<div className="flp-form__row">
+									<label className="flp-form__field">
+										<span>Phone *</span>
+										<input type="tel" name="phone" value={form.phone} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="+94 7X XXX XXXX" autoComplete="tel" required />
+									</label>
+									<label className="flp-form__field">
+										<span>WhatsApp</span>
+										<input type="tel" name="whatsapp" value={form.whatsapp} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="If different from phone" />
+									</label>
+								</div>
+								<div className="flp-form__row">
+									<label className="flp-form__field">
+										<span>Current / Prior Qualification</span>
+										<input type="text" name="qualification" value={form.qualification} onChange={handleFieldChange} onFocus={handleFieldFocus} placeholder="e.g. BSc Accounting, AAT, ACCA…" />
+									</label>
+									<label className="flp-form__field">
+										<span>Interested Entry Level</span>
+										<select name="entryLevel" value={form.entryLevel} onChange={handleFieldChange} onFocus={handleFieldFocus}>
+											<option value="">Select a level…</option>
+											{ENTRY_LEVEL_OPTIONS.map((o) => <option key={o} value={o}>{o}</option>)}
+										</select>
+									</label>
+								</div>
+								<label className="flp-form__field">
+									<span>Message</span>
+									<textarea name="message" value={form.message} onChange={handleFieldChange} onFocus={handleFieldFocus} rows={3} placeholder="Anything you'd like us to know?" />
+								</label>
+
+								{formError && <p className="flp-form__error">{formError}</p>}
+
+								<button
+									type="submit"
+									className="flp-btn flp-btn--primary flp-btn--lg flp-form__submit"
+									disabled={formState === 'submitting'}
+								>
+									{formState === 'submitting' ? 'Sending…' : 'Get In Touch'}
+								</button>
+								<p className="flp-form__privacy">
+									By submitting, you agree to be contacted by Nanaska. We respect your privacy.
+								</p>
+							</form>
+						)}
 					</div>
 				</div>
 			</section>
