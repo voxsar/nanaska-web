@@ -20,6 +20,7 @@ const dataItems = [
 	{ label: 'Payments', icon: '💳', to: '/admin/payments' },
 	{ label: 'Payment Links', icon: '🔗', to: '/admin/payment-links' },
 	{ label: 'Form Submissions', icon: '📋', to: '/admin/form-data' },
+	{ label: 'FLP Leads', icon: '🎯', to: '/admin/flp-leads' },
 ];
 
 const settingItems = [

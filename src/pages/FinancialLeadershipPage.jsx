@@ -215,7 +215,7 @@ export default function FinancialLeadershipPage() {
 			trackFormSubmit(FORM_NAME, { entry_level: form.entryLevel || 'unspecified' });
 			trackEvent('generate_lead', { form_name: FORM_NAME, currency: 'GBP', value: 2000 });
 			setForm(EMPTY_FORM);
-		} catch (err) {
+		} catch {
 			setFormState('error');
 			setFormError('Something went wrong. Please try again or contact us on WhatsApp.');
 			trackEvent('form_submit_failed', { form_name: FORM_NAME });

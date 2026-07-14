@@ -14,6 +14,7 @@ import StudentsPage from './pages/StudentsPage';
 import NewsletterPage from './pages/NewsletterPage';
 import PaymentsPage from './pages/PaymentsPage';
 import FormDataPage from './pages/FormDataPage';
+import FlpLeadsPage from './pages/FlpLeadsPage';
 import MetaTagsPage from './pages/MetaTagsPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import PaymentSettingsPage from './pages/PaymentSettingsPage';
@@ -47,6 +48,7 @@ export default function AdminApp() {
 					<Route path="newsletter" element={<NewsletterPage />} />
 					<Route path="payments" element={<PaymentsPage />} />
 					<Route path="form-data" element={<FormDataPage />} />
+					<Route path="flp-leads" element={<FlpLeadsPage />} />
 					<Route path="meta-tags" element={<MetaTagsPage />} />
 					<Route path="analytics" element={<AnalyticsPage />} />
 					<Route path="payment-settings" element={<PaymentSettingsPage />} />
