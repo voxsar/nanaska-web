@@ -18,19 +18,9 @@ const BROCHURE_URL = '/images/2025-07-Nanaska-FLP-Pathway.pdf';
 
 /* ─── Data ────────────────────────────────────────────────────── */
 
-/* The CIMA T-shaped Professional model (from the CGMA FLP brochure) */
-const TSHAPE_WIDE = [
-	{ icon: '🔭', label: 'Anticipation & Resilience' },
-	{ icon: '🗣️', label: 'Communication & Storytelling' },
-	{ icon: '🧠', label: 'Strategic & Critical Thinking' },
-	{ icon: '⭐', label: 'Leadership & Impact' },
-	{ icon: '💡', label: 'Innovation & Collaboration' },
-];
-const TSHAPE_DEEP = [
-	{ icon: '🤖', label: 'AI & Digital Skills' },
-	{ icon: '📊', label: 'Technical & Functional Knowledge' },
-	{ icon: '🤝', label: 'Trust & Ethics' },
-];
+/* Official CIMA diagrams (white-background images, shown on a white section) */
+const TSHAPE_IMG = '/images/t-shape-finance-model.jpeg';
+const QUALIFICATION_IMG = '/images/CIMA_Professional_Qualification_RGB-830x1024.jpg.jpeg';
 
 /* Key features of the CIMA FLP pathway */
 const KEY_FEATURES = [
@@ -66,12 +56,12 @@ const REGISTRATION_STEPS = [
 const ENTRY_LEVEL_OPTIONS = ['Operational Level', 'Management Level', 'Strategic Level', 'Not sure yet'];
 
 const WHY_POINTS = [
-	{ icon: '/images/2025-07-certificate.png', title: 'Official Partner for CGMA FLP', alt: 'Certificate icon' },
-	{ icon: '/images/2025-07-world-map.png', title: 'World Class Case Study Program', alt: 'World map icon' },
-	{ icon: '/images/2025-07-support.png', title: 'Exceptional Student Support System', alt: 'Support icon' },
-	{ icon: '/images/2025-07-personalized.png', title: 'Personalized Attention', alt: 'Personalized icon' },
-	{ icon: '/images/2025-07-medical-prescription.png', title: 'Proven Track Record', alt: 'Track record icon' },
-	{ icon: '/images/2025-07-cup.png', title: 'Delivering High Achievers & Prize Winners', alt: 'Trophy icon' },
+	{ icon: '/images/2025-07-certificate.png', title: 'Official Partner for CGMA FLP', desc: 'Recognized collaboration with CIMA to provide support for this specific pathway.', alt: 'Certificate icon' },
+	{ icon: '/images/2025-07-world-map.png', title: 'World Class Case Study Program', desc: 'Meticulously crafted under Mr. Channa Gunawardena’s leadership.', alt: 'World map icon' },
+	{ icon: '/images/2025-07-support.png', title: 'Exceptional Student Support System', desc: 'Guidance every step of the way until program completion.', alt: 'Support icon' },
+	{ icon: '/images/2025-07-personalized.png', title: 'Personalized Attention & Proactive Monitoring', desc: 'Our dedicated team proactively tracks your progress, identifies learning gaps early, and provides timely guidance.', alt: 'Personalized icon' },
+	{ icon: '/images/2025-07-medical-prescription.png', title: 'Proven Track Record', desc: 'Countless students have completed their full CGMA qualification in record time — within 10 to 12 months.', alt: 'Track record icon' },
+	{ icon: '/images/2025-07-cup.png', title: 'Nurturing Prize Winners & High Achievers', desc: 'Delivering Global & Sri Lankan prize winners with first-attempt success, year after year.', alt: 'Trophy icon' },
 ];
 
 const STATIC_LECTURERS = {
@@ -330,12 +320,19 @@ export default function FinancialLeadershipPage() {
 			<section className="flp-why" id="why">
 				<div className="flp-container">
 					<h2 className="flp-section-title" data-reveal>Why Choose Nanaska?</h2>
+					<p className="flp-section-sub flp-why__intro" data-reveal>
+						We are a global leader in CIMA and CGMA FLP tuition, known for producing prize winners and
+						top results both locally and internationally. With expert lecturers — including Mr. Channa
+						Gunawardena, a world-class CIMA case study specialist, as the Lead Lecturer — and 24/7
+						support, we help students and professionals fast-track their qualification in under 12 months.
+					</p>
 					<div className="flp-why__track-wrap">
 						<div className="flp-why__track">
 							{[...WHY_POINTS, ...WHY_POINTS].map((p, i) => (
 								<div key={i} className="flp-why__card">
 									<img src={p.icon} alt={p.alt} className="flp-why__icon" />
 									<p className="flp-why__label">{p.title}</p>
+									<p className="flp-why__desc">{p.desc}</p>
 								</div>
 							))}
 						</div>
@@ -434,31 +431,37 @@ export default function FinancialLeadershipPage() {
 			{/* ── The T-Shaped Finance Professional ── */}
 			<section className="flp-tshape" id="tshape">
 				<div className="flp-container">
-					<h2 className="flp-section-title flp-section-title--white" data-reveal>The T-Shaped Finance Professional</h2>
-					<p className="flp-section-sub flp-section-sub--white" data-reveal>
-						CIMA develops deep technical expertise <em>and</em> broad, boundary-crossing business skills
+					<h2 className="flp-section-title" data-reveal>The T-Shaped Finance Professional</h2>
+					<p className="flp-section-sub flp-tshape__lead" data-reveal>
+						The CIMA T-shaped Professional model develops finance professionals with both deep technical
+						expertise and broad business skills. It combines strong knowledge in finance, digital
+						capabilities, and ethics with essential skills such as strategic thinking, leadership,
+						communication, innovation, and resilience. This prepares students to become well-rounded
+						professionals who can create value and lead with confidence in today&apos;s business world.
 					</p>
-					<div className="flp-tshape__diagram" data-reveal>
-						<div className="flp-tshape__wide">
-							<span className="flp-tshape__badge">WIDE · Boundary-crossing skills</span>
-							<div className="flp-tshape__row">
-								{TSHAPE_WIDE.map((s) => (
-									<div key={s.label} className="flp-tshape__cell">
-										<span className="flp-tshape__icon">{s.icon}</span>
-										<p>{s.label}</p>
-									</div>
-								))}
-							</div>
-						</div>
-						<div className="flp-tshape__deep">
-							<span className="flp-tshape__badge">DEEP</span>
-							{TSHAPE_DEEP.map((s) => (
-								<div key={s.label} className="flp-tshape__cell flp-tshape__cell--deep">
-									<span className="flp-tshape__icon">{s.icon}</span>
-									<p>{s.label}</p>
-								</div>
-							))}
-						</div>
+					<div className="flp-tshape__figure" data-reveal>
+						<img
+							src={TSHAPE_IMG}
+							alt="The CIMA T-shaped finance professional model — wide boundary-crossing skills combined with deep technical knowledge, AI & digital skills, and trust & ethics"
+							loading="lazy"
+						/>
+					</div>
+				</div>
+			</section>
+
+			{/* ── Course Structure (CIMA Professional Qualification) ── */}
+			<section className="flp-syllabus" id="course-structure">
+				<div className="flp-container">
+					<h2 className="flp-section-title" data-reveal>Course Structure</h2>
+					<p className="flp-section-sub" data-reveal>
+						The CIMA Professional Qualification — from Certificate Level to the CGMA designation
+					</p>
+					<div className="flp-syllabus__figure" data-reveal>
+						<img
+							src={QUALIFICATION_IMG}
+							alt="CIMA Professional Qualification structure — Certificate, Operational, Management and Strategic levels with case study exams, leading to CGMA membership"
+							loading="lazy"
+						/>
 					</div>
 				</div>
 			</section>
