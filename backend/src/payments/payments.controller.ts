@@ -56,8 +56,8 @@ export class PaymentsController {
 	/**
 	 * POST /payments/revision-upgrade
 	 * Called by an external system (e.g. n8n / CRM) to register a student directly into
-	 * a Nanaska Edge revision package. Accepts id, name, email, student_id, phone, cima_type.
-	 * cima_type must be one of: OCS | MCS | SCS.
+	 * a Nanaska Edge revision package. target_cima_type (or legacy cima_type) must be
+	 * one of: OCS | MCS | SCS. Additional user-profile fields are accepted and ignored.
 	 */
 	@Post('revision-upgrade')
 	revisionUpgrade(@Body() dto: RevisionUpgradeDto, @Headers('origin') origin: string) {

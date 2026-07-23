@@ -749,7 +749,7 @@ export class PaymentsService {
 		dto: RevisionUpgradeDto,
 		origin?: string,
 	): Promise<{ checkoutUrl: string }> {
-		const code = dto.cima_type.toUpperCase();
+		const code = (dto.target_cima_type || dto.cima_type)!.toUpperCase();
 
 		// Build a frontend checkout URL with user details pre-filled as query params
 		const frontendBase = this.resolveOrigin(origin);
