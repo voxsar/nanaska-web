@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './Contact.css';
 import { useApi } from '../hooks/useApi';
+import RecaptchaNotice from './RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
 
@@ -125,6 +127,8 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
 
+  useEffect(() => { preloadRecaptcha(); }, []);
+
   function validate() {
     const errs = {};
     if (!fields.name.trim()) errs.name = 'Please enter your name.';
@@ -140,29 +144,30 @@ export default function Contact() {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setSending(true);
-    fetch(`${API_URL}/settings/contact`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fields),
-    })
-      .then((res) => {
-        setSending(false);
-        if (res.ok) {
-          setSubmitted(true);
-          setFields({ name: '', email: '', phone: '', subject: SUBJECTS[0], message: '' });
-        } else {
-          setErrors({ message: 'Submission failed. Please try again.' });
-        }
-      })
-      .catch(() => {
-        setSending(false);
-        setErrors({ message: 'Network error. Please try again.' });
+    try {
+      const res = await fetch(`${API_URL}/settings/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(await withRecaptcha('contact_form', fields)),
       });
+      setSending(false);
+      if (res.ok) {
+        setSubmitted(true);
+        setFields({ name: '', email: '', phone: '', subject: SUBJECTS[0], message: '' });
+      } else if (res.status === 403) {
+        setErrors({ message: 'We could not verify that you are human. Please reload the page and try again.' });
+      } else {
+        setErrors({ message: 'Submission failed. Please try again.' });
+      }
+    } catch {
+      setSending(false);
+      setErrors({ message: 'Network error. Please try again.' });
+    }
   }
 
   return (
@@ -301,6 +306,8 @@ export default function Contact() {
               >
                 {sending ? 'Sending…' : 'Send Message'}
               </button>
+
+              <RecaptchaNotice />
             </form>
           )}
         </div>

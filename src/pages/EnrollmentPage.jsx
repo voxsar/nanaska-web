@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
 import { getCombinationIdForLevel, getCombinationIdForCourse } from '../data/pricingData';
+import RecaptchaNotice from '../components/RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 import './EnrollmentPage.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
@@ -25,6 +27,7 @@ export default function EnrollmentPage() {
 	const [submitted, setSubmitted] = useState(false);
 	// Fetch all combinations from API to look up IDs for admin-created courses
 	const [apiCombinations, setApiCombinations] = useState(null);
+	useEffect(() => { preloadRecaptcha(); }, []);
 	useEffect(() => {
 		if (!API_URL) return;
 		fetch(`${API_URL}/courses/combinations`)
@@ -149,10 +152,10 @@ export default function EnrollmentPage() {
 			let res;
 			if (token) {
 				// Authenticated user path
-				const payload = {
+				const payload = await withRecaptcha('checkout', {
 					currency: effectiveCurrency,
 					...cartData,
-				};
+				});
 				res = await fetch(`${API_URL}/payments/create`, {
 					method: 'POST',
 					headers: {
@@ -163,14 +166,14 @@ export default function EnrollmentPage() {
 				});
 			} else {
 				// Guest user path – send form details with the request
-				const payload = {
+				const payload = await withRecaptcha('guest_checkout', {
 					firstName: form.firstName,
 					lastName: form.lastName,
 					email: form.email,
 					phone: form.phone || undefined,
 					currency: effectiveCurrency,
 					...cartData,
-				};
+				});
 				res = await fetch(`${API_URL}/payments/guest-create`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
@@ -253,7 +256,7 @@ export default function EnrollmentPage() {
 				await fetch(`${API_URL}/payments/enrollment-submit`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
+					body: JSON.stringify(await withRecaptcha('enrollment_submit', {
 						firstName: form.firstName,
 						lastName: form.lastName,
 						email: form.email,
@@ -271,7 +274,7 @@ export default function EnrollmentPage() {
 						cartItems,
 						currency: currency || 'GBP',
 						amount: cartTotal,
-					}),
+					})),
 				});
 			} catch (_) {
 				// Non-blocking – proceed to payment even if save fails
@@ -542,6 +545,7 @@ export default function EnrollmentPage() {
 							<button type="submit" className="enrollment-page__submit-btn" disabled={paying || cartItems.length === 0}>
 								{paying ? 'Redirecting to payment…' : '💳 Enroll & Pay Now →'}
 							</button>
+							<RecaptchaNotice />
 						</form>
 					</main>
 				</div>

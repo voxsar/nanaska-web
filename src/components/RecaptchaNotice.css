@@ -1,0 +1,25 @@
+.recaptcha-notice {
+  margin: 0.75rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--color-text-muted, #6b7280);
+  text-align: center;
+}
+
+.recaptcha-notice a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.recaptcha-notice a:hover {
+  color: var(--color-cyan, #24ade3);
+}
+
+/* On dark backgrounds (footer, Edge overlay) the notice needs a lighter tone. */
+.recaptcha-notice--light {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.recaptcha-notice--light a:hover {
+  color: #ffffff;
+}

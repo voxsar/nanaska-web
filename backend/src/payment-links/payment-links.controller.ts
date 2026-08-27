@@ -14,6 +14,7 @@ import { PaymentLinksService } from './payment-links.service';
 import { CreatePaymentLinkDto } from './dto/create-payment-link.dto';
 import { PayPaymentLinkDto } from './dto/pay-payment-link.dto';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
+import { Recaptcha } from '../recaptcha/recaptcha.decorator';
 
 @Controller('payment-links')
 export class PaymentLinksController {
@@ -52,11 +53,13 @@ export class PaymentLinksController {
 		return this.service.getPublicInfo(slug);
 	}
 
+	@Recaptcha('payment_link_verify')
 	@Post('p/:slug/verify')
 	verifyPassword(@Param('slug') slug: string, @Body() dto: VerifyPasswordDto) {
 		return this.service.verifyPassword(slug, dto.password);
 	}
 
+	@Recaptcha('payment_link_pay')
 	@Post('p/:slug/pay')
 	initiatePayment(
 		@Param('slug') slug: string,

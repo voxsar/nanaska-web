@@ -145,9 +145,21 @@
   margin-top: 0.25rem;
 }
 
-.enroll-modal__submit:hover {
+.enroll-modal__submit:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(245, 166, 35, 0.4);
+}
+
+.enroll-modal__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.enroll-modal__error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #dc2626;
+  text-align: center;
 }
 
 .enroll-modal__note {

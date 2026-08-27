@@ -15,10 +15,12 @@ import { PaymentLinksModule } from './payment-links/payment-links.module';
 import { BackupsModule } from './backups/backups.module';
 import { MediaModule } from './media/media.module';
 import { FlpLeadsModule } from './flp-leads/flp-leads.module';
+import { RecaptchaModule } from './recaptcha/recaptcha.module';
 
 @Module({
 	imports: [
 		ScheduleModule.forRoot(),
+		RecaptchaModule,
 		PrismaModule,
 		AuthModule,
 		AdminModule,

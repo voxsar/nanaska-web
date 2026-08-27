@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './EnrollModal.css';
+import RecaptchaNotice from './RecaptchaNotice';
+import { preloadRecaptcha, verifyRecaptcha } from '../lib/recaptcha';
 
 export default function EnrollModal() {
   const [open, setOpen] = useState(false);
@@ -10,6 +12,8 @@ export default function EnrollModal() {
   const [phone, setPhone] = useState('');
   const [level, setLevel] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const handleClose = useCallback(() => {
     setOpen(false);
@@ -43,11 +47,23 @@ export default function EnrollModal() {
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  const handleSubmit = (e) => {
+  /* Warm up reCAPTCHA only once the modal is actually shown */
+  useEffect(() => {
+    if (open) preloadRecaptcha();
+  }, [open]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (name && email) {
-      setSubmitted(true);
+    if (submitting || !name || !email) return;
+    setError('');
+    setSubmitting(true);
+    const human = await verifyRecaptcha('enroll_interest');
+    setSubmitting(false);
+    if (!human) {
+      setError('We could not verify that you are human. Please reload the page and try again.');
+      return;
     }
+    setSubmitted(true);
   };
 
   if (!open) return null;
@@ -128,9 +144,13 @@ export default function EnrollModal() {
               </select>
             </div>
 
-            <button type="submit" className="enroll-modal__submit">
-              Register My Interest →
+            {error && <p className="enroll-modal__error">{error}</p>}
+
+            <button type="submit" className="enroll-modal__submit" disabled={submitting}>
+              {submitting ? 'Submitting…' : 'Register My Interest →'}
             </button>
+
+            <RecaptchaNotice />
 
             <p className="enroll-modal__note">
               Or <Link to="/enrollment" onClick={handleClose}>view the full enrolment page</Link>

@@ -19,6 +19,7 @@ import { WebhookDto } from './dto/webhook.dto';
 import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 import { RevisionUpgradeDto } from './dto/revision-upgrade.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Recaptcha } from '../recaptcha/recaptcha.decorator';
 
 @Controller('payments')
 export class PaymentsController {
@@ -28,6 +29,7 @@ export class PaymentsController {
 	 * POST /payments/create
 	 * Authenticated – creates a PENDING order and returns the signed IPG payload.
 	 */
+	@Recaptcha('checkout')
 	@UseGuards(JwtAuthGuard)
 	@Post('create')
 	createPayment(@Body() dto: CreatePaymentDto, @Request() req, @Headers('origin') origin: string) {
@@ -39,6 +41,7 @@ export class PaymentsController {
 	 * Unauthenticated – allows guest users to pay without an account.
 	 * Guest details (name, email, phone) are stored on the order record.
 	 */
+	@Recaptcha('guest_checkout')
 	@Post('guest-create')
 	createGuestPayment(@Body() dto: GuestPaymentDto, @Headers('origin') origin: string) {
 		return this.paymentsService.createGuestPayment(dto, origin);
@@ -48,6 +51,7 @@ export class PaymentsController {
 	 * POST /payments/enrollment-submit
 	 * Saves enrollment form data (unauthenticated) before the user is redirected to payment.
 	 */
+	@Recaptcha('enrollment_submit')
 	@Post('enrollment-submit')
 	saveEnrollment(@Body() dto: EnrollmentSubmitDto) {
 		return this.paymentsService.saveEnrollment(dto);

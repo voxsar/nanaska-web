@@ -157,3 +157,11 @@ img {
 }
 
 
+
+/* ── Google reCAPTCHA v3 ──
+   The floating badge sits bottom-right, where it overlaps the FAB stack and the
+   mobile bottom nav. It is hidden here; every protected form renders the
+   attribution Google requires in its place (see RecaptchaNotice). */
+.grecaptcha-badge {
+  visibility: hidden;
+}

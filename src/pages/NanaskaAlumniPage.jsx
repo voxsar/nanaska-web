@@ -1,28 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './NanaskaAlumniPage.css';
 import { useApi } from '../hooks/useApi';
+import RecaptchaNotice from '../components/RecaptchaNotice';
+import { preloadRecaptcha, verifyRecaptcha } from '../lib/recaptcha';
 
 const INITIAL = { name: '', email: '', phone: '', occupation: '', address: '' };
 
 export default function NanaskaAlumniPage() {
   const [form, setForm] = useState(INITIAL);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const { data: prizeWinners } = useApi('/testimonials?prizeWinner=true&published=true');
+
+  useEffect(() => { preloadRecaptcha(); }, []);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitting) return;
     if (!form.name || !form.email || !form.phone) {
       setError('Please fill in all required fields.');
       return;
     }
     setError('');
+    setSubmitting(true);
+    const human = await verifyRecaptcha('alumni_register');
+    setSubmitting(false);
+    if (!human) {
+      setError('We could not verify that you are human. Please reload the page and try again.');
+      return;
+    }
     setSubmitted(true);
   };
 
@@ -155,7 +168,10 @@ export default function NanaskaAlumniPage() {
                     onChange={handleChange}
                   />
                 </div>
-                <button type="submit" className="alumni-form__submit">Submit</button>
+                <button type="submit" className="alumni-form__submit" disabled={submitting}>
+                  {submitting ? 'Submitting…' : 'Submit'}
+                </button>
+                <RecaptchaNotice />
               </form>
             )}
           </div>

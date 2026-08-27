@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import RecaptchaNotice from '../components/RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 import './PaymentLinkPage.css';
 
 const API = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
@@ -43,6 +45,8 @@ export default function PaymentLinkPage() {
 	const [paying, setPaying] = useState(false);
 	const [formError, setFormError] = useState('');
 
+	useEffect(() => { preloadRecaptcha(); }, []);
+
 	useEffect(() => {
 		loadLink();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -78,7 +82,10 @@ export default function PaymentLinkPage() {
 		setPasswordError('');
 		setVerifying(true);
 		try {
-			await axios.post(`${API}/payment-links/p/${slug}/verify`, { password });
+			await axios.post(
+				`${API}/payment-links/p/${slug}/verify`,
+				await withRecaptcha('payment_link_verify', { password }),
+			);
 			setStatus('form');
 		} catch (err) {
 			setPasswordError(err.response?.data?.message || 'Incorrect password. Please try again.');
@@ -101,10 +108,10 @@ export default function PaymentLinkPage() {
 		}
 		try {
 			setPaying(true);
-			const payload = {
+			const payload = await withRecaptcha('payment_link_pay', {
 				...form,
 				password: linkInfo?.hasPassword ? password : undefined,
-			};
+			});
 			const res = await axios.post(`${API}/payment-links/p/${slug}/pay`, payload);
 			const { paymentUrl } = res.data;
 			if (paymentUrl) {
@@ -199,6 +206,7 @@ export default function PaymentLinkPage() {
 						<button type="submit" className="plp-btn-primary" disabled={verifying}>
 							{verifying ? 'Verifying…' : 'Continue →'}
 						</button>
+						<RecaptchaNotice />
 					</form>
 					<p className="plp-contact">Forgot your password? <a href="mailto:info@nanaska.com">Contact us</a></p>
 				</div>
@@ -335,6 +343,7 @@ export default function PaymentLinkPage() {
 					<p className="plp-secure-note">
 						🔒 Your payment is processed securely by Sampath Bank PayCorp. Nanaska does not store your card details.
 					</p>
+					<RecaptchaNotice />
 				</form>
 			</div>
 		</div>

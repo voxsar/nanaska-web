@@ -7,6 +7,8 @@ import {
 	getCoursePricesByCode,
 	getPriceForCountry,
 } from '../data/pricingData';
+import RecaptchaNotice from '../components/RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 import './NanaskaEdgePage.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
@@ -551,7 +553,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 		const res = await fetch(`${API_URL}/payments/enrollment-submit`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
+			body: JSON.stringify(await withRecaptcha('enrollment_submit', {
 				firstName: form.firstName,
 				lastName: form.lastName,
 				email: form.email,
@@ -574,7 +576,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 				currency: selectedCurrency,
 				amount,
 				orderId,
-			}),
+			})),
 		});
 
 		if (!res.ok) {
@@ -611,7 +613,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 			externalId: prefill?.externalId || undefined,
 		};
 
-		const payload = {
+		const payload = await withRecaptcha('guest_checkout', {
 			firstName: form.firstName,
 			lastName: form.lastName,
 			email: form.email,
@@ -621,7 +623,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 			...(combinationId ? { combinationId } : { courseIds: [selection.code] }),
 			isEdgeRevision: true,
 			enrollmentMeta,
-		};
+		});
 
 		const res = await fetch(`${API_URL}/payments/guest-create`, {
 			method: 'POST',
@@ -691,6 +693,8 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 			setSubmitting(false);
 		}
 	};
+
+	useEffect(() => { preloadRecaptcha(); }, []);
 
 	// Tick down the password email expiry countdown
 	useEffect(() => {
@@ -846,6 +850,7 @@ function SignupView({ selection, settings, onBack, prefill = {} }) {
 									? 'Your registration will appear under Nanaska admin enrollment submissions.'
 									: 'Secure payment is processed through the main Nanaska payment gateway.'}
 							</p>
+							<RecaptchaNotice />
 						</form>
 					)}
 				</main>

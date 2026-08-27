@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import nanaskaLogo from '../assets/nanaska-logo.png';
 import './Footer.css';
+import RecaptchaNotice from './RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
 
@@ -26,24 +28,27 @@ export default function Footer() {
 
 	const [subError, setSubError] = useState('');
 
-	const handleSubscribe = (e) => {
+	const handleSubscribe = async (e) => {
 		e.preventDefault();
 		if (!email) return;
 		setSubError('');
-		fetch(`${API_URL}/settings/newsletter/signup`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email }),
-		})
-			.then((res) => {
-				if (res.ok) {
-					setSubscribed(true);
-					setEmail('');
-				} else {
-					setSubError('Subscription failed. Please try again.');
-				}
-			})
-			.catch(() => setSubError('Network error. Please try again.'));
+		try {
+			const res = await fetch(`${API_URL}/settings/newsletter/signup`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(await withRecaptcha('newsletter_signup', { email })),
+			});
+			if (res.ok) {
+				setSubscribed(true);
+				setEmail('');
+			} else if (res.status === 403) {
+				setSubError('We could not verify that you are human. Please reload the page and try again.');
+			} else {
+				setSubError('Subscription failed. Please try again.');
+			}
+		} catch {
+			setSubError('Network error. Please try again.');
+		}
 	};
 
 	return (
@@ -166,6 +171,7 @@ export default function Footer() {
 									placeholder="Your email address"
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
+									onFocus={preloadRecaptcha}
 									required
 								/>
 
@@ -178,6 +184,7 @@ export default function Footer() {
 							</form>
 						)}
 						{subError && <p className="footer__subscribe-error">{subError}</p>}
+						{!subscribed && <RecaptchaNotice className="recaptcha-notice--light" />}
 					</div>
 
 				</div>

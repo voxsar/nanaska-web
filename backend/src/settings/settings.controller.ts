@@ -7,6 +7,7 @@ import { UpsertPageMetaDto } from './dto/upsert-page-meta.dto';
 import { NewsletterSignupDto } from './dto/newsletter-signup.dto';
 import { ContactSubmissionDto } from './dto/contact-submission.dto';
 import { AdminJwtAuthGuard } from '../admin/admin-jwt-auth.guard';
+import { Recaptcha } from '../recaptcha/recaptcha.decorator';
 import { EmailService } from '../email/email.service';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 
@@ -28,12 +29,14 @@ export class SettingsController {
 	) { }
 
 	// Public: newsletter signup
+	@Recaptcha('newsletter_signup')
 	@Post('newsletter/signup')
 	newsletterSignup(@Body() dto: NewsletterSignupDto) {
 		return this.settingsService.newsletterSignup(dto);
 	}
 
 	// Public: contact form
+	@Recaptcha('contact_form')
 	@Post('contact')
 	submitContact(@Body() dto: ContactSubmissionDto) {
 		return this.settingsService.submitContact(dto);

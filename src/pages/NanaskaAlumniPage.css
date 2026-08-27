@@ -187,9 +187,14 @@
   transition: background 0.2s, transform 0.2s;
 }
 
-.alumni-form__submit:hover {
+.alumni-form__submit:hover:not(:disabled) {
   background: #1b9acc;
   transform: translateY(-2px);
+}
+
+.alumni-form__submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 /* Success */

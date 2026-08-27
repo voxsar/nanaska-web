@@ -11,6 +11,8 @@ import {
 	trackFormError,
 	trackEvent,
 } from '../hooks/useTracking';
+import RecaptchaNotice from '../components/RecaptchaNotice';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 import './FinancialLeadershipPage.css';
 
 const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
@@ -155,6 +157,8 @@ export default function FinancialLeadershipPage() {
 
 	const FORM_NAME = 'flp_lead';
 
+	useEffect(() => { preloadRecaptcha(); }, []);
+
 	/* Show the sticky sign-up bar after the hero, hide it once the form is on screen. */
 	useEffect(() => {
 		const onScroll = () => {
@@ -222,8 +226,14 @@ export default function FinancialLeadershipPage() {
 			const res = await fetch(`${API_URL}/flp-leads`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ...form, source: 'flp-page' }),
+				body: JSON.stringify(await withRecaptcha('flp_lead', { ...form, source: 'flp-page' })),
 			});
+			if (res.status === 403) {
+				setFormState('error');
+				setFormError('We could not verify that you are human. Please reload the page and try again.');
+				trackEvent('form_submit_failed', { form_name: FORM_NAME, reason: 'recaptcha' });
+				return;
+			}
 			if (!res.ok) throw new Error('Request failed');
 			setFormState('success');
 			// GA4: standard lead events + Clarity upgrade
@@ -815,6 +825,7 @@ export default function FinancialLeadershipPage() {
 								<p className="flp-form__privacy">
 									By submitting, you agree to be contacted by Nanaska. We respect your privacy.
 								</p>
+								<RecaptchaNotice />
 							</form>
 						)}
 					</div>
