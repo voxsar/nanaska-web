@@ -2,6 +2,14 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # VITE_RECAPTCHA_SITE_KEY is a reCAPTCHA *site* key: it is public by design and
+  # is compiled into the client bundle, where it is visible in page source. That is
+  # how reCAPTCHA works – the private half is RECAPTCHA_SECRET_KEY, which lives only
+  # on the backend. Exempt it from secrets scanning, which otherwise fails the build
+  # for finding it in the build output.
+  SECRETS_SCAN_OMIT_KEYS = "VITE_RECAPTCHA_SITE_KEY"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
