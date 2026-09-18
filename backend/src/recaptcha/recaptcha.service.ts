@@ -69,6 +69,9 @@ export class RecaptchaService {
 		}
 
 		if (typeof token !== 'string' || token.trim().length === 0) {
+			this.logger.warn(
+				`reCAPTCHA token missing (action: ${options.action || 'n/a'}, ip: ${options.remoteIp || 'unknown'}) – request blocked`,
+			);
 			return { ok: false, skipped: false, reason: 'missing-token' };
 		}
 
@@ -100,6 +103,12 @@ export class RecaptchaService {
 			return { ok: false, skipped: false, score, action: data.action, reason: 'low-score' };
 		}
 
+		// Logged so the score distribution of real traffic is visible: a v3 key with
+		// no history scores almost everything highly, which lets scripted browsers
+		// through at the default threshold.
+		this.logger.log(
+			`reCAPTCHA passed – score ${score}, action ${data.action || 'n/a'}, ip ${options.remoteIp || 'unknown'}`,
+		);
 		return { ok: true, skipped: false, score, action: data.action };
 	}
 
