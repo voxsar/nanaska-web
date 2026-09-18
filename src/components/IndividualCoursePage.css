@@ -113,6 +113,21 @@
   flex-wrap: wrap;
 }
 
+.individual-course__combine-hint {
+  max-width: 34rem;
+  margin: 1rem auto 0;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: #fff;
+  text-align: center;
+}
+
 .individual-course__enroll-btn {
   display: inline-block;
   background: #fff;

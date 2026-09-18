@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
-import { getLevelPricesById, getCoursePricesByCode } from '../data/pricingData';
+import { getLevelPricesById, getCoursePricesByCode, getTierTable, getTierPrices } from '../data/pricingData';
 import LecturerPanel from './LecturerPanel';
 import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
 import { useApi } from '../hooks/useApi';
@@ -12,7 +12,7 @@ export default function CourseLevelPage({ level }) {
 	const [activeSubject, setActiveSubject] = useState(level.subjects[0].code);
 	const [activeTab, setActiveTab] = useState('overview');
 	const currentSubject = level.subjects.find((s) => s.code === activeSubject);
-	const { addCourse, addLevel, isInCart, isLevelInCart } = useCart();
+	const { cartItems, addCourse, addLevel, isInCart, isLevelInCart } = useCart();
 	const { selectedCountry, getAmountForCountry, formatAmount } = usePricing();
 
 	// Fetch the full combination for this level from the API to get DB-accurate prices
@@ -38,6 +38,14 @@ export default function CourseLevelPage({ level }) {
 	const LECTURERS = (apiLecturers?.length) ? apiLecturers : STATIC_LECTURERS;
 
 	const levelInCart = isLevelInCart(level.levelId);
+
+	// Tiered fee structure for this level — combining subjects lowers the total,
+	// so show the ladder and highlight the tier the visitor is currently on.
+	const tierTable = getTierTable(level.levelId);
+	const singleTier = getTierPrices(level.levelId, 1);
+	const subjectsInCart = levelInCart
+		? level.subjects.length
+		: cartItems.filter(i => i.type === 'course' && i.levelId === level.levelId).length;
 
 	// Build the enriched level object with DB price + combinationId for cart
 	const enrichedLevel = {
@@ -128,6 +136,42 @@ export default function CourseLevelPage({ level }) {
 							);
 						})}
 					</div>
+
+					{/* Fee ladder — combining subjects brings the per-subject price down */}
+					{tierTable.length > 0 && (
+						<div className="subject-tiers">
+							<div className="subject-tiers__head">
+								<span className="subject-tiers__title">💡 The more subjects you combine, the less you pay</span>
+								{subjectsInCart > 0 && (
+									<span className="subject-tiers__current">
+										{subjectsInCart} in cart
+									</span>
+								)}
+							</div>
+							<div className="subject-tiers__grid">
+								{tierTable.map(tier => {
+									const tierAmount = getAmountForCountry(tier, selectedCountry);
+									const singleAmount = getAmountForCountry(singleTier, selectedCountry);
+									const saving = singleAmount * tier.count - tierAmount;
+									const isFullLevel = tier.count === level.subjects.length;
+									return (
+										<div
+											key={tier.count}
+											className={`subject-tiers__tier${tier.count === subjectsInCart ? ' subject-tiers__tier--active' : ''}`}
+										>
+											<span className="subject-tiers__count">
+												{isFullLevel ? `All ${tier.count} — Full Level` : `${tier.count} Subject${tier.count > 1 ? 's' : ''}`}
+											</span>
+											<span className="subject-tiers__price">{formatAmount(tierAmount)}</span>
+											{saving > 0 && (
+												<span className="subject-tiers__save">Save {formatAmount(saving)}</span>
+											)}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
 
 					{/* Subject Detail */}
 					{currentSubject && (

@@ -24,12 +24,34 @@ const COURSE_PRICE_MAP = {
 	SCS: { gbp: 599, lkr: 30750 },
 };
 
-// Level bundle prices sourced from user-provided CSV combinations
+// Level bundle prices (all subjects at a level) — the cheapest per-subject rate
 const LEVEL_PRICE_MAP = {
 	certificate: { gbp: 360, lkr: 50000 },
 	operational: { gbp: 600, lkr: 65000 },
 	management: { gbp: 600, lkr: 65000 },
 	strategic: { gbp: 600, lkr: 65000 },
+};
+
+// Bundle pricing by level -> number of subjects. Combining subjects lowers the
+// total, so a cart holding several subjects from the same level is priced from
+// this table instead of summing single-subject prices.
+// Certificate figures follow the published Nanaska fee structure; GBP mirrors
+// the same discount, rounded to the nearest pound.
+const LEVEL_TIER_PRICE_MAP = {
+	certificate: {
+		1: { gbp: 105, lkr: 16000 },
+		2: { gbp: 190, lkr: 29000 },
+		3: { gbp: 289, lkr: 44000 },
+		4: { gbp: 360, lkr: 50000 },
+	},
+};
+
+// Frontend level IDs -> backend combination ID prefixes
+const LEVEL_PREFIX_MAP = {
+	certificate: 'cert',
+	operational: 'op',
+	management: 'mg',
+	strategic: 'st',
 };
 
 // Frontend level IDs -> backend combination IDs
@@ -99,4 +121,54 @@ export function getCombinationIdForLevel(levelId) {
 
 export function getCombinationIdForCourse(courseCode) {
 	return COURSE_COMBINATION_ID_MAP[courseCode] || '';
+}
+
+/** True when this level prices multi-subject carts as a discounted bundle. */
+export function hasTierPricing(levelId) {
+	return Boolean(LEVEL_TIER_PRICE_MAP[levelId]);
+}
+
+/** Bundle prices for `subjectCount` subjects at a level, or null when untiered. */
+export function getTierPrices(levelId, subjectCount) {
+	return LEVEL_TIER_PRICE_MAP[levelId]?.[subjectCount] || null;
+}
+
+/** Every tier for a level as [{ count, gbp, lkr }], ascending. Empty when untiered. */
+export function getTierTable(levelId) {
+	const tiers = LEVEL_TIER_PRICE_MAP[levelId];
+	if (!tiers) return [];
+	return Object.keys(tiers)
+		.map(Number)
+		.sort((a, b) => a - b)
+		.map(count => ({ count, ...tiers[count] }));
+}
+
+/**
+ * Backend combination ID for a set of course codes at a level.
+ * Mirrors the seed's ID scheme: prefix + sorted lowercase codes, e.g.
+ * ('certificate', ['BA2', 'BA1']) -> 'cert_ba1_ba2'.
+ */
+export function getCombinationIdForCourses(levelId, courseCodes) {
+	const prefix = LEVEL_PREFIX_MAP[levelId];
+	if (!prefix || !courseCodes?.length) return '';
+	const suffix = [...courseCodes].sort().map(code => code.toLowerCase()).join('_');
+	return `${prefix}_${suffix}`;
+}
+
+/**
+ * The next bundle tier up from `currentCount` subjects, with the extra cost of
+ * getting there — e.g. going from 1 to 2 certificate subjects adds LKR 13,000
+ * rather than another full LKR 16,000. Null when already at the top tier.
+ */
+export function getNextTierUpgrade(levelId, currentCount) {
+	const current = getTierPrices(levelId, currentCount);
+	const next = getTierPrices(levelId, currentCount + 1);
+	if (!next) return null;
+	const base = current || { gbp: 0, lkr: 0 };
+	return {
+		count: currentCount + 1,
+		gbp: next.gbp,
+		lkr: next.lkr,
+		extra: { gbp: next.gbp - base.gbp, lkr: next.lkr - base.lkr },
+	};
 }

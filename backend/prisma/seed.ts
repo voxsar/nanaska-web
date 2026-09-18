@@ -463,7 +463,7 @@ const LEVEL_COURSE_GROUPS = {
 // Explicit price overrides for both full-level packages and single-subject combinations
 const COMBINATION_PRICE_OVERRIDES: Record<string, { price?: number; priceGbp?: number; name?: string; slug?: string }> = {
 	// Full-level packages
-	cert_full: { name: 'CIMA Certificate Level', slug: 'cima-certificate-level', price: 55000, priceGbp: 360 },
+	cert_full: { name: 'CIMA Certificate Level', slug: 'cima-certificate-level', price: 50000, priceGbp: 360 },
 	op_full: { name: 'CIMA Operational Level', slug: 'cima-operational-level', price: 75000, priceGbp: 600 },
 	mg_full: { name: 'CIMA Management Level', slug: 'cima-management-level', price: 77775, priceGbp: 600 },
 	st_full: { name: 'CIMA Strategic Level', slug: 'cima-strategic-level', price: 105750, priceGbp: 600 },
@@ -487,6 +487,20 @@ const COMBINATION_PRICE_OVERRIDES: Record<string, { price?: number; priceGbp?: n
 	op_f1_p1: { price: 58000, priceGbp: 0 },
 	mg_f2_p2: { price: 70000, priceGbp: 0 },
 	st_e3_p3: { price: 80000, priceGbp: 0 },
+};
+
+// Tiered bundle pricing: price by level and number of subjects, so combining
+// subjects costs less than buying them one at a time. Applied to every
+// combination of that size unless a more specific override above wins.
+// Certificate figures follow the published Nanaska fee structure; GBP mirrors
+// the same discount, rounded to the nearest pound.
+const LEVEL_TIER_PRICES: Record<string, Record<number, { price: number; priceGbp: number }>> = {
+	certificate: {
+		1: { price: 16000, priceGbp: 105 },
+		2: { price: 29000, priceGbp: 190 },
+		3: { price: 44000, priceGbp: 289 },
+		4: { price: 50000, priceGbp: 360 },
+	},
 };
 
 // Generate all possible combinations for all levels
@@ -515,19 +529,41 @@ function generateCombinations() {
 			const priceLkr = sorted.reduce((sum, code) => sum + (COURSE_PRICES[code] || 0), 0);
 			const priceGbp = sorted.reduce((sum, code) => sum + (COURSE_PRICES_GBP[code] || 0), 0);
 
-			// Check if there's a specific override for this combination
+			// Check if there's a specific override for this combination, then the
+			// level's bundle tier for this many subjects, before falling back to
+			// the plain sum of single-subject prices.
 			const override = COMBINATION_PRICE_OVERRIDES[comboId];
+			const tier = LEVEL_TIER_PRICES[levelKey]?.[sorted.length];
 
 			result.push({
 				id: comboId,
 				level: levelKey,
 				subjects: sorted,
-				price: override?.price ?? priceLkr,
-				priceGbp: override?.priceGbp ?? priceGbp,
+				price: override?.price ?? tier?.price ?? priceLkr,
+				priceGbp: override?.priceGbp ?? tier?.priceGbp ?? priceGbp,
 				name: override?.name ?? '',
 				slug: override?.slug ?? null,
 			});
 		}
+
+		// Full-level package alias (cert_full, op_full, …) — the ID the site links
+		// to for "add the whole level", holding the same courses as the largest
+		// generated subset but carrying the published package price.
+		const fullId = `${prefix}_full`;
+		const fullOverride = COMBINATION_PRICE_OVERRIDES[fullId];
+		const fullTier = LEVEL_TIER_PRICES[levelKey]?.[courseCodes.length];
+		const fullSumLkr = courseCodes.reduce((sum, code) => sum + (COURSE_PRICES[code] || 0), 0);
+		const fullSumGbp = courseCodes.reduce((sum, code) => sum + (COURSE_PRICES_GBP[code] || 0), 0);
+
+		result.push({
+			id: fullId,
+			level: levelKey,
+			subjects: [...courseCodes].sort(),
+			price: fullOverride?.price ?? fullTier?.price ?? fullSumLkr,
+			priceGbp: fullOverride?.priceGbp ?? fullTier?.priceGbp ?? fullSumGbp,
+			name: fullOverride?.name ?? '',
+			slug: fullOverride?.slug ?? null,
+		});
 	}
 
 	return result;

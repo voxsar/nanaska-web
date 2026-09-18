@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
-import { getCombinationIdForLevel, getCombinationIdForCourse } from '../data/pricingData';
+import { getCombinationIdForLevel, getCombinationIdForCourse, getNextTierUpgrade, getPriceForCountry } from '../data/pricingData';
 import RecaptchaNotice from '../components/RecaptchaNotice';
 import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
 import './EnrollmentPage.css';
@@ -22,7 +22,7 @@ const COUNTRIES = [
 ];
 
 export default function EnrollmentPage() {
-	const { cartItems, getItemPrice, getCartTotal } = useCart();
+	const { cartItems, getItemPrice, getCartGroups, getCartTotal, getCartSavings } = useCart();
 	const { selectedCountry, setSelectedCountry, formatAmount, isSriLanka, currency } = usePricing();
 	const [submitted, setSubmitted] = useState(false);
 	// Fetch all combinations from API to look up IDs for admin-created courses
@@ -110,14 +110,22 @@ export default function EnrollmentPage() {
 	const handlePayOnline = async () => {
 		if (!API_URL) return;
 
-		// Build cart payload: send combination IDs for level packages, course IDs for individual courses
-		const combinationIds = cartItems
-			.filter(item => item.type === 'level' && item.combinationId)
-			.map(item => item.combinationId);
+		// Build cart payload from the priced groups so the charge matches what was
+		// displayed: level packages and discounted multi-subject bundles are sent as
+		// combination IDs (the backend prices those directly), and anything left over
+		// is sent as individual course IDs for the backend to sum.
+		const combinationIds = [];
+		const courseIds = [];
 
-		const courseIds = cartItems
-			.filter(item => item.type === 'course')
-			.map(item => item.courseCode);
+		cartGroups.forEach(group => {
+			if (group.combinationId) {
+				combinationIds.push(group.combinationId);
+				return;
+			}
+			group.items.forEach(item => {
+				if (item.type === 'course') courseIds.push(item.courseCode);
+			});
+		});
 
 		// Single combination optimization
 		if (combinationIds.length === 1 && courseIds.length === 0) {
@@ -195,7 +203,10 @@ export default function EnrollmentPage() {
 		}
 	};
 
-	const cartTotal = getCartTotal(form.country || selectedCountry);
+	const pricingCountry = form.country || selectedCountry;
+	const cartGroups = getCartGroups(pricingCountry);
+	const cartTotal = getCartTotal(pricingCountry);
+	const cartSavings = getCartSavings(pricingCountry);
 
 	const getCartCombinationId = () => {
 		if (cartItems.length === 0) return '';
@@ -318,25 +329,72 @@ export default function EnrollmentPage() {
 							) : (
 								<>
 									<ul className="enrollment-page__summary-list">
-										{cartItems.map(item => (
-											<li
-												key={item.type === 'level' ? item.levelId : item.courseCode}
-												className={`enrollment-page__summary-item${item.type === 'level' ? ' enrollment-page__summary-item--level' : ''}`}
-											>
-												<div className="enrollment-page__summary-item-info">
-													<span className="enrollment-page__summary-item-name">
-														{item.type === 'level' ? item.levelTitle : `${item.courseCode} – ${item.courseName}`}
-													</span>
-													{item.type === 'level' && (
-														<span className="enrollment-page__summary-badge">
-															📚 Full Level · {item.courseCount} courses
+										{cartGroups.map(group => {
+											// Subjects that qualify for a combined rate are listed under one
+											// bundle price, matching the amount that will be charged.
+											if (group.type === 'bundle') {
+												const upgrade = getNextTierUpgrade(group.levelId, group.items.length);
+												return (
+													<li key={group.key} className="enrollment-page__summary-item enrollment-page__summary-item--bundle">
+														<div className="enrollment-page__summary-item-info">
+															<span className="enrollment-page__summary-item-name">
+																🎁 {group.title} · {group.items.length} subjects
+															</span>
+															<span className="enrollment-page__summary-subjects">
+																{group.items.map(i => i.courseCode).join(' + ')}
+															</span>
+															<span className="enrollment-page__summary-badge enrollment-page__summary-badge--save">
+																Combined rate — saves {formatAmount(group.savings)}
+															</span>
+															{upgrade && (
+																<span className="enrollment-page__summary-badge enrollment-page__summary-badge--upsell">
+																	Add 1 more subject for just {formatAmount(getPriceForCountry(upgrade.extra, pricingCountry))}
+																</span>
+															)}
+														</div>
+														<span className="enrollment-page__summary-price">
+															<s className="enrollment-page__summary-was">{formatAmount(group.listAmount)}</s>
+															{formatAmount(group.amount)}
 														</span>
-													)}
-												</div>
-												<span className="enrollment-page__summary-price">{formatAmount(getItemPrice(item, form.country || selectedCountry))}</span>
-											</li>
-										))}
+													</li>
+												);
+											}
+
+											return group.items.map(item => {
+												const isLevel = item.type === 'level';
+												const upgrade = isLevel ? null : getNextTierUpgrade(group.levelId, 1);
+												return (
+													<li
+														key={isLevel ? item.levelId : item.courseCode}
+														className={`enrollment-page__summary-item${isLevel ? ' enrollment-page__summary-item--level' : ''}`}
+													>
+														<div className="enrollment-page__summary-item-info">
+															<span className="enrollment-page__summary-item-name">
+																{isLevel ? item.levelTitle : `${item.courseCode} – ${item.courseName}`}
+															</span>
+															{isLevel && (
+																<span className="enrollment-page__summary-badge">
+																	📚 Full Level · {item.courseCount} courses
+																</span>
+															)}
+															{upgrade && (
+																<span className="enrollment-page__summary-badge enrollment-page__summary-badge--upsell">
+																	Add 1 more subject for just {formatAmount(getPriceForCountry(upgrade.extra, pricingCountry))}
+																</span>
+															)}
+														</div>
+														<span className="enrollment-page__summary-price">{formatAmount(getItemPrice(item, pricingCountry))}</span>
+													</li>
+												);
+											});
+										})}
 									</ul>
+									{cartSavings > 0 && (
+										<div className="enrollment-page__summary-savings">
+											<span>Bundle savings</span>
+											<span>− {formatAmount(cartSavings)}</span>
+										</div>
+									)}
 									<div className="enrollment-page__summary-total">
 										<span>Total</span>
 										<span>{formatAmount(cartTotal)}</span>

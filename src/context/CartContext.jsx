@@ -3,6 +3,8 @@ import {
 	getCoursePricesByCode,
 	getLevelPricesById,
 	getPriceForCountry,
+	getTierPrices,
+	getCombinationIdForCourses,
 } from '../data/pricingData';
 
 const CartContext = createContext(null);
@@ -131,8 +133,85 @@ export function CartProvider({ children }) {
 		return getPriceForCountry(getItemPrices(item), country);
 	}
 
+	/**
+	 * Collapse the cart into priced groups.
+	 *
+	 * Individual subjects from the same level are grouped together so that
+	 * levels with tiered pricing (see LEVEL_TIER_PRICE_MAP) charge the bundle
+	 * rate rather than the sum of single-subject prices — adding a 2nd or 3rd
+	 * certificate subject brings the total down per subject. Levels without a
+	 * tier table keep summing exactly as before.
+	 *
+	 * Each group carries `amount` (what is charged), `listAmount` (what the
+	 * subjects would cost bought separately) and the backend `combinationId`
+	 * the bundle must be checked out as, so display and charge cannot drift.
+	 */
+	function getCartGroups(country) {
+		const groups = [];
+		const groupIndexByLevel = new Map();
+
+		cartItems.forEach(item => {
+			if (item.type !== 'course') {
+				const amount = getItemPrice(item, country);
+				groups.push({
+					key: `level:${item.levelId}`,
+					type: 'level',
+					levelId: item.levelId,
+					title: item.levelTitle,
+					items: [item],
+					amount,
+					listAmount: amount,
+					savings: 0,
+					combinationId: item.combinationId || '',
+				});
+				return;
+			}
+
+			if (!groupIndexByLevel.has(item.levelId)) {
+				groupIndexByLevel.set(item.levelId, groups.length);
+				groups.push({
+					key: `courses:${item.levelId}`,
+					type: 'courses',
+					levelId: item.levelId,
+					title: item.levelTitle,
+					items: [],
+					amount: 0,
+					listAmount: 0,
+					savings: 0,
+					combinationId: '',
+				});
+			}
+			groups[groupIndexByLevel.get(item.levelId)].items.push(item);
+		});
+
+		return groups.map(group => {
+			if (group.type !== 'courses') return group;
+
+			const listAmount = group.items.reduce((sum, i) => sum + getItemPrice(i, country), 0);
+			const tier = getTierPrices(group.levelId, group.items.length);
+			const isBundle = Boolean(tier) && group.items.length > 1;
+			const amount = tier ? getPriceForCountry(tier, country) : listAmount;
+
+			return {
+				...group,
+				type: isBundle ? 'bundle' : 'courses',
+				amount,
+				listAmount,
+				savings: Math.max(0, listAmount - amount),
+				combinationId: isBundle
+					? getCombinationIdForCourses(group.levelId, group.items.map(i => i.courseCode))
+					: '',
+			};
+		});
+	}
+
 	function getCartTotal(country) {
-		return cartItems.reduce((sum, i) => sum + getItemPrice(i, country), 0);
+		return getCartGroups(country).reduce((sum, g) => sum + g.amount, 0);
+	}
+
+	/** Total knocked off the cart by bundle pricing, 0 when nothing is discounted. */
+	function getCartSavings(country) {
+		return getCartGroups(country).reduce((sum, g) => sum + g.savings, 0);
 	}
 
 	const cartCount = cartItems.length;
@@ -141,7 +220,7 @@ export function CartProvider({ children }) {
 		<CartContext.Provider value={{
 			cartItems, cartCount, mergeAnimation,
 			addCourse, addLevel, removeItem, clearCart, isInCart, isLevelInCart,
-			getItemPrice, getCartTotal,
+			getItemPrice, getCartGroups, getCartTotal, getCartSavings,
 		}}>
 			{children}
 		</CartContext.Provider>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { usePricing } from '../context/PricingContext';
-import { getCoursePricesByCode } from '../data/pricingData';
+import { getCoursePricesByCode, getNextTierUpgrade, getPriceForCountry } from '../data/pricingData';
 import LecturerPanel from './LecturerPanel';
 import { LECTURERS as STATIC_LECTURERS } from '../data/lecturersData';
 import { useApi } from '../hooks/useApi';
@@ -37,6 +37,12 @@ export default function IndividualCoursePage({ course, level }) {
 	const levelInCart = isLevelInCart(level.levelId);
 	const relatedCourses = level.subjects.filter(s => s.code !== course.code);
 	const coursePrice = getAmountForCountry(getCoursePricesByCode(course.code, course.price || 0), selectedCountry);
+
+	// Levels with tiered pricing get cheaper per subject as subjects are combined,
+	// so show what a second subject would actually cost from this page.
+	const pairTier = getNextTierUpgrade(level.levelId, 1);
+	const pairExtra = pairTier ? getPriceForCountry(pairTier.extra, selectedCountry) : 0;
+	const pairSaving = pairTier ? coursePrice - pairExtra : 0;
 
 	const handleAddToCart = () => {
 		addCourse(mergedCourse, level);
@@ -79,6 +85,13 @@ export default function IndividualCoursePage({ course, level }) {
 							{levelInCart ? '✓ Level in Cart' : inCart ? '✓ Added to Cart' : '+ Add to Enrollment Cart'}
 						</button>
 					</div>
+
+					{pairTier && !inCart && !levelInCart && pairSaving > 0 && (
+						<p className="individual-course__combine-hint">
+							💡 Combine and save — adding a second {level.title} subject costs just{' '}
+							{formatAmount(pairExtra)} more, {formatAmount(pairSaving)} less than buying it on its own.
+						</p>
+					)}
 				</div>
 				<div className="individual-course__hero-wave">
 					<svg viewBox="0 0 1440 80" preserveAspectRatio="none">

@@ -197,6 +197,80 @@
 	margin-top: 0.15rem;
 }
 
+/* Fee ladder — bundle price per number of subjects */
+.subject-tiers {
+	background: #f8fafc;
+	border: 1.5px solid #e2e8f0;
+	border-radius: 16px;
+	padding: 1.25rem 1.5rem;
+	margin: -0.75rem 0 2.5rem;
+}
+
+.subject-tiers__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+	margin-bottom: 1rem;
+}
+
+.subject-tiers__title {
+	font-size: 0.9rem;
+	font-weight: 700;
+	color: #1b365d;
+}
+
+.subject-tiers__current {
+	font-size: 0.75rem;
+	font-weight: 700;
+	color: var(--level-color);
+	background: #fff;
+	border: 1.5px solid var(--level-color);
+	border-radius: 999px;
+	padding: 0.2rem 0.7rem;
+}
+
+.subject-tiers__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 0.75rem;
+}
+
+.subject-tiers__tier {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	background: #fff;
+	border: 1.5px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 0.85rem 1rem;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.subject-tiers__tier--active {
+	border-color: var(--level-color);
+	box-shadow: 0 4px 14px rgba(27, 54, 93, 0.1);
+}
+
+.subject-tiers__count {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #64748b;
+}
+
+.subject-tiers__price {
+	font-size: 1.05rem;
+	font-weight: 800;
+	color: #1b365d;
+}
+
+.subject-tiers__save {
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: #047857;
+}
+
 /* Subject Detail */
 .subject-detail {
 	background: #fff;
