@@ -22,7 +22,7 @@ const COUNTRIES = [
 ];
 
 export default function EnrollmentPage() {
-	const { cartItems, getItemPrice, getCartGroups, getCartTotal, getCartSavings } = useCart();
+	const { cartItems, getItemPrice, getCartGroups, getCartFees, getCartTotal, getCartSavings } = useCart();
 	const { selectedCountry, setSelectedCountry, formatAmount, isSriLanka, currency } = usePricing();
 	const [submitted, setSubmitted] = useState(false);
 	// Fetch all combinations from API to look up IDs for admin-created courses
@@ -205,6 +205,7 @@ export default function EnrollmentPage() {
 
 	const pricingCountry = form.country || selectedCountry;
 	const cartGroups = getCartGroups(pricingCountry);
+	const cartFees = getCartFees(pricingCountry);
 	const cartTotal = getCartTotal(pricingCountry);
 	const cartSavings = getCartSavings(pricingCountry);
 
@@ -395,6 +396,12 @@ export default function EnrollmentPage() {
 											<span>− {formatAmount(cartSavings)}</span>
 										</div>
 									)}
+									{cartFees.map(fee => (
+										<div key={fee.key} className="enrollment-page__summary-fee">
+											<span>{fee.title}</span>
+											<span>{formatAmount(fee.amount)}</span>
+										</div>
+									))}
 									<div className="enrollment-page__summary-total">
 										<span>Total</span>
 										<span>{formatAmount(cartTotal)}</span>

@@ -167,6 +167,15 @@
   padding-top: 0.5rem;
 }
 
+.enrollment-page__summary-fee {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  padding-top: 0.5rem;
+}
+
 .enrollment-page__summary-total {
   display: flex;
   justify-content: space-between;

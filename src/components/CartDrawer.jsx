@@ -5,9 +5,10 @@ import { getNextTierUpgrade, getPriceForCountry } from '../data/pricingData';
 import './CartDrawer.css';
 
 export default function CartDrawer({ isOpen, onClose }) {
-	const { cartItems, mergeAnimation, removeItem, getItemPrice, getCartGroups, getCartTotal, getCartSavings } = useCart();
+	const { cartItems, mergeAnimation, removeItem, getItemPrice, getCartGroups, getCartFees, getCartTotal, getCartSavings } = useCart();
 	const { selectedCountry, formatAmount } = usePricing();
 	const cartGroups = getCartGroups(selectedCountry);
+	const cartFees = getCartFees(selectedCountry);
 	const cartTotal = getCartTotal(selectedCountry);
 	const cartSavings = getCartSavings(selectedCountry);
 
@@ -127,6 +128,12 @@ export default function CartDrawer({ isOpen, onClose }) {
 								<span>− {formatAmount(cartSavings)}</span>
 							</div>
 						)}
+						{cartFees.map(fee => (
+							<div key={fee.key} className="cart-drawer__fee">
+								<span>{fee.title}</span>
+								<span>{formatAmount(fee.amount)}</span>
+							</div>
+						))}
 						<div className="cart-drawer__total">
 							<span>Estimated Total</span>
 							<span>{formatAmount(cartTotal)}</span>

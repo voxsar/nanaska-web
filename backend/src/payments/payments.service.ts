@@ -17,6 +17,16 @@ import { GoogleSheetsService } from '../admin/google-sheets.service';
 const EDGE_REGISTRATION_WEBHOOK_URL = 'https://automation.nanaska.com/webhook-test/registration';
 
 /**
+ * One-off registration fee added on top of course fees, keyed by course level.
+ * Charged once per order however many subjects of that level it holds, so a
+ * single certificate subject and the full certificate level both add one fee.
+ * Kept in step with LEVEL_REGISTRATION_FEE_MAP in the frontend's pricingData.js.
+ */
+const LEVEL_REGISTRATION_FEES: Record<string, { gbp: number; lkr: number }> = {
+	certificate: { gbp: 30, lkr: 5000 },
+};
+
+/**
  * PaymentsService
  *
  * Implements a PayHere-compatible IPG flow:
@@ -96,6 +106,23 @@ export class PaymentsService {
 		return newCombo;
 	}
 
+	/**
+	 * Registration fee owed by a cart spanning `levels`, in `currency`.
+	 * Levels are de-duplicated first, so the fee is charged once per level no
+	 * matter how many of its subjects are being bought. Levels absent from
+	 * LEVEL_REGISTRATION_FEES add nothing.
+	 */
+	private registrationFeeFor(levels: string[], currency: string): number {
+		const distinct = new Set(levels.filter(Boolean));
+		let fee = 0;
+		for (const level of distinct) {
+			const prices = LEVEL_REGISTRATION_FEES[level];
+			if (!prices) continue;
+			fee += currency === 'GBP' ? prices.gbp : prices.lkr;
+		}
+		return fee;
+	}
+
 	/** HMAC-SHA256 of envelopeJson signed with IPG_HMAC_SECRET (hex-encoded, as required by PayCorp). */
 	private sign(envelopeJson: string): string {
 		return crypto
@@ -141,6 +168,8 @@ export class PaymentsService {
 		let totalPriceLkr = 0;
 		let totalPriceGbp = 0;
 		const allCombinationIds: string[] = [];
+		// Course levels represented in this cart, used to apply registration fees.
+		const purchasedLevels: string[] = [];
 
 		// Add single combinationId if provided
 		if (dto.combinationId) {
@@ -161,6 +190,10 @@ export class PaymentsService {
 			if (!combo) throw new NotFoundException(`Combination ${comboId} not found`);
 			totalPriceLkr += combo.price;
 			totalPriceGbp += combo.priceGbp || 0;
+			// Read the level off the courses rather than the combination row —
+			// dynamically created combinations are labelled 'mixed'.
+			const comboLevels = combo.items.map((i) => i.course.level);
+			purchasedLevels.push(...(comboLevels.length ? comboLevels : [combo.level]));
 		}
 
 		// Add individual course prices
@@ -174,11 +207,14 @@ export class PaymentsService {
 			for (const course of courses) {
 				totalPriceLkr += course.price;
 				totalPriceGbp += course.priceGbp || 0;
+				purchasedLevels.push(course.level);
 			}
 		}
 
-		// Use currency-specific total
-		const amount = currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+		// Use currency-specific total, plus any one-off registration fee the levels
+		// in this cart carry (charged once per level — see LEVEL_REGISTRATION_FEES).
+		const registrationFee = this.registrationFeeFor(purchasedLevels, currency);
+		const amount = (currency === 'GBP' ? totalPriceGbp : totalPriceLkr) + registrationFee;
 
 		if (amount <= 0) {
 			throw new BadRequestException('Cart total must be greater than zero');
@@ -241,6 +277,8 @@ export class PaymentsService {
 		let totalPriceLkr = 0;
 		let totalPriceGbp = 0;
 		const allCombinationIds: string[] = [];
+		// Course levels represented in this cart, used to apply registration fees.
+		const purchasedLevels: string[] = [];
 
 		// Add single combinationId if provided
 		if (dto.combinationId) {
@@ -261,6 +299,10 @@ export class PaymentsService {
 			if (!combo) throw new NotFoundException(`Combination ${comboId} not found`);
 			totalPriceLkr += combo.price;
 			totalPriceGbp += combo.priceGbp || 0;
+			// Read the level off the courses rather than the combination row —
+			// dynamically created combinations are labelled 'mixed'.
+			const comboLevels = combo.items.map((i) => i.course.level);
+			purchasedLevels.push(...(comboLevels.length ? comboLevels : [combo.level]));
 		}
 
 		// Add individual course prices
@@ -274,15 +316,20 @@ export class PaymentsService {
 			for (const course of courses) {
 				totalPriceLkr += course.price;
 				totalPriceGbp += course.priceGbp || 0;
+				purchasedLevels.push(course.level);
 			}
 		}
 
 		// Use currency-specific total — Edge revision passes an explicit amount that
 		// matches the price shown on the Edge page (admin-editable via settings).
 		// Always prefer the explicit amount when provided to keep display and charge in sync.
+		// Course fees plus any one-off registration fee the levels in this cart
+		// carry (charged once per level — see LEVEL_REGISTRATION_FEES). Edge
+		// revisions keep their explicit amount and are never charged the fee.
+		const registrationFee = this.registrationFeeFor(purchasedLevels, currency);
 		const amount = (dto.isEdgeRevision && dto.amount && dto.amount > 0)
 			? dto.amount
-			: currency === 'GBP' ? totalPriceGbp : totalPriceLkr;
+			: (currency === 'GBP' ? totalPriceGbp : totalPriceLkr) + registrationFee;
 
 		if (amount <= 0) {
 			throw new BadRequestException('Cart total must be greater than zero');

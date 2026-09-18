@@ -5,6 +5,7 @@ import {
 	getPriceForCountry,
 	getTierPrices,
 	getCombinationIdForCourses,
+	getRegistrationFees,
 } from '../data/pricingData';
 
 const CartContext = createContext(null);
@@ -205,8 +206,33 @@ export function CartProvider({ children }) {
 		});
 	}
 
+	/**
+	 * One-off registration fees the cart owes, as [{ key, levelId, title, amount }].
+	 * Charged once per level regardless of how many of its subjects are in the
+	 * cart, so they are kept out of getCartGroups and added on top of the course
+	 * fees — they are not discountable and must not be read as a subject price.
+	 */
+	function getCartFees(country) {
+		const titleByLevel = new Map();
+		cartItems.forEach(item => {
+			if (item.levelId && !titleByLevel.has(item.levelId)) {
+				titleByLevel.set(item.levelId, item.levelTitle || '');
+			}
+		});
+
+		return getRegistrationFees([...titleByLevel.keys()]).map(fee => ({
+			key: `fee:${fee.levelId}`,
+			levelId: fee.levelId,
+			title: `Registration Fee${titleByLevel.get(fee.levelId) ? ` — ${titleByLevel.get(fee.levelId)}` : ''}`,
+			amount: getPriceForCountry(fee, country),
+		}));
+	}
+
+	/** Course fees plus any one-off registration fees. */
 	function getCartTotal(country) {
-		return getCartGroups(country).reduce((sum, g) => sum + g.amount, 0);
+		const courseTotal = getCartGroups(country).reduce((sum, g) => sum + g.amount, 0);
+		const feeTotal = getCartFees(country).reduce((sum, f) => sum + f.amount, 0);
+		return courseTotal + feeTotal;
 	}
 
 	/** Total knocked off the cart by bundle pricing, 0 when nothing is discounted. */
@@ -220,7 +246,7 @@ export function CartProvider({ children }) {
 		<CartContext.Provider value={{
 			cartItems, cartCount, mergeAnimation,
 			addCourse, addLevel, removeItem, clearCart, isInCart, isLevelInCart,
-			getItemPrice, getCartGroups, getCartTotal, getCartSavings,
+			getItemPrice, getCartGroups, getCartFees, getCartTotal, getCartSavings,
 		}}>
 			{children}
 		</CartContext.Provider>

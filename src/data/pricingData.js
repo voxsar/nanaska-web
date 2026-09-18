@@ -46,6 +46,13 @@ const LEVEL_TIER_PRICE_MAP = {
 	},
 };
 
+// One-off registration fee charged on top of course fees. Billed once per level
+// per order — a cart holding one certificate subject, three, or the full level
+// all pay this exactly once. Levels missing from this map charge no fee.
+const LEVEL_REGISTRATION_FEE_MAP = {
+	certificate: { gbp: 30, lkr: 5000 },
+};
+
 // Frontend level IDs -> backend combination ID prefixes
 const LEVEL_PREFIX_MAP = {
 	certificate: 'cert',
@@ -121,6 +128,28 @@ export function getCombinationIdForLevel(levelId) {
 
 export function getCombinationIdForCourse(courseCode) {
 	return COURSE_COMBINATION_ID_MAP[courseCode] || '';
+}
+
+/** Registration fee prices for a level, or null when the level charges none. */
+export function getRegistrationFeePrices(levelId) {
+	return LEVEL_REGISTRATION_FEE_MAP[levelId] || null;
+}
+
+/**
+ * The registration fees owed by a cart spanning `levelIds`, as
+ * [{ levelId, gbp, lkr }]. Duplicate level IDs collapse to one entry so the fee
+ * is charged once per level however many of its subjects are being bought.
+ */
+export function getRegistrationFees(levelIds) {
+	const seen = new Set();
+	const fees = [];
+	(levelIds || []).forEach(levelId => {
+		if (!levelId || seen.has(levelId)) return;
+		seen.add(levelId);
+		const prices = LEVEL_REGISTRATION_FEE_MAP[levelId];
+		if (prices) fees.push({ levelId, ...prices });
+	});
+	return fees;
 }
 
 /** True when this level prices multi-subject carts as a discounted bundle. */
