@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import './NanaskaAlumniPage.css';
 import { useApi } from '../hooks/useApi';
 import RecaptchaNotice from '../components/RecaptchaNotice';
-import { preloadRecaptcha, verifyRecaptcha } from '../lib/recaptcha';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
+
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
 
 const INITIAL = { name: '', email: '', phone: '', occupation: '', address: '' };
 
@@ -30,11 +32,28 @@ export default function NanaskaAlumniPage() {
     }
     setError('');
     setSubmitting(true);
-    const human = await verifyRecaptcha('alumni_register');
-    setSubmitting(false);
-    if (!human) {
-      setError('We could not verify that you are human. Please reload the page and try again.');
+    try {
+      const res = await fetch(`${API_URL}/alumni`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(await withRecaptcha('alumni_register', {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          occupation: form.occupation.trim(),
+          address: form.address.trim(),
+        })),
+      });
+      if (res.status === 403) {
+        setError('We could not verify that you are human. Please reload the page and try again.');
+        return;
+      }
+      if (!res.ok) throw new Error('Request failed');
+    } catch {
+      setError('Something went wrong. Please try again or contact us directly.');
       return;
+    } finally {
+      setSubmitting(false);
     }
     setSubmitted(true);
   };

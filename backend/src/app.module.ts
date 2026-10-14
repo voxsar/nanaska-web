@@ -16,6 +16,7 @@ import { BackupsModule } from './backups/backups.module';
 import { MediaModule } from './media/media.module';
 import { FlpLeadsModule } from './flp-leads/flp-leads.module';
 import { RecaptchaModule } from './recaptcha/recaptcha.module';
+import { FormLeadsModule } from './form-leads/form-leads.module';
 
 @Module({
 	imports: [
@@ -36,6 +37,7 @@ import { RecaptchaModule } from './recaptcha/recaptcha.module';
 		BackupsModule,
 		MediaModule,
 		FlpLeadsModule,
+		FormLeadsModule,
 	],
 })
 export class AppModule { }

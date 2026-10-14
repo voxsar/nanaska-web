@@ -2,7 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import './EnrollModal.css';
 import RecaptchaNotice from './RecaptchaNotice';
-import { preloadRecaptcha, verifyRecaptcha } from '../lib/recaptcha';
+import { preloadRecaptcha, withRecaptcha } from '../lib/recaptcha';
+
+const API_URL = (import.meta.env.VITE_API_URL || 'https://api.nanaska.com').trim().replace(/\/+$/, '');
 
 export default function EnrollModal() {
   const [open, setOpen] = useState(false);
@@ -57,11 +59,24 @@ export default function EnrollModal() {
     if (submitting || !name || !email) return;
     setError('');
     setSubmitting(true);
-    const human = await verifyRecaptcha('enroll_interest');
-    setSubmitting(false);
-    if (!human) {
-      setError('We could not verify that you are human. Please reload the page and try again.');
+    try {
+      const res = await fetch(`${API_URL}/enquiry-leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(await withRecaptcha('enroll_interest', {
+          name: name.trim(), email: email.trim(), phone: phone.trim(), level,
+        })),
+      });
+      if (res.status === 403) {
+        setError('We could not verify that you are human. Please reload the page and try again.');
+        return;
+      }
+      if (!res.ok) throw new Error('Request failed');
+    } catch {
+      setError('Something went wrong. Please try again or contact us directly.');
       return;
+    } finally {
+      setSubmitting(false);
     }
     setSubmitted(true);
   };

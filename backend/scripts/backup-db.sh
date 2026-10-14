@@ -48,6 +48,20 @@ echo "Host: $DB_HOST:$DB_PORT"
 echo "Backup file: $BACKUP_FILE"
 echo "=========================================="
 
+# Roll the PITR change log (see scripts/pitr-stream.sh): everything up to this
+# moment is stored beside this backup as nanaska_changes_<TIMESTAMP>.log
+PITR_DIR="$BACKUP_DIR/pitr"
+if [ -f "$PITR_DIR/current.log" ]; then
+    mv "$PITR_DIR/current.log" "$PITR_DIR/nanaska_changes_$TIMESTAMP.log"
+    PITR_PID=$(pgrep -f "pg_recvlogical.*-S nanaska_pitr" | head -1 || true)
+    if [ -n "$PITR_PID" ]; then
+        kill -HUP "$PITR_PID"
+        echo "PITR log rolled: $PITR_DIR/nanaska_changes_$TIMESTAMP.log"
+    else
+        echo "WARNING: PITR streamer not running; change log was not rolled over cleanly"
+    fi
+fi
+
 # Perform the backup using pg_dump
 export PGPASSWORD="$DB_PASS"
 pg_dump -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" \
@@ -75,6 +89,16 @@ else
     echo ""
     echo "✗ Backup failed!"
     exit 1
+fi
+
+# Copy backups and PITR logs to S3 (s3://$AWS_BUCKET/nanaska_web/), then keep
+# only the newest backup on this server. Files are deleted locally only after
+# the S3 copy is confirmed; a failure here never fails the backup itself.
+if [ -n "$AWS_BUCKET" ]; then
+    python3 -I "$(dirname "$0")/offsite-upload.py" --prune \
+        || echo "WARNING: off-site upload failed; local backups were kept"
+else
+    echo "WARNING: AWS_BUCKET not set; skipping off-site upload"
 fi
 
 # List recent backups

@@ -358,3 +358,31 @@ model SiteImage {
 
   @@map("site_images")
 }
+
+// ─── Enquiry Leads (home-page "Register My Interest" modal) ─────────────────────
+model EnquiryLead {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  level     String?                      // certificate | operational | management | strategic
+  source    String   @default("home-modal")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("enquiry_leads")
+}
+
+// ─── Alumni Registrations (/nanaska-alumni form) ────────────────────────────────
+model AlumniRegistration {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  phone      String
+  occupation String?
+  address    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("alumni_registrations")
+}
