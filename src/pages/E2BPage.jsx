@@ -94,13 +94,13 @@ const FACULTY = [
 		name: 'Channa Gunawardana',
 		role: 'Founder and Lead Lecturer, Nanaska',
 		credentials: 'FCMA, CGMA (UK), FCA (SL), MBA, BSc First Class',
-		image: '/images/2021-04-Channa.png',
+		image: '/images/e2b/channa-gunawardana.png',
 	},
 	{
 		name: 'Mahesh Amarasiri',
 		role: 'Group CFO and Board Director, ACL Cables PLC',
 		credentials: 'BSc Electrical Engineering, FCMA, CGMA, ACIM, CMA - Sri Lanka, MBA (PIM)',
-		initials: 'MA',
+		image: '/images/e2b/mahesh-amarasiri.png',
 	},
 	{
 		name: 'Ali Raheem',
@@ -112,13 +112,13 @@ const FACULTY = [
 		name: 'Lahiru Wijerathna',
 		role: 'Chief Executive Officer, Modern Pack Lanka (Pvt) Ltd',
 		credentials: 'BSc Engineering (Hons), CIMA Passed Finalist, MBS, MSc Project Management',
-		initials: 'LW',
+		image: '/images/e2b/lahiru-wijerathna.png',
 	},
 	{
 		name: 'Miyuru Dharmage',
 		role: 'Senior Manager - AI Innovations, Nanaska',
 		credentials: 'MSc Advanced Software Engineering, BSc Computer Science',
-		initials: 'MD',
+		image: '/images/e2b/miyuru-dharmage.png',
 	},
 ];
 
