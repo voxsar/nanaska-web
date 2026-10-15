@@ -77,6 +77,16 @@
 	text-wrap: balance;
 }
 
+.e2b-hero__subtitle {
+	max-width: 680px;
+	margin: 0.8rem 0 0;
+	color: var(--e2b-amber);
+	font-size: clamp(1.3rem, 2.8vw, 2.3rem);
+	font-weight: 800;
+	line-height: 1.18;
+	text-wrap: balance;
+}
+
 .e2b-hero__lead {
 	max-width: 680px;
 	margin: 1.5rem 0 0;
@@ -237,8 +247,15 @@
 }
 
 .e2b-section {
+	position: relative;
+	isolation: isolate;
 	padding: clamp(4rem, 8vw, 6.25rem) 0;
 	background: var(--e2b-bg);
+}
+
+.e2b-section > .e2b-container {
+	position: relative;
+	z-index: 1;
 }
 
 .e2b-section--white {
@@ -248,6 +265,44 @@
 .e2b-section--blue {
 	background: var(--e2b-navy);
 	color: #fff;
+}
+
+.e2b-section--image {
+	overflow: hidden;
+	background-position: center;
+	background-size: cover;
+}
+
+.e2b-section--image::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+}
+
+.e2b-section--image-desk {
+	background-image: url('/images/e2b/backgrounds/e2b-engineering-finance-desk.webp');
+}
+
+.e2b-section--image-desk::before {
+	background: linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.9) 48%, rgba(246, 251, 253, 0.72) 100%);
+}
+
+.e2b-section--image-blueprint {
+	background-image: url('/images/e2b/backgrounds/e2b-blueprint-boardroom.webp');
+}
+
+.e2b-section--image-blueprint::before {
+	background: linear-gradient(90deg, rgba(246, 251, 253, 0.97) 0%, rgba(246, 251, 253, 0.92) 50%, rgba(246, 251, 253, 0.76) 100%);
+}
+
+.e2b-section--image-workshop {
+	background-image: url('/images/e2b/backgrounds/e2b-leadership-workshop.webp');
+}
+
+.e2b-section--image-workshop::before {
+	background: linear-gradient(180deg, rgba(246, 251, 253, 0.92) 0%, rgba(246, 251, 253, 0.86) 46%, rgba(255, 255, 255, 0.94) 100%);
 }
 
 .e2b-split,
@@ -447,9 +502,54 @@
 	line-height: 1.5;
 }
 
-.e2b-session > strong {
+.e2b-session__lead {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.7rem;
+}
+
+.e2b-session__lead > strong {
 	color: var(--e2b-teal-dark);
 	line-height: 1.45;
+}
+
+.e2b-session__avatars {
+	display: flex;
+	align-items: center;
+	padding-left: 0.2rem;
+}
+
+.e2b-session__avatar {
+	display: block;
+	width: 3.15rem;
+	height: 3.15rem;
+	overflow: hidden;
+	border: 3px solid #fff;
+	border-radius: 50%;
+	background: linear-gradient(135deg, var(--e2b-navy), var(--e2b-teal-dark));
+	box-shadow: 0 10px 24px -16px rgba(20, 47, 82, 0.8);
+}
+
+.e2b-session__avatar + .e2b-session__avatar {
+	margin-left: -0.72rem;
+}
+
+.e2b-session__avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transform: scale(2.15);
+	transform-origin: center top;
+}
+
+.e2b-session__avatar--ali img {
+	transform: scale(1.34) translateY(4%);
+	transform-origin: center top;
+}
+
+.e2b-session__avatar--miyuru img {
+	transform: scale(1.9);
 }
 
 .e2b-faculty-grid {
@@ -561,7 +661,7 @@
 		grid-template-columns: 1fr;
 	}
 
-	.e2b-session > strong {
+	.e2b-session__lead {
 		padding-top: 0.8rem;
 		border-top: 1px solid var(--e2b-line);
 	}

@@ -44,6 +44,14 @@ const SNAPSHOT = [
 	{ label: 'Pathway', value: 'Move directly into the relevant Nanaska FLP intake' },
 ];
 
+const SESSION_LEADERS = {
+	channa: { name: 'Channa Gunawardana', image: '/images/e2b/channa-gunawardana.png' },
+	ali: { name: 'Ali Raheem', image: '/images/2024-06-Ali_Raheem-removebg-preview.png' },
+	mahesh: { name: 'Mahesh Amarasiri', image: '/images/e2b/mahesh-amarasiri.png' },
+	lahiru: { name: 'Lahiru Wijerathna', image: '/images/e2b/lahiru-wijerathna.png' },
+	miyuru: { name: 'Miyuru Dharmage', image: '/images/e2b/miyuru-dharmage.png' },
+};
+
 const SESSIONS = [
 	{
 		no: '01',
@@ -51,6 +59,7 @@ const SESSIONS = [
 		focus: 'How businesses create value; strategic choices and trade-offs; whether an idea is commercially and operationally workable.',
 		topics: 'Value creation, strategic options, suitability, feasibility, acceptability and strategy implementation.',
 		lead: 'Channa Gunawardana',
+		leaders: ['channa'],
 	},
 	{
 		no: '02',
@@ -58,6 +67,7 @@ const SESSIONS = [
 		focus: 'Relevant costs, contribution, bottlenecks, limiting factors, quality costs and environmental costs.',
 		topics: 'Relevant costing, opportunity cost, linear programming and operational decision-making.',
 		lead: 'Ali Raheem with Lahiru Wijerathna',
+		leaders: ['ali', 'lahiru'],
 	},
 	{
 		no: '03',
@@ -65,6 +75,7 @@ const SESSIONS = [
 		focus: 'Ratio interpretation, financial-reporting judgement, ESG and what a CFO expects in an engineering business case.',
 		topics: 'Profitability, liquidity, gearing, impairment, provisions, R&D expenditure, ESG and funding.',
 		lead: 'Ali Raheem with Mahesh Amarasiri',
+		leaders: ['ali', 'mahesh'],
 	},
 	{
 		no: '04',
@@ -72,6 +83,7 @@ const SESSIONS = [
 		focus: 'Payoff tables, expected value, risk attitudes, practical AI tasks, human review and governance.',
 		topics: 'Decision models, AI, data governance, internal controls, cyber and confidentiality risks.',
 		lead: 'Ali Raheem with Miyuru Dharmage',
+		leaders: ['ali', 'miyuru'],
 	},
 	{
 		no: '05',
@@ -79,6 +91,7 @@ const SESSIONS = [
 		focus: 'Board and management responsibilities, ethics, escalation, accountability and applied problem-solving.',
 		topics: 'Corporate governance, risk ownership, internal controls, ethics and professional scepticism.',
 		lead: 'Channa Gunawardana',
+		leaders: ['channa'],
 	},
 	{
 		no: '06',
@@ -86,6 +99,7 @@ const SESSIONS = [
 		focus: 'Short pre-seen, focused update, group discussion, verbal pitch and supportive panel feedback.',
 		topics: 'CIMA case study framework and boardroom-style recommendation practice.',
 		lead: 'Channa Gunawardana, Lahiru Wijerathna and Mahesh Amarasiri',
+		leaders: ['channa', 'lahiru', 'mahesh'],
 	},
 ];
 
@@ -155,7 +169,8 @@ export default function E2BPage() {
 				<div className="e2b-container e2b-hero__grid">
 					<div className="e2b-hero__content">
 						<p className="e2b-eyebrow">Engineer-to-Business Leadership</p>
-						<h1>E2B for Engineers Ready to Lead Beyond Technical Expertise</h1>
+						<h1>E2B for Engineers</h1>
+						<p className="e2b-hero__subtitle">Ready to Lead Beyond Technical Expertise</p>
 						<p className="e2b-hero__lead">
 							A focused six-week online bridging programme that helps engineering professionals build the
 							business perspective, commercial confidence and leadership language needed before entering CIMA
@@ -192,7 +207,7 @@ export default function E2BPage() {
 				</div>
 			</section>
 
-			<section className="e2b-section e2b-section--white">
+			<section className="e2b-section e2b-section--white e2b-section--image e2b-section--image-desk">
 				<div className="e2b-container e2b-split">
 					<div>
 						<p className="e2b-eyebrow">Why CIMA for engineers?</p>
@@ -251,7 +266,7 @@ export default function E2BPage() {
 				</div>
 			</section>
 
-			<section className="e2b-section" id="programme">
+			<section className="e2b-section e2b-section--image e2b-section--image-blueprint" id="programme">
 				<div className="e2b-container e2b-programme-grid">
 					<div>
 						<p className="e2b-eyebrow">Programme at a glance</p>
@@ -287,14 +302,26 @@ export default function E2BPage() {
 									<p>{session.focus}</p>
 									<small>{session.topics}</small>
 								</div>
-								<strong>{session.lead}</strong>
+								<div className="e2b-session__lead">
+									<strong>{session.lead}</strong>
+									<div className="e2b-session__avatars" aria-label={`${session.lead} lecturer photos`}>
+										{session.leaders.map((leaderKey) => {
+											const leader = SESSION_LEADERS[leaderKey];
+											return (
+												<span key={leaderKey} className={`e2b-session__avatar e2b-session__avatar--${leaderKey}`}>
+													<img src={leader.image} alt={leader.name} loading="lazy" />
+												</span>
+											);
+										})}
+									</div>
+								</div>
 							</article>
 						))}
 					</div>
 				</div>
 			</section>
 
-			<section className="e2b-section">
+			<section className="e2b-section e2b-section--image e2b-section--image-workshop">
 				<div className="e2b-container">
 					<div className="e2b-section-head">
 						<p className="e2b-eyebrow">Faculty</p>
