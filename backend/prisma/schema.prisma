@@ -359,6 +359,51 @@ model SiteImage {
   @@map("site_images")
 }
 
+// ─── Nanaska Edge instances (registration webhook targets) ──────────────────────
+// One row per running edge. A paid order is posted to every enabled edge whose
+// courseCodes match it (empty courseCodes = every course), signed with that
+// edge's own secret so each edge verifies deliveries independently.
+model EdgeWebhook {
+  id          String   @id @default(uuid())
+  name        String                                   // admin-facing, e.g. "Lambda (tau)"
+  url         String   @db.Text                        // full endpoint, e.g. https://edge.api.lambda.nanaska.com/api/provision/students/website-registration
+  secret      String   @db.Text                        // shared HMAC-SHA256 secret (the edge's PROVISION_HMAC_SECRET)
+  courseCodes String[] @map("course_codes")            // OCS | MCS | SCS | course ids; empty = all
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  deliveries EdgeWebhookDelivery[]
+
+  @@map("edge_webhooks")
+}
+
+// Delivery attempts, so a failed hand-off to one edge is visible in admin and
+// can be retried without replaying the payment.
+model EdgeWebhookDelivery {
+  id            String    @id @default(uuid())
+  webhookId     String    @map("webhook_id")
+  orderId       String?   @map("order_id")
+  event         String    @default("registration.paid")
+  payloadJson   Json?     @map("payload_json")
+  status        String                                  // pending | success | failed
+  statusCode    Int?      @map("status_code")
+  responseBody  String?   @db.Text @map("response_body")
+  error         String?   @db.Text
+  attempts      Int       @default(0)
+  deliveredAt   DateTime? @map("delivered_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  webhook EdgeWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId, createdAt])
+  @@index([orderId])
+  @@map("edge_webhook_deliveries")
+}
+
 // ─── Enquiry Leads (home-page "Register My Interest" modal) ─────────────────────
 model EnquiryLead {
   id        String   @id @default(uuid())

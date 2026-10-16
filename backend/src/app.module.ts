@@ -17,6 +17,7 @@ import { MediaModule } from './media/media.module';
 import { FlpLeadsModule } from './flp-leads/flp-leads.module';
 import { RecaptchaModule } from './recaptcha/recaptcha.module';
 import { FormLeadsModule } from './form-leads/form-leads.module';
+import { EdgeWebhooksModule } from './edge-webhooks/edge-webhooks.module';
 
 @Module({
 	imports: [
@@ -38,6 +39,7 @@ import { FormLeadsModule } from './form-leads/form-leads.module';
 		MediaModule,
 		FlpLeadsModule,
 		FormLeadsModule,
+		EdgeWebhooksModule,
 	],
 })
 export class AppModule { }

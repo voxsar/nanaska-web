@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import EdgeWebhooksManager from '../components/EdgeWebhooksManager';
 
 const CASE_STUDIES = [
 	{ code: 'ocs', label: 'OCS', name: 'Operational Case Study' },
@@ -295,6 +296,9 @@ export default function NanaskaEdgeSettingsPage() {
 					{saving ? 'Saving...' : 'Save Edge Settings'}
 				</button>
 			</form>
+
+			{/* Outside the settings form on purpose: this section has its own forms. */}
+			<EdgeWebhooksManager />
 		</div>
 	);
 }

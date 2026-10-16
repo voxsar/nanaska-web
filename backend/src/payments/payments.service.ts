@@ -13,6 +13,7 @@ import { EnrollmentSubmitDto } from './dto/enrollment-submit.dto';
 import { RevisionUpgradeDto } from './dto/revision-upgrade.dto';
 import { EmailService } from '../email/email.service';
 import { GoogleSheetsService } from '../admin/google-sheets.service';
+import { EdgeWebhooksService } from '../edge-webhooks/edge-webhooks.service';
 
 const EDGE_REGISTRATION_WEBHOOK_URL = 'https://automation.nanaska.com/webhook-test/registration';
 
@@ -43,6 +44,7 @@ export class PaymentsService {
 		private readonly prisma: PrismaService,
 		private readonly email: EmailService,
 		private readonly googleSheets: GoogleSheetsService,
+		private readonly edgeWebhooks: EdgeWebhooksService,
 	) { }
 
 	/**
@@ -681,6 +683,11 @@ export class PaymentsService {
 			}
 		}
 
+		// Hand the paid registration to every configured Nanaska Edge. Done
+		// before the enrollment check below because a plain course purchase has
+		// no enrollment record but still registers a student on the edges.
+		await this.dispatchPaidRegistrationToEdges(order, enrollment);
+
 		if (!enrollment) return;
 
 		// Fire upgrade webhook for revision upgrades that originated from an external system (externalId present)
@@ -721,6 +728,109 @@ export class PaymentsService {
 			await this.sendEdgeRegistrationToN8n(enrollment, 'paid', order);
 		} catch (error) {
 			this.logger.error(`Failed to send paid Nanaska Edge registration for order ${order.id}`, error.message);
+		}
+	}
+
+	/**
+	 * Post a paid registration to every Nanaska Edge whose webhook matches it.
+	 *
+	 * Each edge creates the student pending approval, emails them an email
+	 * verification link and emails an admin an approval request with the
+	 * receipt. Never throws: the payment has already gone through, so a
+	 * webhook problem is logged and recorded, not raised at the caller.
+	 */
+	private async dispatchPaidRegistrationToEdges(order: any, enrollment: any | null): Promise<void> {
+		try {
+			const student = await this.getReceiptStudentDetails(order);
+
+			if (!student.email) {
+				this.logger.warn(`Order ${order.id}: no student email, nothing sent to the edges`);
+				return;
+			}
+
+			const edgeItem = enrollment ? this.getEdgeCartItem(enrollment) : null;
+			const meta = (order.metaJson as Record<string, any>) || {};
+			const metaCartItems: any[] = Array.isArray(meta.cartItems) ? meta.cartItems : [];
+			const cartItems = enrollment ? this.getCartItems(enrollment) : metaCartItems;
+			const comboItems: any[] = order.combination?.items ?? [];
+
+			const courseCode = edgeItem?.courseCode
+				|| metaCartItems.find((item) => item?.courseCode)?.courseCode
+				|| student.cimaStage
+				|| null;
+			const levels = [...new Set(comboItems.map((item) => item.course?.level).filter(Boolean))];
+			const nameParts = (student.name || '').trim().split(/\s+/);
+
+			// Every code the order touches, so an edge that serves only some
+			// courses can be filtered on any of them.
+			const matchCodes = [...new Set([
+				courseCode,
+				edgeItem?.combinationId,
+				order.combinationId,
+				...levels,
+				...comboItems.map((item) => item.courseId ?? item.course?.id),
+				...cartItems.map((item) => item?.courseCode),
+				...cartItems.map((item) => item?.combinationId),
+			].filter(Boolean).map((code: string) => String(code)))];
+
+			const lineItems = comboItems.length
+				? comboItems.map((item) => ({
+					description: item.course?.name || item.courseId,
+					amount: order.currency === 'GBP' ? (item.course?.priceGbp ?? null) : (item.course?.price ?? null),
+				}))
+				: cartItems
+					.map((item) => ({
+						description: item?.title || item?.name || item?.courseCode || item?.combinationId,
+						amount: item?.amount ?? item?.price ?? null,
+					}))
+					.filter((line) => Boolean(line.description));
+
+			await this.edgeWebhooks.dispatchPaidRegistration({
+				orderId: order.id,
+				enrollmentId: enrollment?.id ?? null,
+				paymentRef: order.ipgRef ?? null,
+				paidAt: new Date(),
+				amount: order.amount,
+				currency: order.currency,
+				student: {
+					name: student.name,
+					firstName: enrollment?.firstName || meta.firstName || nameParts[0] || null,
+					lastName: enrollment?.lastName || meta.lastName || nameParts.slice(1).join(' ') || null,
+					email: student.email,
+					phone: student.phone ?? null,
+					whatsapp: student.whatsapp ?? null,
+					cimaId: student.cimaId ?? null,
+					studentId: meta.studentId ?? null,
+					dateOfBirth: student.dob ?? null,
+					gender: student.gender ?? null,
+					country: student.country ?? null,
+					street: student.street ?? null,
+					city: student.city ?? null,
+					postcode: student.postcode ?? null,
+					timezone: meta.timezone ?? null,
+				},
+				course: {
+					code: courseCode,
+					name: this.getReceiptCourseName(order),
+					qualificationStage: levels.length === 1 ? levels[0] : null,
+					combinationId: edgeItem?.combinationId || order.combinationId || meta.combinationId || null,
+					cohortId: meta.cohortId ?? null,
+					packageSlug: meta.package ?? null,
+					items: cartItems,
+				},
+				receipt: {
+					receiptNo: order.ipgRef || String(order.id).slice(-8).toUpperCase(),
+					method: 'Card',
+					total: order.amount,
+					lineItems: lineItems.length ? lineItems : [{
+						description: this.getReceiptCourseName(order),
+						amount: order.amount,
+					}],
+				},
+				matchCodes,
+			});
+		} catch (err: any) {
+			this.logger.error(`Failed to dispatch order ${order.id} to the edges: ${err.message}`);
 		}
 	}
 
